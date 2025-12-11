@@ -54,5 +54,15 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["@shopify/app-bridge-react"],
+    // Manejar rutas con espacios correctamente
+    force: false,
+    // Excluir dependencias problemáticas si es necesario
+    exclude: [],
   },
+  // Configuración adicional para manejar rutas con espacios
+  resolve: {
+    preserveSymlinks: false,
+  },
+  // Limpiar caché si hay problemas con rutas con espacios
+  cacheDir: "node_modules/.vite",
 });

@@ -1,0 +1,322 @@
+.custom-invoice-block {
+  margin: 1.5rem 0;
+}
+
+.custom-invoice-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.custom-invoice-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.custom-invoice-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0 0 1rem 0;
+}
+
+.custom-invoice-toggle-wrapper {
+  margin-top: 1rem;
+}
+
+.custom-invoice-toggle-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 0.75rem;
+}
+
+.custom-invoice-toggle {
+  width: 48px;
+  height: 28px;
+  appearance: none;
+  background: #ccc;
+  border-radius: 14px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.custom-invoice-toggle::before {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.3s;
+}
+
+.custom-invoice-toggle:checked {
+  background: #4CAF50;
+}
+
+.custom-invoice-toggle:checked::before {
+  transform: translateX(20px);
+}
+
+.custom-invoice-toggle-text {
+  font-size: 0.95rem;
+  color: #333;
+  user-select: none;
+}
+
+.custom-invoice-modal {
+  border: none;
+  border-radius: 8px;
+  padding: 0;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.custom-invoice-modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.custom-invoice-modal-content {
+  position: relative;
+  padding: 2rem;
+}
+
+.custom-invoice-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-invoice-modal-close:hover {
+  color: #333;
+}
+
+.custom-invoice-modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  color: #333;
+}
+
+.custom-invoice-login-prompt {
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+.custom-invoice-login-prompt a {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.custom-invoice-btn {
+  background: #0066cc;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.custom-invoice-btn:hover {
+  background: #0052a3;
+}
+
+.custom-invoice-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.customer-data-summary {
+  padding: 1rem 0;
+}
+
+.customer-data-summary h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.customer-data-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.customer-data-item:last-child {
+  border-bottom: none;
+}
+
+.customer-data-item strong {
+  display: inline-block;
+  min-width: 120px;
+  color: #666;
+}
+
+.custom-invoice-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.custom-invoice-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.custom-invoice-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.custom-invoice-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.required {
+  color: #d32f2f;
+}
+
+.custom-invoice-input {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.custom-invoice-input:focus {
+  outline: none;
+  border-color: #0066cc;
+}
+
+.custom-invoice-input:invalid {
+  border-color: #d32f2f;
+}
+
+.custom-invoice-input[readonly] {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.custom-invoice-error {
+  color: #d32f2f;
+  font-size: 0.85rem;
+  display: none;
+}
+
+.custom-invoice-error.show {
+  display: block;
+}
+
+.cedula-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cedula-input {
+  flex: 1;
+}
+
+.cedula-separator {
+  font-weight: 600;
+  color: #666;
+}
+
+.phone-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.phone-code {
+  width: 150px;
+  flex-shrink: 0;
+}
+
+.phone-number {
+  flex: 1;
+}
+
+.custom-invoice-form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.custom-invoice-btn-secondary {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.custom-invoice-btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+.custom-invoice-message {
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+.custom-invoice-message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.custom-invoice-message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+@media (max-width: 768px) {
+  .custom-invoice-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .cedula-input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cedula-separator {
+    display: none;
+  }
+
+  .phone-input-group {
+    flex-direction: column;
+  }
+
+  .phone-code {
+    width: 100%;
+  }
+}
+

@@ -1,0 +1,10 @@
+name = "cart-form"
+
+uid = "464e4b1a-9e12-8c7b-9ee7-b3adcd4fe557100f9843"
+
+type = "theme"
+
+[build]
+command = ""
+watch = []
+

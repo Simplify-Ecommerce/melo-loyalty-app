@@ -1,0 +1,456 @@
+{% doc %}
+  App block para factura personalizada en el carrito.
+  Incluye toggle switch y modal para registro/actualización de datos del cliente.
+{% enddoc %}
+
+<div class="custom-invoice-block" {{ block.shopify_attributes }}>
+  <div class="custom-invoice-card">
+    <h3 class="custom-invoice-title">{{ block.settings.title }}</h3>
+    <p class="custom-invoice-subtitle">{{ block.settings.subtitle }}</p>
+
+    <div class="custom-invoice-toggle-wrapper">
+      <label class="custom-invoice-toggle-label">
+        <input
+          type="checkbox"
+          id="custom-invoice-toggle"
+          class="custom-invoice-toggle"
+          aria-label="Factura personalizada"
+        >
+        <span class="custom-invoice-toggle-text" id="toggle-text"> No, no quiero una factura personalizada </span>
+      </label>
+    </div>
+  </div>
+
+  <dialog id="custom-invoice-modal" class="custom-invoice-modal" aria-labelledby="modal-title">
+    <div class="custom-invoice-modal-content">
+      <button class="custom-invoice-modal-close" id="modal-close" aria-label="Cerrar modal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <h2 id="modal-title" class="custom-invoice-modal-title">Factura Personalizada</h2>
+
+      <div id="modal-content">
+        {% if customer %}
+          <div id="logged-in-content">
+            <div id="customer-data-display" style="display: none;">
+              <div class="customer-data-summary">
+                <h3>Sus datos están completos</h3>
+                <div id="customer-data-details"></div>
+                <button type="button" id="update-data-btn" class="custom-invoice-btn custom-invoice-btn-secondary">
+                  Actualizar datos
+                </button>
+              </div>
+            </div>
+            <div id="customer-form-container" style="display: none;">
+              {% render 'custom-invoice-form', is_update: true, customer: customer %}
+            </div>
+            <div id="loading-indicator" style="display: none;">
+              <p>Cargando datos...</p>
+            </div>
+          </div>
+        {% else %}
+          <div id="not-logged-in-content">
+            <p class="custom-invoice-login-prompt">
+              ¿Tienes cuenta?
+              <a href="{{ routes.account_login_url }}?checkout_url={{ routes.cart_url | url_encode }}" id="login-link"
+                >Inicia sesión aquí</a
+              >
+            </p>
+            <div id="register-form-container">
+              {% render 'custom-invoice-form', is_update: false %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </dialog>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  
+  const toggle = document.getElementById('custom-invoice-toggle');
+  const toggleText = document.getElementById('toggle-text');
+  const modal = document.getElementById('custom-invoice-modal');
+  const modalClose = document.getElementById('modal-close');
+  const STORAGE_KEY = 'customInvoicePreference';
+  const API_BASE = '/apps/custom-invoice/customers';
+  const CART_URL = '{{ routes.cart_url }}';
+  const LOGIN_URL = '{{ routes.account_login_url }}';
+  {% if customer %}
+  const CUSTOMER_ID = '{{ customer.id }}';
+  const IS_LOGGED_IN = true;
+  {% else %}
+  const IS_LOGGED_IN = false;
+  {% endif %}
+
+  function init() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const d = JSON.parse(saved);
+      if (d.wantsInvoice) {
+        toggle.checked = true;
+        updateToggleText();
+      }
+    }
+    
+    toggle.addEventListener('change', handleToggleChange);
+    if (modalClose) {
+      modalClose.addEventListener('click', closeModal);
+    }
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+    }
+    
+    interceptCheckoutSubmit();
+    checkCheckoutButton();
+    window.addEventListener('storage', handleStorageChange);
+  }
+
+  function handleToggleChange() {
+    updateToggleText();
+    const wantsInvoice = toggle.checked;
+    savePreference({ wantsInvoice });
+    
+    if (wantsInvoice) {
+      openModal();
+      checkCustomerDataCompleteness();
+    } else {
+      closeModal();
+      enableCheckout();
+    }
+    
+    checkCheckoutButton();
+  }
+
+  function updateToggleText() {
+    toggleText.textContent = toggle.checked 
+      ? 'Sí, quiero una factura personalizada' 
+      : 'No, no quiero una factura personalizada';
+  }
+
+  function openModal() {
+    if (modal) {
+      modal.showModal();
+      loadCustomerData();
+    }
+  }
+
+  function closeModal() {
+    if (modal) {
+      modal.close();
+    }
+  }
+
+  function savePreference(d) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+  }
+
+  function getPreference() {
+    const s = localStorage.getItem(STORAGE_KEY);
+    return s ? JSON.parse(s) : { wantsInvoice: false };
+  }
+
+  function checkCustomerDataCompleteness() {
+    if (IS_LOGGED_IN) {
+      fetch(`${API_BASE}/get?customer_id=${CUSTOMER_ID}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.customer && d.customer.isDataComplete) {
+            enableCheckout();
+          } else {
+            disableCheckout();
+          }
+        })
+        .catch(e => {
+          console.error('Error:', e);
+          disableCheckout();
+        });
+    } else {
+      disableCheckout();
+    }
+  }
+
+  function interceptCheckoutSubmit() {
+    const cf = document.querySelector('form[action*="checkout"], form[action*="/checkout"]');
+    if (!cf) {
+      setTimeout(interceptCheckoutSubmit, 500);
+      return;
+    }
+    
+    cf.addEventListener('submit', function(e) {
+      const p = getPreference();
+      if (p.wantsInvoice) {
+        if (IS_LOGGED_IN) {
+          fetch(`${API_BASE}/get?customer_id=${CUSTOMER_ID}`)
+            .then(r => r.json())
+            .then(d => {
+              if (!d.customer || !d.customer.isDataComplete) {
+                e.preventDefault();
+                e.stopPropagation();
+                openModal();
+                alert('Complete sus datos o desactive el toggle.');
+              }
+            })
+            .catch(err => {
+              console.error('Error:', err);
+              e.preventDefault();
+              e.stopPropagation();
+              openModal();
+              alert('Error. Complete sus datos o desactive el toggle.');
+            });
+        } else {
+          e.preventDefault();
+          e.stopPropagation();
+          openModal();
+          alert('Complete sus datos o desactive el toggle.');
+        }
+      }
+    });
+  }
+
+  function checkCheckoutButton() {
+    const cf = document.querySelector('form[action*="checkout"], form[action*="/checkout"]');
+    if (!cf) {
+      setTimeout(checkCheckoutButton, 500);
+      return;
+    }
+    
+    const cb = cf.querySelector('button[type="submit"], input[type="submit"], button[name="add"], a[href*="checkout"]');
+    if (!cb) {
+      setTimeout(checkCheckoutButton, 500);
+      return;
+    }
+    
+    const p = getPreference();
+    if (p.wantsInvoice) {
+      checkCustomerDataCompleteness();
+    } else {
+      enableCheckout();
+    }
+  }
+
+  function disableCheckout() {
+    const cf = document.querySelector('form[action*="checkout"], form[action*="/checkout"]');
+    if (!cf) return;
+    
+    const cb = cf.querySelector('button[type="submit"], input[type="submit"], button[name="add"], a[href*="checkout"]');
+    if (cb) {
+      cb.disabled = true;
+      cb.style.opacity = '0.6';
+      cb.style.cursor = 'not-allowed';
+      if (cb.tagName === 'A') {
+        cb.style.pointerEvents = 'none';
+      }
+    }
+  }
+
+  function enableCheckout() {
+    const cf = document.querySelector('form[action*="checkout"], form[action*="/checkout"]');
+    if (!cf) return;
+    
+    const cb = cf.querySelector('button[type="submit"], input[type="submit"], button[name="add"], a[href*="checkout"]');
+    if (cb) {
+      cb.disabled = false;
+      cb.style.opacity = '1';
+      cb.style.cursor = 'pointer';
+      if (cb.tagName === 'A') {
+        cb.style.pointerEvents = 'auto';
+      }
+    }
+  }
+
+  function loadCustomerData() {
+    if (IS_LOGGED_IN) {
+      const li = document.getElementById('loading-indicator');
+      const dd = document.getElementById('customer-data-display');
+      const fd = document.getElementById('customer-form-container');
+      
+      if (li) li.style.display = 'block';
+      if (dd) dd.style.display = 'none';
+      if (fd) fd.style.display = 'none';
+      
+      fetch(`${API_BASE}/get?customer_id=${CUSTOMER_ID}`)
+        .then(r => r.json())
+        .then(d => {
+          if (li) li.style.display = 'none';
+          if (d.customer && d.customer.isDataComplete) {
+            showCustomerData(d.customer);
+          } else {
+            showUpdateForm(d.customer);
+          }
+        })
+        .catch(e => {
+          console.error('Error:', e);
+          if (li) li.style.display = 'none';
+          showUpdateForm();
+        });
+    }
+  }
+
+  function showCustomerData(c) {
+    const dd = document.getElementById('customer-data-display');
+    const fd = document.getElementById('customer-form-container');
+    const dt = document.getElementById('customer-data-details');
+    const ub = document.getElementById('update-data-btn');
+    
+    if (dd) dd.style.display = 'block';
+    if (fd) fd.style.display = 'none';
+    
+    if (dt && c) {
+      const mf = c.metafields || {};
+      dt.innerHTML = `
+        <div class="customer-data-item">
+          <strong>Nombre:</strong> ${c.firstName || ''} ${c.lastName || ''}
+        </div>
+        <div class="customer-data-item">
+          <strong>Email:</strong> ${c.email || ''}
+        </div>
+        <div class="customer-data-item">
+          <strong>Documento:</strong> ${mf.document_type || ''} - ${mf.document_number || ''}
+        </div>
+        <div class="customer-data-item">
+          <strong>Teléfono:</strong> ${mf.phone_country_code || ''} ${mf.phone || ''}
+        </div>
+      `;
+    }
+    
+    if (ub) {
+      ub.addEventListener('click', () => {
+        showUpdateForm(c);
+      });
+    }
+  }
+
+  function showUpdateForm(c) {
+    const dd = document.getElementById('customer-data-display');
+    const fd = document.getElementById('customer-form-container');
+    if (dd) dd.style.display = 'none';
+    if (fd) fd.style.display = 'block';
+    
+    if (c && c.metafields) {
+      populateForm(c);
+    }
+  }
+  
+  function populateForm(c) {
+    const mf = c.metafields || {};
+    const f = document.getElementById('custom-invoice-form');
+    if (!f) return;
+    
+    if (mf.document_type) {
+      const dt = document.getElementById('document_type');
+      if (dt) {
+        dt.value = mf.document_type;
+        handleDocumentTypeChange();
+      }
+    }
+    
+    if (mf.document_number && mf.document_type === 'cedula') {
+      const parts = mf.document_number.split('-');
+      if (parts.length === 3) {
+        const p = document.getElementById('cedula_province');
+        const b = document.getElementById('cedula_book');
+        const t = document.getElementById('cedula_tome');
+        if (p) p.value = parts[0];
+        if (b) b.value = parts[1];
+        if (t) t.value = parts[2];
+      }
+    } else if (mf.document_number) {
+      const dn = document.getElementById('document_number');
+      if (dn) dn.value = mf.document_number;
+    }
+    
+    const fields = {
+      first_name: mf.first_name,
+      last_name: mf.last_name,
+      email: c.email,
+      birth_date: mf.birth_date,
+      gender: mf.gender,
+      phone: mf.phone,
+      phone_country_code: mf.phone_country_code,
+      province: mf.province,
+      district: mf.district,
+      corregimiento: mf.corregimiento
+    };
+    
+    Object.keys(fields).forEach(k => {
+      const field = document.getElementById(k);
+      if (field && fields[k]) {
+        field.value = fields[k];
+      }
+    });
+  }
+  
+  function handleDocumentTypeChange() {
+    const dt = document.getElementById('document_type')?.value;
+    const cf = document.getElementById('cedula_fields');
+    const dn = document.getElementById('document_number');
+    
+    if (dt === 'cedula') {
+      if (cf) cf.style.display = 'block';
+      if (dn) dn.style.display = 'none';
+    } else {
+      if (cf) cf.style.display = 'none';
+      if (dn) dn.style.display = 'block';
+    }
+  }
+
+  function handleStorageChange(e) {
+    if (e.key === STORAGE_KEY) {
+      const p = getPreference();
+      toggle.checked = p.wantsInvoice;
+      updateToggleText();
+      checkCheckoutButton();
+    }
+  }
+
+  window.enableCheckoutAfterUpdate = function() {
+    enableCheckout();
+    savePreference({ wantsInvoice: true, dataComplete: true });
+  };
+
+  window.getLoginUrl = function() {
+    const cartUrl = CART_URL || window.location.href;
+    return `${LOGIN_URL}?checkout_url=${encodeURIComponent(cartUrl)}`;
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Factura Personalizada",
+  "target": "section",
+  "enabled_on": {
+    "templates": ["cart"]
+  },
+  "stylesheet": "cart-form.css",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "¿Necesitas factura personalizada?"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "default": "Completa tus datos para generar una factura personalizada"
+    }
+  ]
+}
+{% endschema %}

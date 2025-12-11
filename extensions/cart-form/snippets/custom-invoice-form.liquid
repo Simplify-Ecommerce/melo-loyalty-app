@@ -1,0 +1,220 @@
+{% doc %}
+  Formulario para registro/actualización de datos del cliente para factura personalizada.
+  
+  @param {boolean} is_update - Si es true, es un formulario de actualización (oculta email y cédula)
+  @param {object} customer - Objeto del cliente (solo para actualización)
+{% enddoc %}
+
+<form id="custom-invoice-form" class="custom-invoice-form">
+  {% if is_update and customer %}
+    <input type="hidden" id="customer_id" name="customer_id" value="{{ customer.id }}" />
+  {% endif %}
+  <div class="custom-invoice-form-group">
+    <label for="document_type" class="custom-invoice-label">
+      Tipo de Documento <span class="required">*</span>
+    </label>
+    <select id="document_type" name="document_type" class="custom-invoice-input" required>
+      <option value="">Seleccione un tipo</option>
+      <option value="cedula">Cédula</option>
+      <option value="ruc">RUC</option>
+      <option value="pasaporte">Pasaporte</option>
+    </select>
+    <span class="custom-invoice-error" id="document_type_error"></span>
+  </div>
+
+  <div class="custom-invoice-form-group" id="document_number_group">
+    <label for="document_number" class="custom-invoice-label">
+      Número de Documento <span class="required">*</span>
+    </label>
+    <div id="cedula_fields" style="display: none;">
+      <div class="cedula-input-group">
+        <input 
+          type="text" 
+          id="cedula_province" 
+          name="cedula_province" 
+          class="custom-invoice-input cedula-input" 
+          placeholder="Provincia"
+          maxlength="4"
+        />
+        <span class="cedula-separator">-</span>
+        <input 
+          type="text" 
+          id="cedula_book" 
+          name="cedula_book" 
+          class="custom-invoice-input cedula-input" 
+          placeholder="Libro"
+          maxlength="10"
+        />
+        <span class="cedula-separator">-</span>
+        <input 
+          type="text" 
+          id="cedula_tome" 
+          name="cedula_tome" 
+          class="custom-invoice-input cedula-input" 
+          placeholder="Tomo"
+          maxlength="10"
+        />
+      </div>
+    </div>
+    <input 
+      type="text" 
+      id="document_number" 
+      name="document_number" 
+      class="custom-invoice-input" 
+      placeholder="Número de documento"
+    />
+    <span class="custom-invoice-error" id="document_number_error"></span>
+  </div>
+
+  <div class="custom-invoice-form-row">
+    <div class="custom-invoice-form-group">
+      <label for="first_name" class="custom-invoice-label">
+        Nombre <span class="required">*</span>
+      </label>
+      <input 
+        type="text" 
+        id="first_name" 
+        name="first_name" 
+        class="custom-invoice-input" 
+        required
+        pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+        minlength="1"
+      />
+      <span class="custom-invoice-error" id="first_name_error"></span>
+    </div>
+
+    <div class="custom-invoice-form-group">
+      <label for="last_name" class="custom-invoice-label">
+        Apellido <span class="required">*</span>
+      </label>
+      <input 
+        type="text" 
+        id="last_name" 
+        name="last_name" 
+        class="custom-invoice-input" 
+        required
+        pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+        minlength="1"
+      />
+      <span class="custom-invoice-error" id="last_name_error"></span>
+    </div>
+  </div>
+
+  <div class="custom-invoice-form-group">
+    <label for="email" class="custom-invoice-label">
+      Email <span class="required">*</span>
+    </label>
+    <input 
+      type="email" 
+      id="email" 
+      name="email" 
+      class="custom-invoice-input" 
+      required
+      {% if is_update and customer %}readonly value="{{ customer.email }}"{% endif %}
+    />
+    <span class="custom-invoice-error" id="email_error"></span>
+  </div>
+
+  <div class="custom-invoice-form-row">
+    <div class="custom-invoice-form-group">
+      <label for="birth_date" class="custom-invoice-label">
+        Fecha de Nacimiento <span class="required">*</span>
+      </label>
+      <input 
+        type="date" 
+        id="birth_date" 
+        name="birth_date" 
+        class="custom-invoice-input" 
+        required
+        max="{{ 'now' | date: '%Y-%m-%d' }}"
+      />
+      <span class="custom-invoice-error" id="birth_date_error"></span>
+    </div>
+
+    <div class="custom-invoice-form-group">
+      <label for="gender" class="custom-invoice-label">
+        Género <span class="required">*</span>
+      </label>
+      <select id="gender" name="gender" class="custom-invoice-input" required>
+        <option value="">Seleccione</option>
+        <option value="masculino">Masculino</option>
+        <option value="femenino">Femenino</option>
+        <option value="otro">Otro</option>
+        <option value="prefiero_no_decir">Prefiero no decir</option>
+      </select>
+      <span class="custom-invoice-error" id="gender_error"></span>
+    </div>
+  </div>
+
+  <div class="custom-invoice-form-group">
+    <label for="phone" class="custom-invoice-label">
+      Teléfono <span class="required">*</span>
+    </label>
+    <div class="phone-input-group">
+      <select id="phone_country_code" name="phone_country_code" class="custom-invoice-input phone-code" required>
+        <option value="+507">+507 (Panamá)</option>
+        <option value="+1">+1 (USA/Canadá)</option>
+        <option value="+52">+52 (México)</option>
+        <option value="+57">+57 (Colombia)</option>
+        <option value="+34">+34 (España)</option>
+      </select>
+      <input 
+        type="tel" 
+        id="phone" 
+        name="phone" 
+        class="custom-invoice-input phone-number" 
+        placeholder="1234-5678"
+        required
+      />
+    </div>
+    <span class="custom-invoice-error" id="phone_error"></span>
+  </div>
+
+  <div class="custom-invoice-form-row">
+    <div class="custom-invoice-form-group">
+      <label for="province" class="custom-invoice-label">
+        Provincia <span class="required">*</span>
+      </label>
+      <select id="province" name="province" class="custom-invoice-input" required>
+        <option value="">Seleccione</option>
+        <option value="test">Test</option>
+      </select>
+      <span class="custom-invoice-error" id="province_error"></span>
+    </div>
+
+    <div class="custom-invoice-form-group">
+      <label for="district" class="custom-invoice-label">
+        Distrito <span class="required">*</span>
+      </label>
+      <select id="district" name="district" class="custom-invoice-input" required>
+        <option value="">Seleccione</option>
+        <option value="test">Test</option>
+      </select>
+      <span class="custom-invoice-error" id="district_error"></span>
+    </div>
+  </div>
+
+  <div class="custom-invoice-form-group">
+    <label for="corregimiento" class="custom-invoice-label">
+      Corregimiento <span class="required">*</span>
+    </label>
+    <select id="corregimiento" name="corregimiento" class="custom-invoice-input" required>
+      <option value="">Seleccione</option>
+      <option value="test">Test</option>
+    </select>
+    <span class="custom-invoice-error" id="corregimiento_error"></span>
+  </div>
+
+  <div class="custom-invoice-form-actions">
+    <button type="button" id="cancel-btn" class="custom-invoice-btn custom-invoice-btn-secondary">
+      Cancelar
+    </button>
+    <button type="submit" id="submit-btn" class="custom-invoice-btn">
+      {% if is_update %}Actualizar{% else %}Registrarse{% endif %}
+    </button>
+  </div>
+
+  <div id="form-message" class="custom-invoice-message" style="display: none;"></div>
+</form>
+
+
