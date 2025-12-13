@@ -3,22 +3,36 @@
   Incluye toggle switch y modal para registro/actualización de datos del cliente.
 {% enddoc %}
 
+{% if cart.item_count > 0 %}
 <div class="custom-invoice-block" {{ block.shopify_attributes }}>
   <div class="custom-invoice-card">
     <h3 class="custom-invoice-title">{{ block.settings.title }}</h3>
     <p class="custom-invoice-subtitle">{{ block.settings.subtitle }}</p>
 
     <div class="custom-invoice-toggle-wrapper">
-      <label class="custom-invoice-toggle-label">
-        <input
-          type="checkbox"
+      <label class="custom-invoice-toggle-label" for="custom-invoice-toggle">
+        <button
+          type="button"
+          role="switch"
           id="custom-invoice-toggle"
-          class="custom-invoice-toggle"
+          class="radix-switch"
+          aria-checked="false"
           aria-label="Factura personalizada"
         >
+          <span class="radix-switch-thumb"></span>
+        </button>
         <span class="custom-invoice-toggle-text" id="toggle-text"> No, no quiero una factura personalizada </span>
       </label>
     </div>
+
+    {% if customer %}
+    <div id="customer-data-summary" class="customer-data-summary" style="display: none;">
+      <div id="customer-data-summary-content"></div>
+      <button type="button" id="update-data-summary-btn" class="custom-invoice-link-btn">
+        Actualizar datos
+      </button>
+    </div>
+    {% endif %}
   </div>
 
   <dialog id="custom-invoice-modal" class="custom-invoice-modal" aria-labelledby="modal-title">
@@ -54,7 +68,7 @@
           <div id="not-logged-in-content">
             <p class="custom-invoice-login-prompt">
               ¿Tienes cuenta?
-              <a href="{{ routes.account_login_url }}?checkout_url={{ routes.cart_url | url_encode }}" id="login-link"
+              <a href="{{ routes.storefront_login_url }}" id="login-link"
                 >Inicia sesión aquí</a
               >
             </p>
@@ -77,9 +91,13 @@
   const modal = document.getElementById('custom-invoice-modal');
   const modalClose = document.getElementById('modal-close');
   const STORAGE_KEY = 'customInvoicePreference';
+  // El app proxy mapea /apps/custom-invoice/* a /api/proxy/*
+  // En React Router, las rutas están en api/proxy/customers.$.jsx
+  // Usar la ruta del app proxy que Shopify mapea automáticamente
+  // Si no funciona, probar con /api/proxy/customers directamente
   const API_BASE = '/apps/custom-invoice/customers';
   const CART_URL = '{{ routes.cart_url }}';
-  const LOGIN_URL = '{{ routes.account_login_url }}';
+  const LOGIN_URL = '{{ routes.storefront_login_url }}';
   {% if customer %}
   const CUSTOMER_ID = '{{ customer.id }}';
   const IS_LOGGED_IN = true;
@@ -87,17 +105,55 @@
   const IS_LOGGED_IN = false;
   {% endif %}
 
+  // Lista de países en orden alfabético
+  const COUNTRIES = [
+    'Afganistán', 'Albania', 'Alemania', 'Andorra', 'Angola', 'Antigua y Barbuda', 'Arabia Saudí', 'Argelia', 'Argentina', 'Armenia',
+    'Australia', 'Austria', 'Azerbaiyán', 'Bahamas', 'Bangladés', 'Barbados', 'Baréin', 'Bélgica', 'Belice', 'Benín',
+    'Bielorrusia', 'Birmania', 'Bolivia', 'Bosnia y Herzegovina', 'Botsuana', 'Brasil', 'Brunéi', 'Bulgaria', 'Burkina Faso', 'Burundi',
+    'Bután', 'Cabo Verde', 'Camboya', 'Camerún', 'Canadá', 'Catar', 'Chad', 'Chile', 'China', 'Chipre',
+    'Ciudad del Vaticano', 'Colombia', 'Comoras', 'Corea del Norte', 'Corea del Sur', 'Costa de Marfil', 'Costa Rica', 'Croacia', 'Cuba', 'Dinamarca',
+    'Dominica', 'Ecuador', 'Egipto', 'El Salvador', 'Emiratos Árabes Unidos', 'Eritrea', 'Eslovaquia', 'Eslovenia', 'España', 'Estados Unidos',
+    'Estonia', 'Esuatini', 'Etiopía', 'Filipinas', 'Finlandia', 'Fiyi', 'Francia', 'Gabón', 'Gambia', 'Georgia',
+    'Ghana', 'Granada', 'Grecia', 'Guatemala', 'Guinea', 'Guinea-Bisáu', 'Guinea Ecuatorial', 'Guyana', 'Haití', 'Honduras',
+    'Hungría', 'India', 'Indonesia', 'Irak', 'Irán', 'Irlanda', 'Islandia', 'Islas Marshall', 'Islas Salomón', 'Israel',
+    'Italia', 'Jamaica', 'Japón', 'Jordania', 'Kazajistán', 'Kenia', 'Kirguistán', 'Kiribati', 'Kuwait', 'Laos',
+    'Lesoto', 'Letonia', 'Líbano', 'Liberia', 'Libia', 'Liechtenstein', 'Lituania', 'Luxemburgo', 'Macedonia del Norte', 'Madagascar',
+    'Malasia', 'Malaui', 'Maldivas', 'Malí', 'Malta', 'Marruecos', 'Mauricio', 'Mauritania', 'México', 'Micronesia',
+    'Moldavia', 'Mónaco', 'Mongolia', 'Montenegro', 'Mozambique', 'Namibia', 'Nauru', 'Nepal', 'Nicaragua', 'Níger',
+    'Nigeria', 'Noruega', 'Nueva Zelanda', 'Omán', 'Países Bajos', 'Pakistán', 'Palau', 'Palestina', 'Panamá', 'Papúa Nueva Guinea',
+    'Paraguay', 'Perú', 'Polonia', 'Portugal', 'Reino Unido', 'República Centroafricana', 'República Checa', 'República del Congo', 'República Democrática del Congo', 'República Dominicana',
+    'Ruanda', 'Rumanía', 'Rusia', 'Samoa', 'San Cristóbal y Nieves', 'San Marino', 'San Vicente y las Granadinas', 'Santa Lucía', 'Santo Tomé y Príncipe', 'Senegal',
+    'Serbia', 'Seychelles', 'Sierra Leona', 'Singapur', 'Siria', 'Somalia', 'Sri Lanka', 'Sudáfrica', 'Sudán', 'Sudán del Sur',
+    'Suecia', 'Suiza', 'Surinam', 'Tailandia', 'Tanzania', 'Tayikistán', 'Timor Oriental', 'Togo', 'Tonga', 'Trinidad y Tobago',
+    'Túnez', 'Turkmenistán', 'Turquía', 'Tuvalu', 'Ucrania', 'Uganda', 'Uruguay', 'Uzbekistán', 'Vanuatu', 'Venezuela',
+    'Vietnam', 'Yemen', 'Yibuti', 'Zambia', 'Zimbabue'
+  ];
+
   function init() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const d = JSON.parse(saved);
       if (d.wantsInvoice) {
-        toggle.checked = true;
+        toggle.setAttribute('aria-checked', 'true');
         updateToggleText();
+        
+        // Si el toggle está activado (según localStorage), verificar datos del cliente
+        if (IS_LOGGED_IN) {
+          // Verificar datos del cliente después de un pequeño delay para asegurar que todo esté cargado
+          setTimeout(() => {
+            loadCustomerDataOnInit();
+          }, 500);
+        } else {
+          // Si no está logueado, NO abrir el modal automáticamente, solo bloquear checkout
+          setTimeout(() => {
+            disableCheckout();
+            console.log('[Checkout] Bloqueado: Usuario no logueado y toggle activo');
+          }, 500);
+        }
       }
     }
     
-    toggle.addEventListener('change', handleToggleChange);
+    toggle.addEventListener('click', handleToggleChange);
     if (modalClose) {
       modalClose.addEventListener('click', closeModal);
     }
@@ -109,36 +165,165 @@
       });
     }
     
+    // Agregar listener al botón de actualizar datos en el resumen
+    const updateDataSummaryBtn = document.getElementById('update-data-summary-btn');
+    if (updateDataSummaryBtn) {
+      updateDataSummaryBtn.addEventListener('click', function() {
+        openModal();
+        setTimeout(() => {
+          loadCustomerData();
+        }, 100);
+      });
+    }
+    
     interceptCheckoutSubmit();
     checkCheckoutButton();
     window.addEventListener('storage', handleStorageChange);
   }
 
-  function handleToggleChange() {
+  function loadCustomerDataOnInit() {
+    if (!IS_LOGGED_IN) return;
+    
+    // Verificar localStorage para saber si el toggle está activo
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const wantsInvoice = saved ? JSON.parse(saved).wantsInvoice : false;
+    
+    // Solo proceder si el toggle está activo según localStorage
+    if (!wantsInvoice) {
+      console.log('[Checkout] Toggle no activo según localStorage, no verificando datos');
+      return;
+    }
+    
+    fetch(`${API_BASE}/get?customer_id=${CUSTOMER_ID}`)
+      .then(r => r.json())
+      .then(d => {
+        console.log('[Checkout] Datos del cliente cargados:', d);
+        if (d.complete && d.customer) {
+          // Datos completos: mostrar resumen y habilitar checkout
+          showCustomerDataSummary(d.customer);
+          enableCheckout();
+          console.log('[Checkout] Habilitado: Usuario logueado con datos completos');
+        } else {
+          // Datos incompletos: bloquear checkout y abrir modal automáticamente
+          disableCheckout();
+          console.log('[Checkout] Bloqueado: Usuario logueado pero datos incompletos. Campos faltantes:', d.missingFields || 'desconocidos');
+          // Abrir el modal para que el usuario complete los campos faltantes
+          openModal();
+          setTimeout(() => {
+            loadCustomerData();
+          }, 100);
+        }
+      })
+      .catch(e => {
+        console.error('[Checkout] Error al cargar datos:', e);
+        disableCheckout();
+        console.log('[Checkout] Bloqueado: Error al verificar datos del cliente');
+        // Abrir el modal también en caso de error para que el usuario pueda completar los datos
+        openModal();
+        setTimeout(() => {
+          loadCustomerData();
+        }, 100);
+      });
+  }
+
+  function showCustomerDataSummary(c) {
+    const summaryContainer = document.getElementById('customer-data-summary');
+    const summaryContent = document.getElementById('customer-data-summary-content');
+    
+    if (!summaryContainer || !summaryContent) return;
+    
+    if (c && c.metafields) {
+      const mf = c.metafields || {};
+      const customerTypeLabel = mf.ex_customer_type === '01' ? 'Contribuyente' : 
+                                mf.ex_customer_type === '02' ? 'Consumidor final' : 
+                                mf.ex_customer_type === '04' ? 'Extranjero' : '';
+      
+      summaryContent.innerHTML = `
+        <div class="customer-data-summary-item">
+          <strong>${c.firstName || ''} ${c.lastName || ''}</strong>
+        </div>
+        <div class="customer-data-summary-item">
+          ${mf.ex_tax_id || ''} ${customerTypeLabel ? `(${customerTypeLabel})` : ''}
+        </div>
+        <div class="customer-data-summary-item">
+          ${c.email || ''}
+        </div>
+      `;
+      summaryContainer.style.display = 'block';
+    }
+  }
+
+  function handleToggleChange(e) {
+    e.preventDefault();
+    const currentState = toggle.getAttribute('aria-checked') === 'true';
+    const newState = !currentState;
+    toggle.setAttribute('aria-checked', String(newState));
     updateToggleText();
-    const wantsInvoice = toggle.checked;
+    const wantsInvoice = newState;
     savePreference({ wantsInvoice });
     
+    const summaryContainer = document.getElementById('customer-data-summary');
+    
     if (wantsInvoice) {
+      // Si el toggle se activa, verificar datos pero NO abrir modal automáticamente
+      if (IS_LOGGED_IN) {
+        loadCustomerDataOnInit();
+      } else {
+        // Si no está logueado, abrir modal para registro
       openModal();
-      checkCustomerDataCompleteness();
+        disableCheckout();
+        console.log('[Checkout] Bloqueado: Usuario no logueado y toggle activado');
+      }
     } else {
+      // Si el toggle se desactiva, ocultar resumen y habilitar checkout
       closeModal();
+      if (summaryContainer) {
+        summaryContainer.style.display = 'none';
+      }
       enableCheckout();
+      console.log('[Checkout] Habilitado: Toggle desactivado');
     }
     
     checkCheckoutButton();
   }
 
   function updateToggleText() {
-    toggleText.textContent = toggle.checked 
+    const isChecked = toggle.getAttribute('aria-checked') === 'true';
+    toggleText.textContent = isChecked 
       ? 'Sí, quiero una factura personalizada' 
       : 'No, no quiero una factura personalizada';
   }
 
-  function openModal() {
+  function openModal(showErrors = false) {
     if (modal) {
       modal.showModal();
+      const form = document.getElementById('custom-invoice-form');
+      
+      if (!showErrors) {
+        // Remover la clase "submitted" para que no se muestren errores inicialmente
+        if (form) {
+          form.classList.remove('submitted');
+          // Limpiar todos los errores visuales
+          const errorFields = form.querySelectorAll('.custom-invoice-input.error');
+          errorFields.forEach(field => {
+            field.classList.remove('error');
+            const fieldId = field.id;
+            if (fieldId) {
+              const errorElement = document.getElementById(`${fieldId}_error`);
+              if (errorElement) {
+                errorElement.classList.remove('show');
+                errorElement.textContent = '';
+              }
+            }
+          });
+        }
+      }
+      
+      // Inicializar el formulario cuando se abre el modal
+      setTimeout(() => {
+        initForm();
+      }, 100);
+      
       loadCustomerData();
     }
   }
@@ -158,72 +343,209 @@
     return s ? JSON.parse(s) : { wantsInvoice: false };
   }
 
-  function checkCustomerDataCompleteness() {
+  function checkCustomerDataCompleteness(openModalIfIncomplete = false) {
     if (IS_LOGGED_IN) {
       fetch(`${API_BASE}/get?customer_id=${CUSTOMER_ID}`)
         .then(r => r.json())
         .then(d => {
-          if (d.customer && d.customer.isDataComplete) {
+          console.log('[Checkout] Verificación de datos completos:', d);
+          if (d.complete && d.customer) {
             enableCheckout();
+            showCustomerDataSummary(d.customer);
+            console.log('[Checkout] Habilitado: Datos completos');
           } else {
             disableCheckout();
+            console.log('[Checkout] Bloqueado: Datos incompletos. Campos faltantes:', d.missingFields || 'desconocidos');
+            // Si se solicita y faltan datos, abrir el modal
+            if (openModalIfIncomplete) {
+              openModal(true);
+              setTimeout(() => {
+                loadCustomerData();
+              }, 100);
+            }
           }
         })
         .catch(e => {
-          console.error('Error:', e);
+          console.error('[Checkout] Error al verificar datos:', e);
           disableCheckout();
+          console.log('[Checkout] Bloqueado: Error al verificar datos');
+          // Si hay error y se solicita, abrir el modal
+          if (openModalIfIncomplete) {
+            openModal(true);
+            setTimeout(() => {
+              loadCustomerData();
+            }, 100);
+          }
         });
     } else {
       disableCheckout();
+      console.log('[Checkout] Bloqueado: Usuario no logueado');
+      // Si no está logueado y se solicita, abrir el modal
+      if (openModalIfIncomplete) {
+        openModal(true);
+      }
     }
   }
 
   function interceptCheckoutSubmit() {
-    const cf = document.querySelector('form[action*="checkout"], form[action*="/checkout"]');
-    if (!cf) {
+    // Buscar el formulario del carrito
+    const cartForm = document.getElementById('cart') || document.querySelector('form[id*="cart"], form[action*="checkout"], form[action*="/checkout"]');
+    if (!cartForm) {
       setTimeout(interceptCheckoutSubmit, 500);
       return;
     }
     
-    cf.addEventListener('submit', function(e) {
+    // Variable para almacenar el estado de los datos del cliente
+    let customerDataComplete = null;
+    
+    // Verificar datos del cliente al cargar la página si está logueado
+    if (IS_LOGGED_IN) {
+      fetch(`${API_BASE}/get?customer_id=${CUSTOMER_ID}`)
+        .then(r => r.json())
+        .then(d => {
+          customerDataComplete = d.complete && d.customer;
+          console.log('[Checkout] Estado de datos al cargar:', customerDataComplete ? 'Completos' : 'Incompletos');
+        })
+        .catch(err => {
+          console.error('[Checkout] Error al verificar datos:', err);
+          customerDataComplete = false;
+        });
+    }
+    
+    // Interceptar el submit del formulario
+    function handleCartSubmit(e) {
       const p = getPreference();
-      if (p.wantsInvoice) {
-        if (IS_LOGGED_IN) {
-          fetch(`${API_BASE}/get?customer_id=${CUSTOMER_ID}`)
-            .then(r => r.json())
-            .then(d => {
-              if (!d.customer || !d.customer.isDataComplete) {
-                e.preventDefault();
-                e.stopPropagation();
-                openModal();
-                alert('Complete sus datos o desactive el toggle.');
-              }
-            })
-            .catch(err => {
-              console.error('Error:', err);
-              e.preventDefault();
-              e.stopPropagation();
-              openModal();
-              alert('Error. Complete sus datos o desactive el toggle.');
-            });
-        } else {
+      // Si el toggle no está activo, no hacer nada y dejar que el submit continúe normalmente
+      if (!p.wantsInvoice) {
+        return;
+      }
+      
+      // Si el toggle está activo, validar antes de permitir checkout
+      if (IS_LOGGED_IN) {
+        // Si ya sabemos que los datos están completos, permitir el submit
+        if (customerDataComplete === true) {
+          console.log('[Checkout] Permitido: Datos completos (verificado previamente)');
+          return; // No prevenir el default, dejar que el submit continúe
+        }
+        
+        // Si sabemos que están incompletos, bloquear
+        if (customerDataComplete === false) {
+          console.log('[Checkout] Bloqueado: Datos incompletos (verificado previamente)');
           e.preventDefault();
           e.stopPropagation();
-          openModal();
-          alert('Complete sus datos o desactive el toggle.');
+          openModal(true);
+          setTimeout(() => {
+            loadCustomerData();
+            const form = document.getElementById('custom-invoice-form');
+            if (form) {
+              form.classList.add('submitted');
+            }
+          }, 100);
+          return;
         }
+        
+        // Si aún no sabemos el estado, verificar ahora
+        e.preventDefault();
+        e.stopPropagation();
+        
+        fetch(`${API_BASE}/get?customer_id=${CUSTOMER_ID}`)
+          .then(r => r.json())
+          .then(d => {
+            customerDataComplete = d.complete && d.customer;
+            if (!d.complete || !d.customer) {
+              console.log('[Checkout] Bloqueado en submit: Datos incompletos');
+              openModal(true);
+              setTimeout(() => {
+                loadCustomerData();
+                const form = document.getElementById('custom-invoice-form');
+                if (form) {
+                  form.classList.add('submitted');
+                  const allFields = form.querySelectorAll('input[required], select[required]');
+                  allFields.forEach(field => {
+                    if (!field.value || (field.value && field.value.trim() === '')) {
+                      const fieldId = field.id;
+                      if (fieldId) {
+                        showFormError(fieldId, 'Este campo es requerido');
+                      }
+                    }
+                  });
+                }
+              }, 100);
+            } else {
+              console.log('[Checkout] Permitido en submit: Datos completos');
+              // Si los datos están completos, remover el listener y permitir el submit
+              cartForm.removeEventListener('submit', handleCartSubmit);
+              // Redirigir directamente al checkout
+              window.location.href = '/checkout';
+            }
+          })
+          .catch(err => {
+            console.error('Error:', err);
+            customerDataComplete = false;
+            openModal(true);
+            setTimeout(() => {
+              loadCustomerData();
+              const form = document.getElementById('custom-invoice-form');
+              if (form) {
+                form.classList.add('submitted');
+              }
+            }, 100);
+          });
+      } else {
+        e.preventDefault();
+        e.stopPropagation();
+        openModal(true);
+        setTimeout(() => {
+          const form = document.getElementById('custom-invoice-form');
+          if (form) {
+            form.classList.add('submitted');
+            const allFields = form.querySelectorAll('input[required], select[required]');
+            allFields.forEach(field => {
+              if (!field.value || (field.value && field.value.trim() === '')) {
+                const fieldId = field.id;
+                if (fieldId) {
+                  showFormError(fieldId, 'Este campo es requerido');
+                }
+              }
+            });
+          }
+        }, 100);
       }
-    });
+    }
+    
+    cartForm.addEventListener('submit', handleCartSubmit);
+  }
+
+  function getCheckoutButton() {
+    // Buscar el botón específico por ID primero
+    let cb = document.getElementById('checkout');
+    if (cb) return cb;
+    
+    // Buscar por name="checkout"
+    cb = document.querySelector('button[name="checkout"], input[name="checkout"]');
+    if (cb) return cb;
+    
+    // Buscar en el formulario del carrito
+    const cartForm = document.getElementById('cart') || document.querySelector('form[id*="cart"], form[action*="checkout"], form[action*="/checkout"]');
+    if (cartForm) {
+      cb = cartForm.querySelector('button[type="submit"][name="checkout"], button#checkout, button[name="checkout"]');
+      if (cb) return cb;
+      
+      // Fallback: cualquier botón submit en el formulario
+      cb = cartForm.querySelector('button[type="submit"], input[type="submit"]');
+      if (cb) return cb;
+    }
+    
+    // Buscar botones asociados al formulario mediante form="cart"
+    cb = document.querySelector('button[form="cart"][name="checkout"], button[form="cart"]#checkout');
+    if (cb) return cb;
+    
+    // Último fallback: buscar cualquier botón con checkout en el texto o href
+    return document.querySelector('button[name*="checkout"], a[href*="checkout"]');
   }
 
   function checkCheckoutButton() {
-    const cf = document.querySelector('form[action*="checkout"], form[action*="/checkout"]');
-    if (!cf) {
-      setTimeout(checkCheckoutButton, 500);
-      return;
-    }
-    
-    const cb = cf.querySelector('button[type="submit"], input[type="submit"], button[name="add"], a[href*="checkout"]');
+    const cb = getCheckoutButton();
     if (!cb) {
       setTimeout(checkCheckoutButton, 500);
       return;
@@ -231,39 +553,124 @@
     
     const p = getPreference();
     if (p.wantsInvoice) {
-      checkCustomerDataCompleteness();
+      if (IS_LOGGED_IN) {
+        // Verificar datos sin abrir modal automáticamente
+        loadCustomerDataOnInit();
+      } else {
+        disableCheckout();
+        console.log('[Checkout] Bloqueado: Usuario no logueado y toggle activo');
+      }
     } else {
       enableCheckout();
+      console.log('[Checkout] Habilitado: Toggle inactivo');
     }
   }
 
   function disableCheckout() {
-    const cf = document.querySelector('form[action*="checkout"], form[action*="/checkout"]');
-    if (!cf) return;
+    const cb = getCheckoutButton();
+    if (!cb) return;
     
-    const cb = cf.querySelector('button[type="submit"], input[type="submit"], button[name="add"], a[href*="checkout"]');
-    if (cb) {
-      cb.disabled = true;
+    // No deshabilitar completamente, solo visualmente, para que pueda abrir el modal
       cb.style.opacity = '0.6';
-      cb.style.cursor = 'not-allowed';
-      if (cb.tagName === 'A') {
-        cb.style.pointerEvents = 'none';
+    cb.style.cursor = 'pointer';
+    cb.style.position = 'relative';
+    cb.setAttribute('data-checkout-blocked', 'true');
+    cb.setAttribute('aria-disabled', 'true');
+    cb.setAttribute('title', 'Complete el formulario de factura personalizada para continuar');
+    
+    // Agregar listener para abrir modal al hacer click
+    if (!cb.hasAttribute('data-modal-listener-added')) {
+      cb.setAttribute('data-modal-listener-added', 'true');
+      cb.addEventListener('click', handleBlockedCheckoutClick);
+    }
+    
+    // Agregar indicador visual (opcional - un pequeño badge o tooltip)
+    if (!cb.querySelector('.checkout-blocked-indicator')) {
+      const indicator = document.createElement('span');
+      indicator.className = 'checkout-blocked-indicator';
+      indicator.textContent = '⚠';
+      indicator.style.cssText = 'position: absolute; top: -8px; right: -8px; background: #ff6b6b; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 10;';
+      cb.style.position = 'relative';
+      cb.appendChild(indicator);
+    }
+  }
+  
+  function handleBlockedCheckoutClick(e) {
+    const cb = getCheckoutButton();
+    if (!cb) return;
+    
+    const isBlocked = cb.getAttribute('data-checkout-blocked') === 'true';
+    if (isBlocked) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const p = getPreference();
+      if (p.wantsInvoice) {
+        // Abrir el modal y marcar para mostrar errores
+        openModal(true);
+        
+        // Marcar el formulario como "submitted" para mostrar errores
+        setTimeout(() => {
+          const form = document.getElementById('custom-invoice-form');
+          if (form) {
+            form.classList.add('submitted');
+            // Validar todos los campos para mostrar qué falta
+            const allFields = form.querySelectorAll('input[required], select[required]');
+            allFields.forEach(field => {
+              if (!field.value || (field.value && field.value.trim() === '')) {
+                const fieldId = field.id;
+                if (fieldId) {
+                  showFormError(fieldId, 'Este campo es requerido');
+                }
+              }
+            });
+          }
+        }, 100);
+        
+        // Si el usuario no está logueado, mostrar mensaje en el modal
+        if (!IS_LOGGED_IN) {
+          // El modal ya mostrará el formulario de registro
+        } else {
+          // Cargar datos del cliente para mostrar el formulario
+          loadCustomerData();
+        }
       }
+    }
+  }
+  
+  function showFormError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorElement = document.getElementById(`${fieldId}_error`);
+    
+    if (field) {
+      field.classList.add('error');
+    }
+    
+    if (errorElement) {
+      errorElement.textContent = message;
+      errorElement.classList.add('show');
     }
   }
 
   function enableCheckout() {
-    const cf = document.querySelector('form[action*="checkout"], form[action*="/checkout"]');
-    if (!cf) return;
+    const cb = getCheckoutButton();
+    if (!cb) return;
     
-    const cb = cf.querySelector('button[type="submit"], input[type="submit"], button[name="add"], a[href*="checkout"]');
-    if (cb) {
       cb.disabled = false;
       cb.style.opacity = '1';
       cb.style.cursor = 'pointer';
+    cb.removeAttribute('aria-disabled');
+    cb.removeAttribute('data-checkout-blocked');
+    cb.removeAttribute('title');
+    
+    // Remover indicador visual
+    const indicator = cb.querySelector('.checkout-blocked-indicator');
+    if (indicator) {
+      indicator.remove();
+    }
+    
       if (cb.tagName === 'A') {
         cb.style.pointerEvents = 'auto';
-      }
     }
   }
 
@@ -281,7 +688,7 @@
         .then(r => r.json())
         .then(d => {
           if (li) li.style.display = 'none';
-          if (d.customer && d.customer.isDataComplete) {
+          if (d.complete && d.customer) {
             showCustomerData(d.customer);
           } else {
             showUpdateForm(d.customer);
@@ -306,6 +713,10 @@
     
     if (dt && c) {
       const mf = c.metafields || {};
+      const customerTypeLabel = mf.ex_customer_type === '01' ? 'Contribuyente' : 
+                                mf.ex_customer_type === '02' ? 'Consumidor final' : 
+                                mf.ex_customer_type === '04' ? 'Extranjero' : '';
+      
       dt.innerHTML = `
         <div class="customer-data-item">
           <strong>Nombre:</strong> ${c.firstName || ''} ${c.lastName || ''}
@@ -314,11 +725,10 @@
           <strong>Email:</strong> ${c.email || ''}
         </div>
         <div class="customer-data-item">
-          <strong>Documento:</strong> ${mf.document_type || ''} - ${mf.document_number || ''}
+          <strong>Celular:</strong> ${mf.ex_phone || ''}
         </div>
-        <div class="customer-data-item">
-          <strong>Teléfono:</strong> ${mf.phone_country_code || ''} ${mf.phone || ''}
-        </div>
+        ${mf.ex_tax_id ? `<div class="customer-data-item"><strong>Identificación:</strong> ${mf.ex_tax_id}</div>` : ''}
+        ${customerTypeLabel ? `<div class="customer-data-item"><strong>Tipo de Cliente:</strong> ${customerTypeLabel}</div>` : ''}
       `;
     }
     
@@ -345,68 +755,105 @@
     const f = document.getElementById('custom-invoice-form');
     if (!f) return;
     
-    if (mf.document_type) {
-      const dt = document.getElementById('document_type');
-      if (dt) {
-        dt.value = mf.document_type;
-        handleDocumentTypeChange();
+    // Campos básicos
+    const firstNameField = document.getElementById('first_name');
+    const lastNameField = document.getElementById('last_name');
+    const emailField = document.getElementById('email');
+    const birthDateField = document.getElementById('birth_date');
+    const genderField = document.getElementById('gender');
+    const phoneField = document.getElementById('phone');
+    
+    if (firstNameField && c.firstName) firstNameField.value = c.firstName;
+    if (lastNameField && c.lastName) lastNameField.value = c.lastName;
+    if (emailField && c.email) emailField.value = c.email;
+    if (birthDateField && mf.ex_birthday) birthDateField.value = mf.ex_birthday;
+    if (genderField && mf.ex_gender) genderField.value = mf.ex_gender;
+    if (phoneField && mf.ex_phone) phoneField.value = mf.ex_phone;
+    
+    // Campos de facturación según tipo de cliente
+    const customerType = mf.ex_customer_type;
+    
+    // País - determinar desde customer_type
+    const countryField = document.getElementById('country');
+    if (countryField) {
+      // Si customer_type es 04, es extranjero (no Panamá)
+      // Si es 01 o 02, es Panamá
+      if (customerType === '04') {
+        // Es extranjero, pero no guardamos el país
+        // Establecer un país diferente a Panamá para mostrar campos de extranjero
+        // Usar el primer país que no sea Panamá
+        const nonPanamaCountry = COUNTRIES.find(c => c !== 'Panamá') || COUNTRIES[0];
+        countryField.value = nonPanamaCountry;
+      } else {
+        // 01 o 02 significa Panamá
+        countryField.value = 'Panamá';
       }
+      // Llamar a handleCountryChange después de un pequeño delay para asegurar que el select esté actualizado
+      setTimeout(() => {
+        handleCountryChange();
+      }, 50);
     }
     
-    if (mf.document_number && mf.document_type === 'cedula') {
-      const parts = mf.document_number.split('-');
-      if (parts.length === 3) {
-        const p = document.getElementById('cedula_province');
-        const b = document.getElementById('cedula_book');
-        const t = document.getElementById('cedula_tome');
-        if (p) p.value = parts[0];
-        if (b) b.value = parts[1];
-        if (t) t.value = parts[2];
+    if (customerType === '04') {
+      // Extranjero
+      const taxIdForeign = document.getElementById('tax_id_foreign');
+      const customerTypeForeign = document.getElementById('customer_type_foreign');
+      if (taxIdForeign && mf.ex_tax_id) taxIdForeign.value = mf.ex_tax_id;
+      if (customerTypeForeign) customerTypeForeign.value = '04';
+    } else if (customerType === '01' || customerType === '02') {
+      // Panamá - Contribuyente o Consumidor final
+      const customerTypeField = document.getElementById('customer_type');
+      if (customerTypeField) {
+        customerTypeField.value = customerType;
+        handleCustomerTypeChange();
       }
-    } else if (mf.document_number) {
-      const dn = document.getElementById('document_number');
-      if (dn) dn.value = mf.document_number;
+      
+      if (customerType === '01') {
+        // Contribuyente
+        const taxIdContribuyente = document.getElementById('tax_id_contribuyente');
+        const customerDv = document.getElementById('customer_dv');
+        const taxpayerNameContribuyente = document.getElementById('taxpayer_name_contribuyente');
+        const taxpayerKindContribuyente = document.getElementById('taxpayer_kind_contribuyente');
+        
+        if (taxIdContribuyente && mf.ex_tax_id) taxIdContribuyente.value = mf.ex_tax_id;
+        if (customerDv && mf.ex_customer_dv) customerDv.value = mf.ex_customer_dv;
+        if (taxpayerNameContribuyente && mf.ex_taxpayer_name) taxpayerNameContribuyente.value = mf.ex_taxpayer_name;
+        if (taxpayerKindContribuyente && mf.ex_taxpayer_kind) taxpayerKindContribuyente.value = mf.ex_taxpayer_kind;
+      } else if (customerType === '02') {
+        // Consumidor final
+        const taxIdConsumidor = document.getElementById('tax_id_consumidor');
+        const taxpayerNameConsumidor = document.getElementById('taxpayer_name_consumidor');
+        const taxpayerKindConsumidor = document.getElementById('taxpayer_kind_consumidor');
+        
+        if (taxIdConsumidor && mf.ex_tax_id) taxIdConsumidor.value = mf.ex_tax_id;
+        if (taxpayerNameConsumidor && mf.ex_taxpayer_name) taxpayerNameConsumidor.value = mf.ex_taxpayer_name;
+        if (taxpayerKindConsumidor && mf.ex_taxpayer_kind) taxpayerKindConsumidor.value = mf.ex_taxpayer_kind;
+      }
+      
+      // Campos de ubicación (solo para Panamá)
+      const provinceField = document.getElementById('province');
+      const districtField = document.getElementById('district');
+      const corregimientoField = document.getElementById('corregimiento');
+      
+      // Por ahora usar "test" como valor temporal
+      if (provinceField) provinceField.value = 'test';
+      if (districtField) districtField.value = 'test';
+      if (corregimientoField) corregimientoField.value = 'test';
+      
+      // Actualizar Razón Social si es consumidor final
+      if (customerType === '02') {
+        setTimeout(() => {
+          updateRazonSocial();
+        }, 100);
+      }
     }
-    
-    const fields = {
-      first_name: mf.first_name,
-      last_name: mf.last_name,
-      email: c.email,
-      birth_date: mf.birth_date,
-      gender: mf.gender,
-      phone: mf.phone,
-      phone_country_code: mf.phone_country_code,
-      province: mf.province,
-      district: mf.district,
-      corregimiento: mf.corregimiento
-    };
-    
-    Object.keys(fields).forEach(k => {
-      const field = document.getElementById(k);
-      if (field && fields[k]) {
-        field.value = fields[k];
-      }
-    });
   }
   
-  function handleDocumentTypeChange() {
-    const dt = document.getElementById('document_type')?.value;
-    const cf = document.getElementById('cedula_fields');
-    const dn = document.getElementById('document_number');
-    
-    if (dt === 'cedula') {
-      if (cf) cf.style.display = 'block';
-      if (dn) dn.style.display = 'none';
-    } else {
-      if (cf) cf.style.display = 'none';
-      if (dn) dn.style.display = 'block';
-    }
-  }
 
   function handleStorageChange(e) {
     if (e.key === STORAGE_KEY) {
       const p = getPreference();
-      toggle.checked = p.wantsInvoice;
+      toggle.setAttribute('aria-checked', String(p.wantsInvoice));
       updateToggleText();
       checkCheckoutButton();
     }
@@ -418,9 +865,716 @@
   };
 
   window.getLoginUrl = function() {
-    const cartUrl = CART_URL || window.location.href;
-    return `${LOGIN_URL}?checkout_url=${encodeURIComponent(cartUrl)}`;
+    // routes.storefront_login_url ya maneja automáticamente el return_to
+    // No agregamos parámetros adicionales para evitar problemas de autenticación
+    return LOGIN_URL;
   };
+
+  // ===== CÓDIGO DEL FORMULARIO =====
+  function initForm() {
+    const form = document.getElementById('custom-invoice-form');
+    if (!form) return;
+    
+    // Cargar países en el select
+    const countrySelect = document.getElementById('country');
+    if (countrySelect) {
+      COUNTRIES.forEach(country => {
+        const option = document.createElement('option');
+        option.value = country;
+        option.textContent = country;
+        if (country === 'Panamá') {
+          option.selected = true;
+        }
+        countrySelect.appendChild(option);
+      });
+      
+      // Manejar cambio de país
+      countrySelect.addEventListener('change', handleCountryChange);
+      handleCountryChange(); // Ejecutar al inicio
+    }
+    
+    // Manejar cambio de tipo de cliente (solo para Panamá)
+    const customerTypeSelect = document.getElementById('customer_type');
+    if (customerTypeSelect) {
+      customerTypeSelect.addEventListener('change', handleCustomerTypeChange);
+    }
+    
+    // Auto-completar Razón Social cuando cambian Nombre o Apellido
+    const firstNameInput = document.getElementById('first_name');
+    const lastNameInput = document.getElementById('last_name');
+    const taxpayerNameConsumidor = document.getElementById('taxpayer_name_consumidor');
+    
+    if (firstNameInput) {
+      firstNameInput.addEventListener('input', updateRazonSocial);
+    }
+    if (lastNameInput) {
+      lastNameInput.addEventListener('input', updateRazonSocial);
+    }
+    
+    // Validar que celular no tenga guiones y solo números
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput) {
+      phoneInput.addEventListener('input', function(e) {
+        console.log('[DEBUG PHONE INPUT] Evento input disparado');
+        console.log('[DEBUG PHONE INPUT] Valor antes de limpiar:', e.target.value);
+        
+        // Limpiar cualquier carácter que no sea número
+        const cleanValue = e.target.value.replace(/[^0-9]/g, '');
+        console.log('[DEBUG PHONE INPUT] Valor después de limpiar:', cleanValue);
+        console.log('[DEBUG PHONE INPUT] Longitud:', cleanValue.length);
+        
+        if (e.target.value !== cleanValue) {
+          e.target.value = cleanValue;
+          console.log('[DEBUG PHONE INPUT] Campo actualizado con valor limpio');
+        }
+        
+        // Limpiar error si el campo tiene valor válido (8 dígitos exactos)
+        if (cleanValue.length === 8) {
+          console.log('[DEBUG PHONE INPUT] Limpiando error - campo válido (8 dígitos)');
+          clearFormError(e.target);
+        } else {
+          console.log('[DEBUG PHONE INPUT] Campo no válido aún - longitud:', cleanValue.length);
+        }
+      });
+    }
+    
+    if (form) form.addEventListener('submit', handleSubmit);
+    
+    // Agregar listener al botón Cancelar para cerrar el modal
+    const cancelBtn = document.getElementById('cancel-btn');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        closeModal();
+      });
+    }
+    
+    const inputs = form.querySelectorAll('input,select');
+    let formSubmitted = false;
+    
+    inputs.forEach((i) => {
+      // Solo validar en blur si el formulario ya fue intentado enviar
+      i.addEventListener('blur', () => {
+        if (formSubmitted) {
+          validateField(i);
+        }
+      });
+      i.addEventListener('input', () => {
+        clearFormError(i);
+        // Si el usuario empieza a escribir, validar en tiempo real
+        if (formSubmitted) {
+          validateField(i);
+        }
+      });
+    });
+    
+    // Marcar cuando el formulario ha sido intentado enviar
+    form.addEventListener('submit', function() {
+      formSubmitted = true;
+      form.classList.add('submitted');
+    }, { once: true });
+  }
+  
+  function handleCountryChange() {
+    const country = document.getElementById('country')?.value;
+    const billingSection = document.getElementById('billing-section');
+    const foreignFields = document.getElementById('foreign-billing-fields');
+    const panamaFields = document.getElementById('panama-billing-fields');
+    
+    if (!country) {
+      if (billingSection) billingSection.style.display = 'none';
+      return;
+    }
+    
+    if (billingSection) billingSection.style.display = 'block';
+    
+    if (country === 'Panamá') {
+      if (foreignFields) foreignFields.style.display = 'none';
+      if (panamaFields) panamaFields.style.display = 'block';
+      handleCustomerTypeChange(); // Actualizar campos según tipo de cliente
+    } else {
+      if (foreignFields) foreignFields.style.display = 'block';
+      if (panamaFields) panamaFields.style.display = 'none';
+      // Para extranjero, establecer automáticamente el tipo
+      const customerTypeForeign = document.getElementById('customer_type_foreign');
+      if (customerTypeForeign) customerTypeForeign.value = '04';
+    }
+  }
+  
+  function handleCustomerTypeChange() {
+    const customerType = document.getElementById('customer_type')?.value;
+    const contribuyenteFields = document.getElementById('contribuyente-fields');
+    const consumidorFields = document.getElementById('consumidor-fields');
+    
+    if (customerType === '01') {
+      // Contribuyente
+      if (contribuyenteFields) contribuyenteFields.style.display = 'block';
+      if (consumidorFields) consumidorFields.style.display = 'none';
+    } else if (customerType === '02') {
+      // Consumidor final
+      if (contribuyenteFields) contribuyenteFields.style.display = 'none';
+      if (consumidorFields) consumidorFields.style.display = 'block';
+      // Actualizar Razón Social cuando se muestra el campo
+      setTimeout(() => {
+        updateRazonSocial();
+      }, 50);
+    } else {
+      // Ninguno seleccionado
+      if (contribuyenteFields) contribuyenteFields.style.display = 'none';
+      if (consumidorFields) consumidorFields.style.display = 'none';
+    }
+  }
+  
+  function updateRazonSocial() {
+    // Solo actualizar si es consumidor final y el campo está visible
+    const customerType = document.getElementById('customer_type')?.value;
+    if (customerType !== '02') return; // Solo para consumidor final
+    
+    const firstName = document.getElementById('first_name')?.value || '';
+    const lastName = document.getElementById('last_name')?.value || '';
+    const taxpayerNameConsumidor = document.getElementById('taxpayer_name_consumidor');
+    
+    if (taxpayerNameConsumidor) {
+      const razonSocial = `${firstName} ${lastName}`.trim().toUpperCase();
+      // Solo actualizar si el campo está vacío o si el usuario no lo ha modificado manualmente
+      // Por ahora, siempre actualizamos cuando cambian nombre/apellido
+      taxpayerNameConsumidor.value = razonSocial;
+    }
+  }
+
+
+  function validateEmail(e) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  }
+
+  function validateName(n) {
+    return /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(n) && n.trim().length >= 1;
+  }
+
+  function validateField(f) {
+    const id = f.id;
+    const v = f.value.trim();
+    if (f.required && !v) {
+      showFormError(id, 'Requerido');
+      return false;
+    }
+    switch (id) {
+      case 'email':
+        if (v && !validateEmail(v)) {
+          showFormError(id, 'Email inválido');
+          return false;
+        }
+        break;
+      case 'first_name':
+      case 'last_name':
+        if (v && !validateName(v)) {
+          showFormError(id, 'Solo letras');
+          return false;
+        }
+        break;
+      case 'phone':
+        console.log('[DEBUG PHONE] Iniciando validación de teléfono');
+        console.log('[DEBUG PHONE] Valor original (v):', v);
+        console.log('[DEBUG PHONE] Valor original tipo:', typeof v);
+        console.log('[DEBUG PHONE] Campo requerido:', f.required);
+        console.log('[DEBUG PHONE] Campo completo:', f);
+        
+        // Validar que no esté vacío si es requerido (ya se validó arriba)
+        if (!v && f.required) {
+          console.log('[DEBUG PHONE] Campo vacío y requerido - retornando false');
+          return false; // Ya se mostró el error de "Requerido"
+        }
+        
+        // Si tiene valor, validar formato
+        if (v) {
+          console.log('[DEBUG PHONE] Campo tiene valor, validando formato');
+          
+          // Limpiar espacios y caracteres no numéricos
+          const cleanValue = v.replace(/[\s\-\(\)]/g, '');
+          console.log('[DEBUG PHONE] Valor limpio:', cleanValue);
+          console.log('[DEBUG PHONE] Longitud del valor limpio:', cleanValue.length);
+          
+          // Validar que solo tenga números
+          const isNumeric = /^[0-9]+$/.test(cleanValue);
+          console.log('[DEBUG PHONE] ¿Es numérico?', isNumeric);
+          
+          if (!isNumeric) {
+            console.log('[DEBUG PHONE] ERROR: No es numérico');
+            showFormError(id, 'Solo números');
+            return false;
+          }
+          
+          // Si el valor limpio es diferente, actualizar el campo
+          if (v !== cleanValue) {
+            console.log('[DEBUG PHONE] Actualizando campo con valor limpio');
+            f.value = cleanValue;
+          }
+          
+          // Validar longitud - debe ser exactamente 8 dígitos
+          console.log('[DEBUG PHONE] Validando longitud:', cleanValue.length);
+          if (cleanValue.length !== 8) {
+            console.log('[DEBUG PHONE] ERROR: Longitud incorrecta. Esperado: 8, Obtenido:', cleanValue.length);
+            showFormError(id, 'El celular debe tener exactamente 8 dígitos');
+            return false;
+          }
+          
+          // Si llegamos aquí, el campo es válido
+          console.log('[DEBUG PHONE] ✓ Campo válido');
+          clearFormError(f);
+        } else {
+          console.log('[DEBUG PHONE] Campo sin valor');
+        }
+        break;
+      case 'gender':
+        if (v && !['M', 'F', 'X'].includes(v)) {
+          showFormError(id, 'Valor inválido');
+          return false;
+        }
+        break;
+      case 'customer_type':
+        if (v && !['01', '02'].includes(v)) {
+          showFormError(id, 'Valor inválido');
+          return false;
+        }
+        break;
+      case 'taxpayer_kind_contribuyente':
+      case 'taxpayer_kind_consumidor':
+        if (v && !['1', '2'].includes(v)) {
+          showFormError(id, 'Valor inválido');
+          return false;
+        }
+        break;
+    }
+    clearFormError(f);
+    return true;
+  }
+
+  function validateForm() {
+    const form = document.getElementById('custom-invoice-form');
+    if (!form) return false;
+    
+    // Marcar el formulario como submitted para mostrar errores visuales
+    form.classList.add('submitted');
+    
+    // Limpiar todos los errores previos
+    const allFields = form.querySelectorAll('.custom-invoice-input');
+    allFields.forEach(field => {
+      clearFormError(field);
+    });
+    
+    let valid = true;
+    const errorFields = [];
+    
+    // Validar campos básicos siempre requeridos
+    const basicFields = ['first_name', 'last_name', 'email', 'birth_date', 'gender', 'phone', 'country'];
+    basicFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field && field.required && !validateField(field)) {
+        valid = false;
+        errorFields.push(field);
+      }
+    });
+    
+    // Validar campos condicionales según país y tipo de cliente
+    const country = document.getElementById('country')?.value;
+    
+    if (country && country !== 'Panamá') {
+      // Extranjero
+      const taxIdForeign = document.getElementById('tax_id_foreign');
+      if (taxIdForeign && !taxIdForeign.value.trim()) {
+        showFormError('tax_id_foreign', 'Este campo es requerido');
+        valid = false;
+        errorFields.push(taxIdForeign);
+      }
+    } else if (country === 'Panamá') {
+      // Panamá
+      const customerType = document.getElementById('customer_type')?.value;
+      if (!customerType) {
+        showFormError('customer_type', 'Este campo es requerido');
+        valid = false;
+        const customerTypeField = document.getElementById('customer_type');
+        if (customerTypeField) errorFields.push(customerTypeField);
+      } else if (customerType === '01') {
+        // Contribuyente
+        const contribuyenteFields = ['tax_id_contribuyente', 'customer_dv', 'taxpayer_name_contribuyente', 'taxpayer_kind_contribuyente'];
+        contribuyenteFields.forEach(fieldId => {
+          const field = document.getElementById(fieldId);
+          if (field && !validateField(field)) {
+            valid = false;
+            errorFields.push(field);
+          }
+        });
+      } else if (customerType === '02') {
+        // Consumidor final
+        const consumidorFields = ['tax_id_consumidor', 'taxpayer_kind_consumidor'];
+        consumidorFields.forEach(fieldId => {
+          const field = document.getElementById(fieldId);
+          if (field && !validateField(field)) {
+            valid = false;
+            errorFields.push(field);
+          }
+        });
+      }
+      
+      // Campos de ubicación (siempre requeridos para Panamá)
+      const locationFields = ['province', 'district', 'corregimiento'];
+      locationFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field && !validateField(field)) {
+          valid = false;
+          errorFields.push(field);
+        }
+      });
+    }
+    
+    // Si hay errores, hacer scroll al primero
+    if (!valid && errorFields.length > 0) {
+      const firstError = errorFields[0];
+      if (firstError) {
+        // Hacer scroll al campo con error
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          firstError.focus();
+        }, 300);
+      }
+    }
+    
+    return valid;
+  }
+
+  function clearFormError(f) {
+    if (!f) return;
+    const id = f.id;
+    const e = document.getElementById(`${id}_error`);
+    if (f) f.classList.remove('error');
+    if (e) {
+      e.textContent = '';
+      e.classList.remove('show');
+    }
+  }
+
+  function showFormMsg(m, t) {
+    const d = document.getElementById('form-message');
+    if (d) {
+      // Permitir HTML en el mensaje para formatear mejor
+      d.innerHTML = m.replace(/\n/g, '<br>');
+      d.className = `custom-invoice-message ${t}`;
+      d.style.display = 'block';
+      setTimeout(() => {
+        d.style.display = 'none';
+      }, 5000);
+    }
+  }
+
+  function getFormData() {
+    const form = document.getElementById('custom-invoice-form');
+    if (!form) return null;
+    
+    const country = document.getElementById('country')?.value;
+    const customerType = document.getElementById('customer_type')?.value;
+    const customerTypeForeign = document.getElementById('customer_type_foreign')?.value;
+    
+    const d = {
+      first_name: document.getElementById('first_name')?.value?.trim() || '',
+      last_name: document.getElementById('last_name')?.value?.trim() || '',
+      email: document.getElementById('email')?.value?.trim() || '',
+      birth_date: document.getElementById('birth_date')?.value || '',
+      gender: document.getElementById('gender')?.value || '',
+      phone: document.getElementById('phone')?.value?.replace(/[^0-9]/g, '') || '',
+      // country NO se guarda, solo se usa para lógica condicional
+    };
+    
+    // Determinar tipo de cliente y campos de facturación
+    let finalCustomerType = '';
+    if (country !== 'Panamá') {
+      finalCustomerType = customerTypeForeign || '04';
+      d.tax_id = document.getElementById('tax_id_foreign')?.value?.trim() || '';
+    } else {
+      finalCustomerType = customerType || '';
+      d.customer_type = finalCustomerType;
+      
+      if (finalCustomerType === '01') {
+        // Contribuyente
+        d.tax_id = document.getElementById('tax_id_contribuyente')?.value?.trim() || '';
+        d.customer_dv = document.getElementById('customer_dv')?.value?.trim() || '';
+        d.taxpayer_name = document.getElementById('taxpayer_name_contribuyente')?.value?.trim() || '';
+        d.taxpayer_kind = document.getElementById('taxpayer_kind_contribuyente')?.value || '';
+      } else if (finalCustomerType === '02') {
+        // Consumidor final
+        d.tax_id = document.getElementById('tax_id_consumidor')?.value?.trim() || '';
+        d.taxpayer_name = document.getElementById('taxpayer_name_consumidor')?.value?.trim() || '';
+        d.taxpayer_kind = document.getElementById('taxpayer_kind_consumidor')?.value || '';
+      }
+      
+      // Campos de ubicación (solo para Panamá)
+      d.province = document.getElementById('province')?.value || '';
+      d.district = document.getElementById('district')?.value || '';
+      d.corregimiento = document.getElementById('corregimiento')?.value || '';
+    }
+    
+    d.customer_type = finalCustomerType;
+    
+    // Agregar customer_id si existe (para actualización)
+    const customerId = document.getElementById('customer_id')?.value;
+    if (customerId) {
+      d.customer_id = customerId;
+    }
+    
+    return d;
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const form = document.getElementById('custom-invoice-form');
+    if (form) {
+      form.classList.add('submitted');
+    }
+    
+    if (!validateForm()) {
+      showFormMsg('Complete todos los campos', 'error');
+      // Hacer scroll al primer campo con error
+      const firstError = form?.querySelector('.custom-invoice-input.error');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstError.focus();
+      }
+      return;
+    }
+    const fd = getFormData();
+    if (!fd) return;
+    const sb = document.getElementById('submit-btn');
+    const originalText = sb ? sb.textContent : '';
+    if (sb) {
+      sb.disabled = true;
+      sb.textContent = 'Procesando...';
+    }
+    const cid = document.getElementById('customer_id')?.value;
+    const isUp = !!cid;
+    try {
+      // Usar la ruta correcta del app proxy
+      // El app proxy mapea /apps/custom-invoice/* a /api/proxy/*
+      const ep = isUp 
+        ? `${API_BASE}/update` 
+        : `${API_BASE}/create`;
+      if (isUp) {
+        fd.customer_id = cid;
+      }
+      const r = await fetch(ep, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fd),
+      });
+      const res = await r.json();
+      if (!r.ok || res.error) {
+        // Si hay un error del backend, intentar parsear y mostrar en campos específicos
+        const errorHandled = handleBackendError(res.error);
+        const error = new Error(res.error || 'Error');
+        error.handled = errorHandled;
+        throw error;
+      }
+      if (isUp) {
+        showFormMsg('Actualizado correctamente', 'success');
+        setTimeout(() => {
+          closeModal();
+          enableCheckout();
+          // Actualizar el resumen de datos si está visible
+          if (IS_LOGGED_IN) {
+            loadCustomerDataOnInit();
+          }
+          console.log('[Checkout] Habilitado: Datos actualizados correctamente');
+        }, 1500);
+      } else {
+        const userEmail = fd.email; // El email que el usuario acaba de registrar
+        // Mostrar el email en el mensaje para que el usuario lo tenga visible
+        // Shopify no soporta pre-poblar el email en la página de login, así que lo mostramos aquí
+        showFormMsg(`Registro exitoso. Redirigiendo al login...<br><strong>Tu email: ${userEmail}</strong><br>Úsalo para iniciar sesión.`, 'success');
+        setTimeout(() => {
+          let loginUrl;
+          
+          if (typeof window.getLoginUrl === 'function') {
+            loginUrl = window.getLoginUrl();
+          } else {
+            const loginLink = document.getElementById('login-link');
+            if (loginLink && loginLink.href) {
+              loginUrl = loginLink.href;
+            } else {
+              // Usar routes.storefront_login_url que maneja automáticamente el return_to
+              loginUrl = LOGIN_URL;
+            }
+          }
+          if (loginUrl) {
+            window.location.href = loginUrl;
+          } else {
+            console.error('No se pudo obtener la URL de login');
+            closeModal();
+          }
+        }, 2000); // Aumentar el tiempo para que el usuario vea el email
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      // El error ya fue manejado por handleBackendError si es un error de validación
+      // Solo mostrar mensaje general si no se pudo mapear a campos específicos
+      if (!err.handled) {
+        showFormMsg(err.message || 'Error al procesar la solicitud', 'error');
+      }
+      if (sb) {
+        sb.disabled = false;
+        sb.textContent = originalText;
+      }
+    }
+  }
+  
+  function handleBackendError(errorMessage) {
+    if (!errorMessage) return false;
+    
+    // Marcar el formulario como submitted para mostrar errores
+    const form = document.getElementById('custom-invoice-form');
+    if (form) {
+      form.classList.add('submitted');
+    }
+    
+    // Intentar mapear errores comunes a campos específicos
+    const errorLower = errorMessage.toLowerCase();
+    const errorFields = [];
+    let fieldsMapped = false;
+    
+    // Mapear errores comunes a campos
+    if (errorLower.includes('nombre') || errorLower.includes('first_name')) {
+      showFormError('first_name', 'Nombre inválido o requerido');
+      const field = document.getElementById('first_name');
+      if (field) errorFields.push(field);
+      fieldsMapped = true;
+    }
+    if (errorLower.includes('apellido') || errorLower.includes('last_name')) {
+      showFormError('last_name', 'Apellido inválido o requerido');
+      const field = document.getElementById('last_name');
+      if (field) errorFields.push(field);
+      fieldsMapped = true;
+    }
+    if (errorLower.includes('email')) {
+      showFormError('email', 'Email inválido o requerido');
+      const field = document.getElementById('email');
+      if (field) errorFields.push(field);
+      fieldsMapped = true;
+    }
+    if (errorLower.includes('fecha') || errorLower.includes('birth_date')) {
+      showFormError('birth_date', 'Fecha de nacimiento inválida o requerida');
+      const field = document.getElementById('birth_date');
+      if (field) errorFields.push(field);
+      fieldsMapped = true;
+    }
+    if (errorLower.includes('género') || errorLower.includes('gender')) {
+      showFormError('gender', 'Género requerido');
+      const field = document.getElementById('gender');
+      if (field) errorFields.push(field);
+      fieldsMapped = true;
+    }
+    if (errorLower.includes('celular') || errorLower.includes('phone')) {
+      showFormError('phone', 'Celular inválido o requerido');
+      const field = document.getElementById('phone');
+      if (field) errorFields.push(field);
+      fieldsMapped = true;
+    }
+    if (errorLower.includes('país') || errorLower.includes('country')) {
+      showFormError('country', 'País requerido');
+      const field = document.getElementById('country');
+      if (field) errorFields.push(field);
+      fieldsMapped = true;
+    }
+    if (errorLower.includes('tipo de cliente') || errorLower.includes('customer_type')) {
+      showFormError('customer_type', 'Tipo de cliente requerido');
+      const field = document.getElementById('customer_type');
+      if (field) errorFields.push(field);
+      fieldsMapped = true;
+    }
+    if (errorLower.includes('cédula') || errorLower.includes('ruc') || errorLower.includes('tax_id')) {
+      const country = document.getElementById('country')?.value;
+      if (country === 'Panamá') {
+        const customerType = document.getElementById('customer_type')?.value;
+        if (customerType === '01') {
+          showFormError('tax_id_contribuyente', 'Cédula o RUC requerido');
+          const field = document.getElementById('tax_id_contribuyente');
+          if (field) errorFields.push(field);
+          fieldsMapped = true;
+        } else if (customerType === '02') {
+          showFormError('tax_id_consumidor', 'Cédula requerida');
+          const field = document.getElementById('tax_id_consumidor');
+          if (field) errorFields.push(field);
+          fieldsMapped = true;
+        }
+      } else {
+        showFormError('tax_id_foreign', 'Pasaporte o Identificación requerido');
+        const field = document.getElementById('tax_id_foreign');
+        if (field) errorFields.push(field);
+        fieldsMapped = true;
+      }
+    }
+    if (errorLower.includes('dv') || errorLower.includes('customer_dv')) {
+      showFormError('customer_dv', 'DV requerido');
+      const field = document.getElementById('customer_dv');
+      if (field) errorFields.push(field);
+      fieldsMapped = true;
+    }
+    if (errorLower.includes('razón social') || errorLower.includes('taxpayer_name')) {
+      const customerType = document.getElementById('customer_type')?.value;
+      if (customerType === '01') {
+        showFormError('taxpayer_name_contribuyente', 'Razón Social requerida');
+        const field = document.getElementById('taxpayer_name_contribuyente');
+        if (field) errorFields.push(field);
+        fieldsMapped = true;
+      }
+    }
+    if (errorLower.includes('tipo de contribuyente') || errorLower.includes('taxpayer_kind')) {
+      const customerType = document.getElementById('customer_type')?.value;
+      if (customerType === '01') {
+        showFormError('taxpayer_kind_contribuyente', 'Tipo de Contribuyente requerido');
+        const field = document.getElementById('taxpayer_kind_contribuyente');
+        if (field) errorFields.push(field);
+        fieldsMapped = true;
+      } else if (customerType === '02') {
+        showFormError('taxpayer_kind_consumidor', 'Tipo de Contribuyente requerido');
+        const field = document.getElementById('taxpayer_kind_consumidor');
+        if (field) errorFields.push(field);
+        fieldsMapped = true;
+      }
+    }
+    if (errorLower.includes('provincia') || errorLower.includes('province')) {
+      showFormError('province', 'Provincia requerida');
+      const field = document.getElementById('province');
+      if (field) errorFields.push(field);
+      fieldsMapped = true;
+    }
+    if (errorLower.includes('distrito') || errorLower.includes('district')) {
+      showFormError('district', 'Distrito requerido');
+      const field = document.getElementById('district');
+      if (field) errorFields.push(field);
+      fieldsMapped = true;
+    }
+    if (errorLower.includes('corregimiento')) {
+      showFormError('corregimiento', 'Corregimiento requerido');
+      const field = document.getElementById('corregimiento');
+      if (field) errorFields.push(field);
+      fieldsMapped = true;
+    }
+    
+    // Si se mapearon errores a campos, hacer scroll al primero
+    if (errorFields.length > 0) {
+      const firstError = errorFields.find(f => f !== null);
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          firstError.focus();
+        }, 300);
+      }
+      return true; // Indica que se mapearon errores a campos
+    } else if (!fieldsMapped) {
+      // Si no se pudo mapear, mostrar mensaje general
+      showFormMsg(errorMessage, 'error');
+      return false; // Indica que no se mapearon errores
+    }
+    
+    return fieldsMapped;
+  }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
@@ -429,6 +1583,7 @@
   }
 })();
 </script>
+{% endif %}
 
 {% schema %}
 {

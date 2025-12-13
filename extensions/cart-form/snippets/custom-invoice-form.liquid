@@ -1,7 +1,8 @@
 {% doc %}
   Formulario para registro/actualización de datos del cliente para factura personalizada.
+  Reestructurado para usar metafields exchanger.
   
-  @param {boolean} is_update - Si es true, es un formulario de actualización (oculta email y cédula)
+  @param {boolean} is_update - Si es true, es un formulario de actualización (oculta email)
   @param {object} customer - Objeto del cliente (solo para actualización)
 {% enddoc %}
 
@@ -9,200 +10,293 @@
   {% if is_update and customer %}
     <input type="hidden" id="customer_id" name="customer_id" value="{{ customer.id }}" />
   {% endif %}
-  <div class="custom-invoice-form-group">
-    <label for="document_type" class="custom-invoice-label">
-      Tipo de Documento <span class="required">*</span>
-    </label>
-    <select id="document_type" name="document_type" class="custom-invoice-input" required>
-      <option value="">Seleccione un tipo</option>
-      <option value="cedula">Cédula</option>
-      <option value="ruc">RUC</option>
-      <option value="pasaporte">Pasaporte</option>
-    </select>
-    <span class="custom-invoice-error" id="document_type_error"></span>
-  </div>
 
-  <div class="custom-invoice-form-group" id="document_number_group">
-    <label for="document_number" class="custom-invoice-label">
-      Número de Documento <span class="required">*</span>
-    </label>
-    <div id="cedula_fields" style="display: none;">
-      <div class="cedula-input-group">
+  <!-- Sección 1: Datos Personales -->
+  <div class="form-section">
+    <h3 class="form-section-title">Datos Personales</h3>
+    
+    <div class="custom-invoice-form-row">
+      <div class="custom-invoice-form-group">
+        <label for="first_name" class="custom-invoice-label">
+          Nombre <span class="required">*</span>
+        </label>
         <input 
           type="text" 
-          id="cedula_province" 
-          name="cedula_province" 
-          class="custom-invoice-input cedula-input" 
-          placeholder="Provincia"
-          maxlength="4"
+          id="first_name" 
+          name="first_name" 
+          class="custom-invoice-input" 
+          required
+          pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+          minlength="1"
         />
-        <span class="cedula-separator">-</span>
+        <span class="custom-invoice-error" id="first_name_error"></span>
+      </div>
+
+      <div class="custom-invoice-form-group">
+        <label for="last_name" class="custom-invoice-label">
+          Apellido <span class="required">*</span>
+        </label>
         <input 
           type="text" 
-          id="cedula_book" 
-          name="cedula_book" 
-          class="custom-invoice-input cedula-input" 
-          placeholder="Libro"
-          maxlength="10"
+          id="last_name" 
+          name="last_name" 
+          class="custom-invoice-input" 
+          required
+          pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+          minlength="1"
         />
-        <span class="cedula-separator">-</span>
-        <input 
-          type="text" 
-          id="cedula_tome" 
-          name="cedula_tome" 
-          class="custom-invoice-input cedula-input" 
-          placeholder="Tomo"
-          maxlength="10"
-        />
+        <span class="custom-invoice-error" id="last_name_error"></span>
       </div>
     </div>
-    <input 
-      type="text" 
-      id="document_number" 
-      name="document_number" 
-      class="custom-invoice-input" 
-      placeholder="Número de documento"
-    />
-    <span class="custom-invoice-error" id="document_number_error"></span>
-  </div>
 
-  <div class="custom-invoice-form-row">
     <div class="custom-invoice-form-group">
-      <label for="first_name" class="custom-invoice-label">
-        Nombre <span class="required">*</span>
+      <label for="email" class="custom-invoice-label">
+        Email <span class="required">*</span>
+      </label>
+      <input 
+        type="email" 
+        id="email" 
+        name="email" 
+        class="custom-invoice-input" 
+        required
+        {% if is_update and customer %}readonly value="{{ customer.email }}"{% endif %}
+      />
+      <span class="custom-invoice-error" id="email_error"></span>
+    </div>
+
+    <div class="custom-invoice-form-row">
+      <div class="custom-invoice-form-group">
+        <label for="birth_date" class="custom-invoice-label">
+          Fecha de Nacimiento <span class="required">*</span>
+        </label>
+        <input 
+          type="date" 
+          id="birth_date" 
+          name="birth_date" 
+          class="custom-invoice-input" 
+          required
+          max="{{ 'now' | date: '%Y-%m-%d' }}"
+        />
+        <span class="custom-invoice-error" id="birth_date_error"></span>
+      </div>
+
+      <div class="custom-invoice-form-group">
+        <label for="gender" class="custom-invoice-label">
+          Género <span class="required">*</span>
+        </label>
+        <select id="gender" name="gender" class="custom-invoice-input" required>
+          <option value="">Seleccione</option>
+          <option value="M">Masculino</option>
+          <option value="F">Femenino</option>
+          <option value="X">Prefiero no decir / Otro</option>
+        </select>
+        <span class="custom-invoice-error" id="gender_error"></span>
+      </div>
+    </div>
+
+    <div class="custom-invoice-form-group">
+      <label for="phone" class="custom-invoice-label">
+        Celular <span class="required">*</span>
       </label>
       <input 
         type="text" 
-        id="first_name" 
-        name="first_name" 
-        class="custom-invoice-input" 
-        required
-        pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
-        minlength="1"
-      />
-      <span class="custom-invoice-error" id="first_name_error"></span>
-    </div>
-
-    <div class="custom-invoice-form-group">
-      <label for="last_name" class="custom-invoice-label">
-        Apellido <span class="required">*</span>
-      </label>
-      <input 
-        type="text" 
-        id="last_name" 
-        name="last_name" 
-        class="custom-invoice-input" 
-        required
-        pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
-        minlength="1"
-      />
-      <span class="custom-invoice-error" id="last_name_error"></span>
-    </div>
-  </div>
-
-  <div class="custom-invoice-form-group">
-    <label for="email" class="custom-invoice-label">
-      Email <span class="required">*</span>
-    </label>
-    <input 
-      type="email" 
-      id="email" 
-      name="email" 
-      class="custom-invoice-input" 
-      required
-      {% if is_update and customer %}readonly value="{{ customer.email }}"{% endif %}
-    />
-    <span class="custom-invoice-error" id="email_error"></span>
-  </div>
-
-  <div class="custom-invoice-form-row">
-    <div class="custom-invoice-form-group">
-      <label for="birth_date" class="custom-invoice-label">
-        Fecha de Nacimiento <span class="required">*</span>
-      </label>
-      <input 
-        type="date" 
-        id="birth_date" 
-        name="birth_date" 
-        class="custom-invoice-input" 
-        required
-        max="{{ 'now' | date: '%Y-%m-%d' }}"
-      />
-      <span class="custom-invoice-error" id="birth_date_error"></span>
-    </div>
-
-    <div class="custom-invoice-form-group">
-      <label for="gender" class="custom-invoice-label">
-        Género <span class="required">*</span>
-      </label>
-      <select id="gender" name="gender" class="custom-invoice-input" required>
-        <option value="">Seleccione</option>
-        <option value="masculino">Masculino</option>
-        <option value="femenino">Femenino</option>
-        <option value="otro">Otro</option>
-        <option value="prefiero_no_decir">Prefiero no decir</option>
-      </select>
-      <span class="custom-invoice-error" id="gender_error"></span>
-    </div>
-  </div>
-
-  <div class="custom-invoice-form-group">
-    <label for="phone" class="custom-invoice-label">
-      Teléfono <span class="required">*</span>
-    </label>
-    <div class="phone-input-group">
-      <select id="phone_country_code" name="phone_country_code" class="custom-invoice-input phone-code" required>
-        <option value="+507">+507 (Panamá)</option>
-        <option value="+1">+1 (USA/Canadá)</option>
-        <option value="+52">+52 (México)</option>
-        <option value="+57">+57 (Colombia)</option>
-        <option value="+34">+34 (España)</option>
-      </select>
-      <input 
-        type="tel" 
         id="phone" 
         name="phone" 
-        class="custom-invoice-input phone-number" 
-        placeholder="1234-5678"
+        class="custom-invoice-input" 
+        placeholder="1234567890"
         required
+        inputmode="numeric"
       />
-    </div>
-    <span class="custom-invoice-error" id="phone_error"></span>
-  </div>
-
-  <div class="custom-invoice-form-row">
-    <div class="custom-invoice-form-group">
-      <label for="province" class="custom-invoice-label">
-        Provincia <span class="required">*</span>
-      </label>
-      <select id="province" name="province" class="custom-invoice-input" required>
-        <option value="">Seleccione</option>
-        <option value="test">Test</option>
-      </select>
-      <span class="custom-invoice-error" id="province_error"></span>
+      <span class="custom-invoice-error" id="phone_error"></span>
     </div>
 
     <div class="custom-invoice-form-group">
-      <label for="district" class="custom-invoice-label">
-        Distrito <span class="required">*</span>
+      <label for="country" class="custom-invoice-label">
+        País <span class="required">*</span>
       </label>
-      <select id="district" name="district" class="custom-invoice-input" required>
-        <option value="">Seleccione</option>
-        <option value="test">Test</option>
+      <select id="country" name="country" class="custom-invoice-input" required>
+        <option value="">Seleccione un país</option>
+        <!-- Los países se cargarán dinámicamente desde JavaScript -->
       </select>
-      <span class="custom-invoice-error" id="district_error"></span>
+      <span class="custom-invoice-error" id="country_error"></span>
     </div>
   </div>
 
-  <div class="custom-invoice-form-group">
-    <label for="corregimiento" class="custom-invoice-label">
-      Corregimiento <span class="required">*</span>
-    </label>
-    <select id="corregimiento" name="corregimiento" class="custom-invoice-input" required>
-      <option value="">Seleccione</option>
-      <option value="test">Test</option>
-    </select>
-    <span class="custom-invoice-error" id="corregimiento_error"></span>
+  <!-- Sección 2: Información de Facturación (condicional) -->
+  <div class="form-section" id="billing-section" style="display: none;">
+    <h3 class="form-section-title">Información de Facturación</h3>
+
+    <!-- Campos para Extranjero (país ≠ Panamá) -->
+    <div id="foreign-billing-fields" style="display: none;">
+      <div class="custom-invoice-form-group">
+        <label for="tax_id_foreign" class="custom-invoice-label">
+          Pasaporte o Identificación <span class="required">*</span>
+        </label>
+        <input 
+          type="text" 
+          id="tax_id_foreign" 
+          name="tax_id_foreign" 
+          class="custom-invoice-input" 
+        />
+        <span class="custom-invoice-error" id="tax_id_foreign_error"></span>
+      </div>
+
+      <div class="custom-invoice-form-group">
+        <label for="customer_type_foreign" class="custom-invoice-label">
+          Tipo de Cliente <span class="required">*</span>
+        </label>
+        <select id="customer_type_foreign" name="customer_type_foreign" class="custom-invoice-input">
+          <option value="04">Extranjero</option>
+        </select>
+        <span class="custom-invoice-error" id="customer_type_foreign_error"></span>
+      </div>
+    </div>
+
+    <!-- Campos para Panamá -->
+    <div id="panama-billing-fields" style="display: none;">
+      <div class="custom-invoice-form-group">
+        <label for="customer_type" class="custom-invoice-label">
+          Tipo de Cliente <span class="required">*</span>
+        </label>
+        <select id="customer_type" name="customer_type" class="custom-invoice-input">
+          <option value="">Seleccione</option>
+          <option value="01">Contribuyente</option>
+          <option value="02">Consumidor final</option>
+        </select>
+        <span class="custom-invoice-error" id="customer_type_error"></span>
+      </div>
+
+      <!-- Campos para Contribuyente -->
+      <div id="contribuyente-fields" style="display: none;">
+        <div class="custom-invoice-form-group">
+          <label for="tax_id_contribuyente" class="custom-invoice-label">
+            Cédula o RUC <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="tax_id_contribuyente" 
+            name="tax_id_contribuyente" 
+            class="custom-invoice-input" 
+          />
+          <span class="custom-invoice-error" id="tax_id_contribuyente_error"></span>
+        </div>
+
+        <div class="custom-invoice-form-group">
+          <label for="customer_dv" class="custom-invoice-label">
+            DV <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="customer_dv" 
+            name="customer_dv" 
+            class="custom-invoice-input" 
+          />
+          <span class="custom-invoice-error" id="customer_dv_error"></span>
+        </div>
+
+        <div class="custom-invoice-form-group">
+          <label for="taxpayer_name_contribuyente" class="custom-invoice-label">
+            Razón Social <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="taxpayer_name_contribuyente" 
+            name="taxpayer_name_contribuyente" 
+            class="custom-invoice-input" 
+          />
+          <span class="custom-invoice-error" id="taxpayer_name_contribuyente_error"></span>
+        </div>
+
+        <div class="custom-invoice-form-group">
+          <label for="taxpayer_kind_contribuyente" class="custom-invoice-label">
+            Tipo de Contribuyente <span class="required">*</span>
+          </label>
+          <select id="taxpayer_kind_contribuyente" name="taxpayer_kind_contribuyente" class="custom-invoice-input">
+            <option value="">Seleccione</option>
+            <option value="1">Natural</option>
+            <option value="2">Jurídico</option>
+          </select>
+          <span class="custom-invoice-error" id="taxpayer_kind_contribuyente_error"></span>
+        </div>
+      </div>
+
+      <!-- Campos para Consumidor final -->
+      <div id="consumidor-fields" style="display: none;">
+        <div class="custom-invoice-form-group">
+          <label for="tax_id_consumidor" class="custom-invoice-label">
+            Cédula <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="tax_id_consumidor" 
+            name="tax_id_consumidor" 
+            class="custom-invoice-input" 
+          />
+          <span class="custom-invoice-error" id="tax_id_consumidor_error"></span>
+        </div>
+
+        <div class="custom-invoice-form-group">
+          <label for="taxpayer_name_consumidor" class="custom-invoice-label">
+            Razón Social
+          </label>
+          <input 
+            type="text" 
+            id="taxpayer_name_consumidor" 
+            name="taxpayer_name_consumidor" 
+            class="custom-invoice-input" 
+          />
+          <span class="custom-invoice-error" id="taxpayer_name_consumidor_error"></span>
+        </div>
+
+        <div class="custom-invoice-form-group">
+          <label for="taxpayer_kind_consumidor" class="custom-invoice-label">
+            Tipo de Contribuyente <span class="required">*</span>
+          </label>
+          <select id="taxpayer_kind_consumidor" name="taxpayer_kind_consumidor" class="custom-invoice-input">
+            <option value="">Seleccione</option>
+            <option value="1">Natural</option>
+            <option value="2">Jurídico</option>
+          </select>
+          <span class="custom-invoice-error" id="taxpayer_kind_consumidor_error"></span>
+        </div>
+      </div>
+
+      <!-- Campos de ubicación (solo para Panamá) -->
+      <div class="custom-invoice-form-row">
+        <div class="custom-invoice-form-group">
+          <label for="province" class="custom-invoice-label">
+            Provincia <span class="required">*</span>
+          </label>
+          <select id="province" name="province" class="custom-invoice-input">
+            <option value="">Seleccione</option>
+            <option value="test">Test</option>
+          </select>
+          <span class="custom-invoice-error" id="province_error"></span>
+        </div>
+
+        <div class="custom-invoice-form-group">
+          <label for="district" class="custom-invoice-label">
+            Distrito <span class="required">*</span>
+          </label>
+          <select id="district" name="district" class="custom-invoice-input">
+            <option value="">Seleccione</option>
+            <option value="test">Test</option>
+          </select>
+          <span class="custom-invoice-error" id="district_error"></span>
+        </div>
+      </div>
+
+      <div class="custom-invoice-form-group">
+        <label for="corregimiento" class="custom-invoice-label">
+          Corregimiento <span class="required">*</span>
+        </label>
+        <select id="corregimiento" name="corregimiento" class="custom-invoice-input">
+          <option value="">Seleccione</option>
+          <option value="test">Test</option>
+        </select>
+        <span class="custom-invoice-error" id="corregimiento_error"></span>
+      </div>
+    </div>
   </div>
 
   <div class="custom-invoice-form-actions">
@@ -216,5 +310,3 @@
 
   <div id="form-message" class="custom-invoice-message" style="display: none;"></div>
 </form>
-
-

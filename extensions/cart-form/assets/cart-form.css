@@ -34,35 +34,57 @@
   gap: 0.75rem;
 }
 
-.custom-invoice-toggle {
-  width: 48px;
-  height: 28px;
-  appearance: none;
-  background: #ccc;
-  border-radius: 14px;
+/* Radix UI Switch Styles */
+.radix-switch {
+  all: unset;
+  width: 42px;
+  height: 25px;
+  background-color: #9ca3af;
+  border-radius: 9999px;
   position: relative;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background-color 150ms;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
-.custom-invoice-toggle::before {
-  content: '';
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: white;
-  top: 3px;
-  left: 3px;
-  transition: transform 0.3s;
+.radix-switch:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
-.custom-invoice-toggle:checked {
-  background: #4CAF50;
+.radix-switch[aria-checked="true"] {
+  background-color: #3b82f6;
 }
 
-.custom-invoice-toggle:checked::before {
-  transform: translateX(20px);
+.radix-switch[aria-checked="true"]:hover {
+  background-color: #2563eb;
+}
+
+.radix-switch:not([aria-checked="true"]):hover {
+  background-color: #6b7280;
+}
+
+.radix-switch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.radix-switch-thumb {
+  display: block;
+  width: 21px;
+  height: 21px;
+  background-color: white;
+  border-radius: 9999px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  transition: transform 150ms;
+  transform: translateX(2px);
+  will-change: transform;
+}
+
+.radix-switch[aria-checked="true"] .radix-switch-thumb {
+  transform: translateX(19px);
 }
 
 .custom-invoice-toggle-text {
@@ -150,13 +172,29 @@
 }
 
 .customer-data-summary {
-  padding: 1rem 0;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
 }
 
 .customer-data-summary h3 {
   font-size: 1.2rem;
   margin-bottom: 1rem;
   color: #333;
+}
+
+.customer-data-summary-item {
+  padding: 0.4rem 0;
+  font-size: 0.9rem;
+  color: #495057;
+  line-height: 1.5;
+}
+
+.customer-data-summary-item strong {
+  color: #212529;
+  font-weight: 600;
 }
 
 .customer-data-item {
@@ -174,10 +212,44 @@
   color: #666;
 }
 
+.custom-invoice-link-btn {
+  background: none;
+  border: none;
+  color: #0066cc;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+  transition: color 0.2s;
+}
+
+.custom-invoice-link-btn:hover {
+  color: #0052a3;
+}
+
 .custom-invoice-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.form-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: #333;
 }
 
 .custom-invoice-form-row {
@@ -215,7 +287,9 @@
   border-color: #0066cc;
 }
 
-.custom-invoice-input:invalid {
+/* Solo mostrar error cuando el formulario ha sido intentado enviar o el campo tiene la clase error */
+.custom-invoice-form.submitted .custom-invoice-input:invalid:not(:focus):not(:placeholder-shown),
+.custom-invoice-input.error {
   border-color: #d32f2f;
 }
 
