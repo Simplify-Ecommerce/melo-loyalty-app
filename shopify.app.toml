@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "74e12df5735cf6d7db0c06d8931b640f"
-name = "melo-pet-and-garden-loyalty"
+name = "Melo Pet and Garden Loyalty"
 application_url = "https://example.com"
 embedded = true
 
