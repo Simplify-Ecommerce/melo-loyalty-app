@@ -170,6 +170,11 @@ export const action = async ({ request, params }) => {
     console.log('[DEBUG PHONE API] Datos recibidos en API:', JSON.stringify(body, null, 2));
     console.log('[DEBUG PHONE API] Valor de phone en body:', body.phone);
     
+    // Mapear document_number a tax_id si existe (para compatibilidad con metafields exchanger)
+    if (body.document_number && !body.tax_id) {
+      body.tax_id = body.document_number;
+    }
+    
     const validation = validateCustomerData(body);
     
     console.log('[DEBUG PHONE API] Resultado de validación:', JSON.stringify(validation, null, 2));
@@ -210,12 +215,14 @@ export const action = async ({ request, params }) => {
 
       // Agregar campos condicionales según tipo de cliente
       if (body.customer_type === "01" || body.customer_type === "02" || body.customer_type === "04") {
-        if (body.tax_id) {
+        // Usar document_number si existe, de lo contrario usar tax_id
+        const taxIdValue = body.document_number || body.tax_id;
+        if (taxIdValue) {
           metafields.push({
             namespace: "exchanger",
             key: "ex_tax_id",
             type: "single_line_text_field",
-            value: body.tax_id,
+            value: taxIdValue,
           });
         }
       }
@@ -380,8 +387,9 @@ export const action = async ({ request, params }) => {
 
       const existingEmail = customerData.data.customer.email;
 
-      // Validar que el tax_id no cambie si ya existe
-      if (existingTaxId && body.tax_id && body.tax_id !== existingTaxId) {
+      // Validar que el tax_id/document_number no cambie si ya existe
+      const taxIdValue = body.document_number || body.tax_id;
+      if (existingTaxId && taxIdValue && taxIdValue !== existingTaxId) {
         return Response.json(
           { error: "El número de identificación no puede ser modificado" },
           { status: 400 }
@@ -429,13 +437,15 @@ export const action = async ({ request, params }) => {
 
       // Agregar campos condicionales según tipo de cliente
       if (body.customer_type === "01" || body.customer_type === "02" || body.customer_type === "04") {
-        if (body.tax_id) {
+        // Usar document_number si existe, de lo contrario usar tax_id
+        const taxIdValue = body.document_number || body.tax_id;
+        if (taxIdValue) {
           metafieldsToSet.push({
             ownerId: customerId,
             namespace: "exchanger",
             key: "ex_tax_id",
             type: "single_line_text_field",
-            value: body.tax_id,
+            value: taxIdValue,
           });
         }
       }

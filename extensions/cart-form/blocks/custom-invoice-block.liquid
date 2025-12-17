@@ -60,6 +60,11 @@
             <div id="customer-form-container" style="display: none;">
               {% render 'custom-invoice-form', is_update: true, customer: customer %}
             </div>
+            <div id="form-skeleton-loader" style="display: none;">
+              <div style="display: flex; justify-content: center; align-items: center; min-height: 300px; padding: 2rem;">
+                <span class="loader"></span>
+              </div>
+            </div>
             <div id="loading-indicator" style="display: none;">
               <p>Cargando datos...</p>
             </div>
@@ -77,6 +82,13 @@
             </div>
           </div>
         {% endif %}
+      </div>
+    </div>
+    <div class="action-container">
+      <div id="form-message" class="custom-invoice-message" style="display: none;"></div>
+      <div class="action-buttons">
+        <button id="action-cancel-btn" type="button">Cancelar</button>
+        <button id="action-update-btn" type="button">Actualizar</button>
       </div>
     </div>
   </dialog>
@@ -130,6 +142,11 @@
   ];
 
   function init() {
+    // Asegurarse de que el modal esté cerrado al inicializar
+    if (modal) {
+      modal.close();
+    }
+    
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const d = JSON.parse(saved);
@@ -169,10 +186,39 @@
     const updateDataSummaryBtn = document.getElementById('update-data-summary-btn');
     if (updateDataSummaryBtn) {
       updateDataSummaryBtn.addEventListener('click', function() {
+        // Primero ocultar cualquier formulario visible antes de abrir el modal
+        const fd = document.getElementById('customer-form-container');
+        const dd = document.getElementById('customer-data-display');
+        if (fd) {
+          fd.style.display = 'none';
+          fd.style.opacity = '0';
+        }
+        if (dd) {
+          dd.style.display = 'none';
+          dd.style.opacity = '0';
+        }
+        
         openModal();
+        // Cargar datos inmediatamente sin delay para mostrar el spinner
         setTimeout(() => {
           loadCustomerData();
-        }, 100);
+        }, 50);
+      });
+    }
+    
+    // También manejar el botón "Actualizar datos" dentro del modal (si existe)
+    const updateDataBtn = document.getElementById('update-data-btn');
+    if (updateDataBtn) {
+      updateDataBtn.addEventListener('click', function() {
+        // Ocultar el resumen de datos y mostrar el formulario
+        const dd = document.getElementById('customer-data-display');
+        const fd = document.getElementById('customer-form-container');
+        if (dd) {
+          dd.style.display = 'none';
+          dd.style.opacity = '0';
+        }
+        // Cargar datos para mostrar el formulario
+        loadCustomerData();
       });
     }
     
@@ -204,25 +250,17 @@
           enableCheckout();
           console.log('[Checkout] Habilitado: Usuario logueado con datos completos');
         } else {
-          // Datos incompletos: bloquear checkout y abrir modal automáticamente
+          // Datos incompletos: bloquear checkout pero NO abrir modal automáticamente
           disableCheckout();
           console.log('[Checkout] Bloqueado: Usuario logueado pero datos incompletos. Campos faltantes:', d.missingFields || 'desconocidos');
-          // Abrir el modal para que el usuario complete los campos faltantes
-          openModal();
-          setTimeout(() => {
-            loadCustomerData();
-          }, 100);
+          // NO abrir el modal automáticamente, el usuario lo abrirá cuando intente hacer checkout
         }
       })
       .catch(e => {
         console.error('[Checkout] Error al cargar datos:', e);
         disableCheckout();
         console.log('[Checkout] Bloqueado: Error al verificar datos del cliente');
-        // Abrir el modal también en caso de error para que el usuario pueda completar los datos
-        openModal();
-        setTimeout(() => {
-          loadCustomerData();
-        }, 100);
+        // NO abrir el modal automáticamente en caso de error
       });
   }
 
@@ -296,7 +334,30 @@
 
   function openModal(showErrors = false) {
     if (modal) {
+      // Primero ocultar cualquier contenido visible antes de abrir el modal
+      const fd = document.getElementById('customer-form-container');
+      const dd = document.getElementById('customer-data-display');
+      const skeleton = document.getElementById('form-skeleton-loader');
+      
+      if (fd) {
+        fd.style.display = 'none';
+        fd.style.opacity = '0';
+      }
+      if (dd) {
+        dd.style.display = 'none';
+        dd.style.opacity = '0';
+      }
+      if (skeleton) {
+        skeleton.style.display = 'none';
+        skeleton.style.opacity = '0';
+      }
+      
       modal.showModal();
+      
+      // Establecer altura inicial del modal para que la animación funcione
+      // Usar una altura mínima inicial
+      modal.style.height = '200px';
+      
       const form = document.getElementById('custom-invoice-form');
       
       if (!showErrors) {
@@ -322,15 +383,24 @@
       // Inicializar el formulario cuando se abre el modal
       setTimeout(() => {
         initForm();
+        // Animar altura cuando se abre el modal
+        setTimeout(() => {
+          animateModalHeight();
+        }, 50);
+        // Cargar datos del cliente después de inicializar el formulario
+        // para asegurar que las opciones del select estén cargadas
+        setTimeout(() => {
+          loadCustomerData();
+        }, 50);
       }, 100);
-      
-      loadCustomerData();
     }
   }
 
   function closeModal() {
     if (modal) {
       modal.close();
+      // Limpiar la altura cuando se cierra el modal para que se resetee
+      modal.style.height = '';
     }
   }
 
@@ -676,77 +746,154 @@
 
   function loadCustomerData() {
     if (IS_LOGGED_IN) {
-      const li = document.getElementById('loading-indicator');
+      const skeleton = document.getElementById('form-skeleton-loader');
       const dd = document.getElementById('customer-data-display');
       const fd = document.getElementById('customer-form-container');
+      const actionCancelBtn = document.getElementById('action-cancel-btn');
+      const actionUpdateBtn = document.getElementById('action-update-btn');
       
-      if (li) li.style.display = 'block';
-      if (dd) dd.style.display = 'none';
-      if (fd) fd.style.display = 'none';
+      // PRIMERO: Ocultar inmediatamente cualquier formulario o resumen visible
+      if (dd) {
+        dd.style.display = 'none';
+        dd.style.opacity = '0';
+      }
+      if (fd) {
+        fd.style.display = 'none';
+        fd.style.opacity = '0';
+      }
+      
+      // DESPUÉS: Mostrar skeleton loader
+      if (skeleton) {
+        skeleton.style.display = 'block';
+        skeleton.style.opacity = '0';
+        requestAnimationFrame(() => {
+          skeleton.style.opacity = '1';
+          // Animar altura cuando se muestra el skeleton
+          setTimeout(() => {
+            animateModalHeight();
+          }, 50);
+        });
+      }
+      
+      // Deshabilitar botones mientras carga
+      if (actionCancelBtn) actionCancelBtn.disabled = true;
+      if (actionUpdateBtn) actionUpdateBtn.disabled = true;
       
       fetch(`${API_BASE}/get?customer_id=${CUSTOMER_ID}`)
         .then(r => r.json())
         .then(d => {
-          if (li) li.style.display = 'none';
-          if (d.complete && d.customer) {
-            showCustomerData(d.customer);
+          // Ocultar skeleton con fade out
+          if (skeleton) {
+            skeleton.style.opacity = '0';
+            setTimeout(() => {
+              skeleton.style.display = 'none';
+              // Animar altura después de ocultar el skeleton
+              animateModalHeight();
+            }, 300);
           } else {
-            showUpdateForm(d.customer);
+            // Si no hay skeleton, animar altura de inmediato
+            setTimeout(() => {
+              animateModalHeight();
+            }, 50);
           }
+          // Habilitar botones cuando los datos estén cargados
+          if (actionCancelBtn) actionCancelBtn.disabled = false;
+          if (actionUpdateBtn) actionUpdateBtn.disabled = false;
+          // Siempre mostrar el formulario directamente, sin mostrar el resumen
+          showUpdateForm(d.customer);
         })
         .catch(e => {
           console.error('Error:', e);
-          if (li) li.style.display = 'none';
+          // Ocultar skeleton incluso si hay error
+          if (skeleton) {
+            skeleton.style.opacity = '0';
+            setTimeout(() => {
+              skeleton.style.display = 'none';
+            }, 300);
+          }
+          // Habilitar botones incluso si hay error
+          if (actionCancelBtn) actionCancelBtn.disabled = false;
+          if (actionUpdateBtn) actionUpdateBtn.disabled = false;
           showUpdateForm();
         });
     }
   }
 
   function showCustomerData(c) {
-    const dd = document.getElementById('customer-data-display');
-    const fd = document.getElementById('customer-form-container');
-    const dt = document.getElementById('customer-data-details');
-    const ub = document.getElementById('update-data-btn');
+    // Mostrar directamente el formulario sin mostrar el resumen
+    showUpdateForm(c);
+  }
+
+  function animateModalHeight() {
+    const modal = document.getElementById('custom-invoice-modal');
+    const modalContent = document.querySelector('.custom-invoice-modal-content');
+    if (!modal || !modalContent) return;
     
-    if (dd) dd.style.display = 'block';
-    if (fd) fd.style.display = 'none';
+    // Calcular nueva altura: altura del contenido + altura del action-container
+    const actionContainer = document.querySelector('.action-container');
+    const contentHeight = modalContent.scrollHeight;
+    const actionHeight = actionContainer ? actionContainer.offsetHeight : 0;
+    const newHeight = contentHeight + actionHeight;
     
-    if (dt && c) {
-      const mf = c.metafields || {};
-      const customerTypeLabel = mf.ex_customer_type === '01' ? 'Contribuyente' : 
-                                mf.ex_customer_type === '02' ? 'Consumidor final' : 
-                                mf.ex_customer_type === '04' ? 'Extranjero' : '';
+    // Obtener altura actual del modal (si no tiene altura asignada, usar la actual)
+    const currentHeight = modal.style.height ? parseInt(modal.style.height) : modal.offsetHeight;
+    
+    // Si las alturas son diferentes, animar
+    if (Math.abs(currentHeight - newHeight) > 1) {
+      // Establecer altura inicial explícitamente para que la transición funcione
+      if (!modal.style.height) {
+        modal.style.height = currentHeight + 'px';
+      }
       
-      dt.innerHTML = `
-        <div class="customer-data-item">
-          <strong>Nombre:</strong> ${c.firstName || ''} ${c.lastName || ''}
-        </div>
-        <div class="customer-data-item">
-          <strong>Email:</strong> ${c.email || ''}
-        </div>
-        <div class="customer-data-item">
-          <strong>Celular:</strong> ${mf.ex_phone || ''}
-        </div>
-        ${mf.ex_tax_id ? `<div class="customer-data-item"><strong>Identificación:</strong> ${mf.ex_tax_id}</div>` : ''}
-        ${customerTypeLabel ? `<div class="customer-data-item"><strong>Tipo de Cliente:</strong> ${customerTypeLabel}</div>` : ''}
-      `;
-    }
-    
-    if (ub) {
-      ub.addEventListener('click', () => {
-        showUpdateForm(c);
+      // Forzar reflow
+      void modal.offsetHeight;
+      
+      // Establecer nueva altura y dejar que la transición CSS haga el trabajo
+      requestAnimationFrame(() => {
+        modal.style.height = newHeight + 'px';
+        
+        // Después de la transición, mantener la altura para futuras animaciones
+        // No restaurar a 'auto' para que las transiciones sigan funcionando
       });
+    } else if (!modal.style.height) {
+      // Si no hay diferencia pero no tiene altura asignada, asignarla
+      modal.style.height = newHeight + 'px';
     }
   }
 
   function showUpdateForm(c) {
     const dd = document.getElementById('customer-data-display');
     const fd = document.getElementById('customer-form-container');
-    if (dd) dd.style.display = 'none';
-    if (fd) fd.style.display = 'block';
+    
+    if (dd) {
+      dd.style.opacity = '0';
+      setTimeout(() => { dd.style.display = 'none'; }, 300);
+    }
+    
+    if (fd) {
+      fd.style.display = 'block';
+      fd.style.opacity = '0';
+      // Usar requestAnimationFrame para asegurar que el display: block se aplique primero
+      requestAnimationFrame(() => {
+        fd.style.opacity = '1';
+        // Animar altura después de que el contenido sea visible
+        setTimeout(() => {
+          animateModalHeight();
+        }, 50);
+      });
+    }
     
     if (c && c.metafields) {
       populateForm(c);
+      // Animar altura después de poblar el formulario
+      setTimeout(() => {
+        animateModalHeight();
+      }, 100);
+    } else {
+      // Animar altura incluso si no hay datos
+      setTimeout(() => {
+        animateModalHeight();
+      }, 100);
     }
   }
   
@@ -776,22 +923,49 @@
     // País - determinar desde customer_type
     const countryField = document.getElementById('country');
     if (countryField) {
-      // Si customer_type es 04, es extranjero (no Panamá)
-      // Si es 01 o 02, es Panamá
-      if (customerType === '04') {
-        // Es extranjero, pero no guardamos el país
-        // Establecer un país diferente a Panamá para mostrar campos de extranjero
-        // Usar el primer país que no sea Panamá
-        const nonPanamaCountry = COUNTRIES.find(c => c !== 'Panamá') || COUNTRIES[0];
-        countryField.value = nonPanamaCountry;
-      } else {
-        // 01 o 02 significa Panamá
-        countryField.value = 'Panamá';
-      }
-      // Llamar a handleCountryChange después de un pequeño delay para asegurar que el select esté actualizado
-      setTimeout(() => {
-        handleCountryChange();
-      }, 50);
+      // Esperar a que las opciones estén cargadas antes de establecer el valor
+      const setCountryValue = () => {
+        // Verificar que el select tenga opciones cargadas
+        if (countryField.options.length <= 1) {
+          // Si aún no hay opciones (solo la opción por defecto), esperar un poco más
+          setTimeout(setCountryValue, 50);
+          return;
+        }
+        
+        // Si customer_type es 04, es extranjero (no Panamá)
+        // Si es 01 o 02, es Panamá
+        let countryValue = '';
+        if (customerType === '04') {
+          // Es extranjero, pero no guardamos el país
+          // Establecer un país diferente a Panamá para mostrar campos de extranjero
+          // Usar el primer país que no sea Panamá
+          const nonPanamaCountry = COUNTRIES.find(c => c !== 'Panamá') || COUNTRIES[0];
+          countryValue = nonPanamaCountry;
+        } else {
+          // 01 o 02 significa Panamá
+          countryValue = 'Panamá';
+        }
+        
+        // Verificar que el valor existe en las opciones antes de establecerlo
+        const optionExists = Array.from(countryField.options).some(opt => opt.value === countryValue);
+        if (optionExists) {
+          countryField.value = countryValue;
+          // Disparar evento change para asegurar que el select reconozca el valor
+          countryField.dispatchEvent(new Event('change', { bubbles: true }));
+          // Limpiar cualquier error del campo
+          clearFormError(countryField);
+          // Llamar a handleCountryChange después de establecer el valor
+          setTimeout(() => {
+            handleCountryChange();
+          }, 50);
+        } else {
+          // Si el valor no existe, intentar de nuevo después de un delay
+          setTimeout(setCountryValue, 50);
+        }
+      };
+      
+      // Iniciar el proceso de establecer el valor
+      setCountryValue();
     }
     
     if (customerType === '04') {
@@ -940,12 +1114,25 @@
     
     if (form) form.addEventListener('submit', handleSubmit);
     
-    // Agregar listener al botón Cancelar para cerrar el modal
-    const cancelBtn = document.getElementById('cancel-btn');
-    if (cancelBtn) {
-      cancelBtn.addEventListener('click', function(e) {
+    // Agregar listeners a los botones del action-container
+    const actionCancelBtn = document.getElementById('action-cancel-btn');
+    if (actionCancelBtn) {
+      actionCancelBtn.addEventListener('click', function(e) {
         e.preventDefault();
         closeModal();
+      });
+    }
+    
+    const actionUpdateBtn = document.getElementById('action-update-btn');
+    if (actionUpdateBtn) {
+      actionUpdateBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Disparar el submit del formulario directamente
+        const form = document.getElementById('custom-invoice-form');
+        if (form) {
+          // Disparar el evento submit del formulario, que será manejado por handleSubmit
+          form.requestSubmit();
+        }
       });
     }
     
@@ -1131,6 +1318,13 @@
           return false;
         }
         break;
+      case 'country':
+        // Validar que el país esté seleccionado y sea válido
+        if (v && !COUNTRIES.includes(v)) {
+          showFormError(id, 'País inválido');
+          return false;
+        }
+        break;
       case 'customer_type':
         if (v && !['01', '02'].includes(v)) {
           showFormError(id, 'Valor inválido');
@@ -1169,9 +1363,29 @@
     const basicFields = ['first_name', 'last_name', 'email', 'birth_date', 'gender', 'phone', 'country'];
     basicFields.forEach(fieldId => {
       const field = document.getElementById(fieldId);
-      if (field && field.required && !validateField(field)) {
-        valid = false;
-        errorFields.push(field);
+      if (field && field.required) {
+        // Para el campo country, verificar que tenga un valor válido
+        if (fieldId === 'country') {
+          const countryValue = field.value;
+          if (!countryValue || countryValue.trim() === '' || countryValue === 'Seleccione un país') {
+            showFormError(fieldId, 'Este campo es requerido');
+            valid = false;
+            errorFields.push(field);
+          } else if (!COUNTRIES.includes(countryValue)) {
+            showFormError(fieldId, 'País inválido');
+            valid = false;
+            errorFields.push(field);
+          } else {
+            // El país es válido, limpiar cualquier error
+            clearFormError(field);
+          }
+        } else {
+          // Para otros campos, usar la validación normal
+          if (!validateField(field)) {
+            valid = false;
+            errorFields.push(field);
+          }
+        }
       }
     });
     
@@ -1259,9 +1473,19 @@
       // Permitir HTML en el mensaje para formatear mejor
       d.innerHTML = m.replace(/\n/g, '<br>');
       d.className = `custom-invoice-message ${t}`;
-      d.style.display = 'block';
+      d.style.visibility = 'visible';
+      d.style.opacity = '1';
+      // Hacer scroll al action-container para que el mensaje sea visible
+      const actionContainer = document.querySelector('.action-container');
+      if (actionContainer) {
+        actionContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
       setTimeout(() => {
-        d.style.display = 'none';
+        d.style.opacity = '0';
+        setTimeout(() => {
+          d.style.visibility = 'hidden';
+          d.innerHTML = '';
+        }, 300);
       }, 5000);
     }
   }
@@ -1286,22 +1510,34 @@
     
     // Determinar tipo de cliente y campos de facturación
     let finalCustomerType = '';
+    let documentNumber = '';
+    let documentType = '';
+    
     if (country !== 'Panamá') {
       finalCustomerType = customerTypeForeign || '04';
-      d.tax_id = document.getElementById('tax_id_foreign')?.value?.trim() || '';
+      documentNumber = document.getElementById('tax_id_foreign')?.value?.trim() || '';
+      documentType = 'pasaporte'; // Extranjero usa pasaporte
     } else {
       finalCustomerType = customerType || '';
       d.customer_type = finalCustomerType;
       
       if (finalCustomerType === '01') {
         // Contribuyente
-        d.tax_id = document.getElementById('tax_id_contribuyente')?.value?.trim() || '';
-        d.customer_dv = document.getElementById('customer_dv')?.value?.trim() || '';
+        documentNumber = document.getElementById('tax_id_contribuyente')?.value?.trim() || '';
+        const customerDv = document.getElementById('customer_dv')?.value?.trim() || '';
+        // Si tiene DV, es un RUC, de lo contrario es cédula
+        if (customerDv) {
+          documentType = 'ruc';
+          d.customer_dv = customerDv;
+        } else {
+          documentType = 'cedula';
+        }
         d.taxpayer_name = document.getElementById('taxpayer_name_contribuyente')?.value?.trim() || '';
         d.taxpayer_kind = document.getElementById('taxpayer_kind_contribuyente')?.value || '';
       } else if (finalCustomerType === '02') {
         // Consumidor final
-        d.tax_id = document.getElementById('tax_id_consumidor')?.value?.trim() || '';
+        documentNumber = document.getElementById('tax_id_consumidor')?.value?.trim() || '';
+        documentType = 'cedula'; // Consumidor final siempre usa cédula
         d.taxpayer_name = document.getElementById('taxpayer_name_consumidor')?.value?.trim() || '';
         d.taxpayer_kind = document.getElementById('taxpayer_kind_consumidor')?.value || '';
       }
@@ -1310,6 +1546,27 @@
       d.province = document.getElementById('province')?.value || '';
       d.district = document.getElementById('district')?.value || '';
       d.corregimiento = document.getElementById('corregimiento')?.value || '';
+    }
+    
+    // Mapear tax_id a document_number y agregar document_type
+    d.document_number = documentNumber;
+    d.document_type = documentType;
+    
+    // Agregar código de país del teléfono
+    // Para Panamá es +507, para otros países necesitaríamos un mapeo
+    // Por ahora, si el país es Panamá, usar +507, de lo contrario usar +1 como default
+    if (country === 'Panamá') {
+      d.phone_country_code = '+507';
+    } else {
+      // Mapeo básico de códigos de país (puedes expandir esto según necesites)
+      const countryCodes = {
+        'Estados Unidos': '+1',
+        'México': '+52',
+        'Colombia': '+57',
+        'España': '+34',
+        // Agregar más países según sea necesario
+      };
+      d.phone_country_code = countryCodes[country] || '+507'; // Default a Panamá si no se encuentra
     }
     
     d.customer_type = finalCustomerType;
@@ -1342,11 +1599,11 @@
     }
     const fd = getFormData();
     if (!fd) return;
-    const sb = document.getElementById('submit-btn');
-    const originalText = sb ? sb.textContent : '';
-    if (sb) {
-      sb.disabled = true;
-      sb.textContent = 'Procesando...';
+    const actionUpdateBtn = document.getElementById('action-update-btn');
+    const originalText = actionUpdateBtn ? actionUpdateBtn.textContent : '';
+    if (actionUpdateBtn) {
+      actionUpdateBtn.disabled = true;
+      actionUpdateBtn.textContent = 'Procesando...';
     }
     const cid = document.getElementById('customer_id')?.value;
     const isUp = !!cid;
@@ -1417,9 +1674,9 @@
       if (!err.handled) {
         showFormMsg(err.message || 'Error al procesar la solicitud', 'error');
       }
-      if (sb) {
-        sb.disabled = false;
-        sb.textContent = originalText;
+      if (actionUpdateBtn) {
+        actionUpdateBtn.disabled = false;
+        actionUpdateBtn.textContent = originalText;
       }
     }
   }

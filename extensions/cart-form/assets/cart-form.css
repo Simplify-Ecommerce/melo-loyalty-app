@@ -100,9 +100,18 @@
   max-width: 600px;
   width: 90%;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
   background: white;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  transition:
+    height 0.3s ease-in-out,
+    max-height 0.3s ease-in-out;
+}
+
+.custom-invoice-modal:not([open]) {
+  display: none;
 }
 
 .custom-invoice-modal::backdrop {
@@ -113,6 +122,10 @@
 .custom-invoice-modal-content {
   position: relative;
   padding: 2rem;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: min-height 0.3s ease-in-out;
 }
 
 .custom-invoice-modal-close {
@@ -288,7 +301,8 @@
 }
 
 /* Solo mostrar error cuando el formulario ha sido intentado enviar o el campo tiene la clase error */
-.custom-invoice-form.submitted .custom-invoice-input:invalid:not(:focus):not(:placeholder-shown),
+.custom-invoice-form.submitted
+  .custom-invoice-input:invalid:not(:focus):not(:placeholder-shown),
 .custom-invoice-input.error {
   border-color: #d32f2f;
 }
@@ -344,6 +358,68 @@
   margin-top: 1rem;
 }
 
+.action-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+.action-container #form-message {
+  flex: 1 1 auto;
+  margin: 0;
+  min-height: 1.2rem;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  flex: 0 0 auto;
+}
+
+.action-container button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+}
+
+.action-buttons button:first-child {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.action-buttons button:first-child:hover {
+  background: #e0e0e0;
+}
+
+.action-buttons button:last-child {
+  background: #0066cc;
+  color: white;
+}
+
+.action-buttons button:last-child:hover {
+  background: #0052a3;
+}
+
+.action-buttons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .custom-invoice-btn-secondary {
   background: #f5f5f5;
   color: #333;
@@ -356,7 +432,8 @@
 .custom-invoice-message {
   padding: 0.75rem;
   border-radius: 4px;
-  margin-top: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 .custom-invoice-message.success {
@@ -369,6 +446,83 @@
   background: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
+}
+
+/* Loader Styles */
+.loader {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  position: relative;
+  animation: rotate 1s linear infinite;
+}
+
+.loader::before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0px;
+  border-radius: 50%;
+  border: 5px solid #0066cc;
+  animation: prixClipFix 2s linear infinite;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes prixClipFix {
+  0% {
+    clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0);
+  }
+  25% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0);
+  }
+  50% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%);
+  }
+  75% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%);
+  }
+  100% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0);
+  }
+}
+
+#form-skeleton-loader {
+  animation: fadeIn 0.3s ease-in;
+  transition:
+    opacity 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
+}
+
+#customer-form-container {
+  transition:
+    opacity 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
+  transform-origin: top;
+}
+
+#customer-data-display {
+  transition:
+    opacity 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
+  transform-origin: top;
+}
+
+#modal-content {
+  transition: min-height 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 768px) {
@@ -393,4 +547,3 @@
     width: 100%;
   }
 }
-
