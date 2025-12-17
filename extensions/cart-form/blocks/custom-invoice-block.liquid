@@ -3,6 +3,10 @@
   Incluye toggle switch y modal para registro/actualización de datos del cliente.
 {% enddoc %}
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
 {% if cart.item_count > 0 %}
 <div class="custom-invoice-block" {{ block.shopify_attributes }}>
   <div class="custom-invoice-card">
@@ -44,6 +48,7 @@
       </button>
 
       <h2 id="modal-title" class="custom-invoice-modal-title">Factura Personalizada</h2>
+      <p class="custom-invoice-modal-subtitle">Regístrate o inicia sesión para generar tu factura personalizada.</p>
 
       <div id="modal-content">
         {% if customer %}
@@ -72,11 +77,14 @@
         {% else %}
           <div id="not-logged-in-content">
             <p class="custom-invoice-login-prompt">
-              ¿Tienes cuenta?
+              ¿Ya tienes cuenta?
               <a href="{{ routes.storefront_login_url }}" id="login-link"
                 >Inicia sesión aquí</a
               >
             </p>
+            <div class="custom-invoice-separator">
+              <span>O regístrate con tus datos</span>
+            </div>
             <div id="register-form-container">
               {% render 'custom-invoice-form', is_update: false %}
             </div>
@@ -88,7 +96,9 @@
       <div id="form-message" class="custom-invoice-message" style="display: none;"></div>
       <div class="action-buttons">
         <button id="action-cancel-btn" type="button">Cancelar</button>
-        <button id="action-update-btn" type="button">Actualizar</button>
+        <button id="action-update-btn" type="button">
+          {% if customer %}Actualizar{% else %}Registrarse{% endif %}
+        </button>
       </div>
     </div>
   </dialog>
@@ -338,6 +348,7 @@
       const fd = document.getElementById('customer-form-container');
       const dd = document.getElementById('customer-data-display');
       const skeleton = document.getElementById('form-skeleton-loader');
+      const actionUpdateBtn = document.getElementById('action-update-btn');
       
       if (fd) {
         fd.style.display = 'none';
@@ -352,10 +363,9 @@
         skeleton.style.opacity = '0';
       }
       
-      // Restaurar el texto del botón "Actualizar" al abrir el modal
-      const actionUpdateBtn = document.getElementById('action-update-btn');
+      // Establecer el texto correcto del botón según si el usuario está logueado
       if (actionUpdateBtn) {
-        actionUpdateBtn.textContent = 'Actualizar';
+        actionUpdateBtn.textContent = IS_LOGGED_IN ? 'Actualizar' : 'Registrarse';
         actionUpdateBtn.disabled = false;
       }
       
@@ -871,6 +881,14 @@
   function showUpdateForm(c) {
     const dd = document.getElementById('customer-data-display');
     const fd = document.getElementById('customer-form-container');
+    const actionUpdateBtn = document.getElementById('action-update-btn');
+    
+    // Restaurar el texto del botón cuando se muestra el formulario
+    // Si el usuario está logueado, mostrar "Actualizar", si no, mostrar "Registrarse"
+    if (actionUpdateBtn) {
+      actionUpdateBtn.disabled = false;
+      actionUpdateBtn.textContent = IS_LOGGED_IN ? 'Actualizar' : 'Registrarse';
+    }
     
     if (dd) {
       dd.style.opacity = '0';
@@ -920,7 +938,28 @@
     if (firstNameField && c.firstName) firstNameField.value = c.firstName;
     if (lastNameField && c.lastName) lastNameField.value = c.lastName;
     if (emailField && c.email) emailField.value = c.email;
-    if (birthDateField && mf.ex_birthday) birthDateField.value = mf.ex_birthday;
+    // Poblar campos de fecha de nacimiento (día, mes, año)
+    if (mf.ex_birthday) {
+      const birthDateStr = mf.ex_birthday;
+      // Parsear la fecha (formato YYYY-MM-DD)
+      const dateParts = birthDateStr.split('-');
+      if (dateParts.length === 3) {
+        const year = dateParts[0];
+        const month = dateParts[1];
+        const day = dateParts[2];
+        
+        const birthDay = document.getElementById('birth_day');
+        const birthMonth = document.getElementById('birth_month');
+        const birthYear = document.getElementById('birth_year');
+        
+        if (birthDay) birthDay.value = String(parseInt(day, 10));
+        if (birthMonth) birthMonth.value = month;
+        if (birthYear) birthYear.value = year;
+        
+        // Actualizar el campo hidden
+        updateBirthDateField();
+      }
+    }
     if (genderField && mf.ex_gender) genderField.value = mf.ex_gender;
     if (phoneField && mf.ex_phone) phoneField.value = mf.ex_phone;
     
@@ -1092,6 +1131,51 @@
       lastNameInput.addEventListener('input', updateRazonSocial);
     }
     
+    // Agregar listeners a los campos de fecha de nacimiento
+    const birthDay = document.getElementById('birth_day');
+    const birthMonth = document.getElementById('birth_month');
+    const birthYear = document.getElementById('birth_year');
+    
+    // Función para actualizar el estilo del placeholder en selects
+    function updateSelectPlaceholderStyle(select) {
+      if (select && select.value === '') {
+        select.style.color = '#b3b3b3';
+      } else if (select) {
+        select.style.color = '#000';
+      }
+    }
+    
+    if (birthDay) {
+      birthDay.addEventListener('change', function() {
+        updateBirthDateField();
+        updateSelectPlaceholderStyle(birthDay);
+      });
+      updateSelectPlaceholderStyle(birthDay);
+    }
+    if (birthMonth) {
+      birthMonth.addEventListener('change', function() {
+        updateBirthDateField();
+        updateSelectPlaceholderStyle(birthMonth);
+      });
+      updateSelectPlaceholderStyle(birthMonth);
+    }
+    if (birthYear) {
+      birthYear.addEventListener('change', function() {
+        updateBirthDateField();
+        updateSelectPlaceholderStyle(birthYear);
+      });
+      updateSelectPlaceholderStyle(birthYear);
+    }
+    
+    // Aplicar estilo de placeholder a todos los selects
+    const allSelects = form.querySelectorAll('select.custom-invoice-input');
+    allSelects.forEach(select => {
+      updateSelectPlaceholderStyle(select);
+      select.addEventListener('change', function() {
+        updateSelectPlaceholderStyle(select);
+      });
+    });
+    
     // Validar que celular no tenga guiones y solo números
     const phoneInput = document.getElementById('phone');
     if (phoneInput) {
@@ -1152,12 +1236,26 @@
         if (formSubmitted) {
           validateField(i);
         }
+        // Si es un campo de fecha, actualizar el campo hidden
+        if (i.id === 'birth_day' || i.id === 'birth_month' || i.id === 'birth_year') {
+          updateBirthDateField();
+        }
       });
       i.addEventListener('input', () => {
         clearFormError(i);
         // Si el usuario empieza a escribir, validar en tiempo real
         if (formSubmitted) {
           validateField(i);
+        }
+      });
+      i.addEventListener('change', () => {
+        // Si es un campo de fecha, actualizar el campo hidden
+        if (i.id === 'birth_day' || i.id === 'birth_month' || i.id === 'birth_year') {
+          updateBirthDateField();
+          if (formSubmitted) {
+            const birthDateField = document.getElementById('birth_date');
+            if (birthDateField) validateField(birthDateField);
+          }
         }
       });
     });
@@ -1325,6 +1423,20 @@
           return false;
         }
         break;
+      case 'birth_date':
+        if (v) {
+          const date = new Date(v);
+          const today = new Date();
+          if (isNaN(date.getTime())) {
+            showFormError(id, 'Fecha inválida');
+            return false;
+          }
+          if (date > today) {
+            showFormError(id, 'La fecha de nacimiento no puede ser futura');
+            return false;
+          }
+        }
+        break;
       case 'country':
         // Validar que el país esté seleccionado y sea válido
         if (v && !COUNTRIES.includes(v)) {
@@ -1367,7 +1479,7 @@
     const errorFields = [];
     
     // Validar campos básicos siempre requeridos
-    const basicFields = ['first_name', 'last_name', 'email', 'birth_date', 'gender', 'phone', 'country'];
+    const basicFields = ['first_name', 'last_name', 'email', 'gender', 'phone', 'country'];
     basicFields.forEach(fieldId => {
       const field = document.getElementById(fieldId);
       if (field && field.required) {
@@ -1395,6 +1507,47 @@
         }
       }
     });
+    
+    // Validar campos de fecha de nacimiento (día, mes, año)
+    const birthDay = document.getElementById('birth_day');
+    const birthMonth = document.getElementById('birth_month');
+    const birthYear = document.getElementById('birth_year');
+    
+    if (birthDay && birthDay.required && !birthDay.value) {
+      showFormError('birth_date', 'Fecha de nacimiento requerida');
+      valid = false;
+      errorFields.push(birthDay);
+    }
+    if (birthMonth && birthMonth.required && !birthMonth.value) {
+      showFormError('birth_date', 'Fecha de nacimiento requerida');
+      valid = false;
+      if (!errorFields.includes(birthMonth)) errorFields.push(birthMonth);
+    }
+    if (birthYear && birthYear.required && !birthYear.value) {
+      showFormError('birth_date', 'Fecha de nacimiento requerida');
+      valid = false;
+      if (!errorFields.includes(birthYear)) errorFields.push(birthYear);
+    }
+    
+    // Si todos los campos de fecha están completos, validar la fecha combinada
+    if (birthDay && birthMonth && birthYear && birthDay.value && birthMonth.value && birthYear.value) {
+      updateBirthDateField();
+      const birthDateField = document.getElementById('birth_date');
+      if (birthDateField && birthDateField.value) {
+        // Validar que la fecha sea válida
+        const date = new Date(birthDateField.value);
+        const today = new Date();
+        if (isNaN(date.getTime())) {
+          showFormError('birth_date', 'Fecha inválida');
+          valid = false;
+        } else if (date > today) {
+          showFormError('birth_date', 'La fecha de nacimiento no puede ser futura');
+          valid = false;
+        } else {
+          clearFormError(birthDateField);
+        }
+      }
+    }
     
     // Validar campos condicionales según país y tipo de cliente
     const country = document.getElementById('country')?.value;
@@ -1502,6 +1655,21 @@
     }
   }
 
+  function updateBirthDateField() {
+    const day = document.getElementById('birth_day')?.value || '';
+    const month = document.getElementById('birth_month')?.value || '';
+    const year = document.getElementById('birth_year')?.value || '';
+    const birthDateField = document.getElementById('birth_date');
+    
+    if (day && month && year && birthDateField) {
+      // Formatear como YYYY-MM-DD
+      const formattedDate = `${year}-${month}-${day.padStart(2, '0')}`;
+      birthDateField.value = formattedDate;
+    } else if (birthDateField) {
+      birthDateField.value = '';
+    }
+  }
+
   function getFormData() {
     const form = document.getElementById('custom-invoice-form');
     if (!form) return null;
@@ -1509,6 +1677,9 @@
     const country = document.getElementById('country')?.value;
     const customerType = document.getElementById('customer_type')?.value;
     const customerTypeForeign = document.getElementById('customer_type_foreign')?.value;
+    
+    // Actualizar birth_date antes de obtener los datos
+    updateBirthDateField();
     
     const d = {
       first_name: document.getElementById('first_name')?.value?.trim() || '',
@@ -1642,7 +1813,7 @@
         throw error;
       }
       if (isUp) {
-        // Restaurar el texto del botón inmediatamente después del éxito
+        // Restaurar el botón inmediatamente después del éxito
         if (actionUpdateBtn) {
           actionUpdateBtn.disabled = false;
           actionUpdateBtn.textContent = originalText || 'Actualizar';
@@ -1658,6 +1829,11 @@
           console.log('[Checkout] Habilitado: Datos actualizados correctamente');
         }, 1500);
       } else {
+        // Restaurar el botón inmediatamente después del éxito (registro)
+        if (actionUpdateBtn) {
+          actionUpdateBtn.disabled = false;
+          actionUpdateBtn.textContent = originalText || 'Registrarse';
+        }
         const userEmail = fd.email; // El email que el usuario acaba de registrar
         // Mostrar el email en el mensaje para que el usuario lo tenga visible
         // Shopify no soporta pre-poblar el email en la página de login, así que lo mostramos aquí
@@ -1733,8 +1909,21 @@
     }
     if (errorLower.includes('fecha') || errorLower.includes('birth_date')) {
       showFormError('birth_date', 'Fecha de nacimiento inválida o requerida');
-      const field = document.getElementById('birth_date');
-      if (field) errorFields.push(field);
+      const birthDay = document.getElementById('birth_day');
+      const birthMonth = document.getElementById('birth_month');
+      const birthYear = document.getElementById('birth_year');
+      if (birthDay) {
+        birthDay.classList.add('error');
+        errorFields.push(birthDay);
+      }
+      if (birthMonth) {
+        birthMonth.classList.add('error');
+        if (!errorFields.includes(birthMonth)) errorFields.push(birthMonth);
+      }
+      if (birthYear) {
+        birthYear.classList.add('error');
+        if (!errorFields.includes(birthYear)) errorFields.push(birthYear);
+      }
       fieldsMapped = true;
     }
     if (errorLower.includes('género') || errorLower.includes('gender')) {

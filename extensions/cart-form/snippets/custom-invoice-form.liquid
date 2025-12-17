@@ -13,18 +13,19 @@
 
   <!-- Sección 1: Datos Personales -->
   <div class="form-section">
-    <h3 class="form-section-title">Datos Personales</h3>
+    <h3 class="form-section-title">Datos personales</h3>
     
     <div class="custom-invoice-form-row">
       <div class="custom-invoice-form-group">
         <label for="first_name" class="custom-invoice-label">
-          Nombre <span class="required">*</span>
+          Nombre
         </label>
         <input 
           type="text" 
           id="first_name" 
           name="first_name" 
           class="custom-invoice-input" 
+          placeholder="Ariel"
           required
           pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
           minlength="1"
@@ -34,13 +35,14 @@
 
       <div class="custom-invoice-form-group">
         <label for="last_name" class="custom-invoice-label">
-          Apellido <span class="required">*</span>
+          Apellido
         </label>
         <input 
           type="text" 
           id="last_name" 
           name="last_name" 
           class="custom-invoice-input" 
+          placeholder="García"
           required
           pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
           minlength="1"
@@ -51,13 +53,14 @@
 
     <div class="custom-invoice-form-group">
       <label for="email" class="custom-invoice-label">
-        Email <span class="required">*</span>
+        Correo electrónico
       </label>
       <input 
         type="email" 
         id="email" 
         name="email" 
         class="custom-invoice-input" 
+        placeholder="ariel.garcia@ejemplo.com"
         required
         {% if is_update and customer %}readonly value="{{ customer.email }}"{% endif %}
       />
@@ -67,28 +70,52 @@
     <div class="custom-invoice-form-row">
       <div class="custom-invoice-form-group">
         <label for="birth_date" class="custom-invoice-label">
-          Fecha de Nacimiento <span class="required">*</span>
+          Fecha de nacimiento
         </label>
-        <input 
-          type="date" 
-          id="birth_date" 
-          name="birth_date" 
-          class="custom-invoice-input" 
-          required
-          max="{{ 'now' | date: '%Y-%m-%d' }}"
-        />
+        <div class="birth-date-fields">
+          <select id="birth_day" name="birth_day" class="custom-invoice-input" required>
+            <option value="">Día</option>
+            {% for i in (1..31) %}
+              <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+          </select>
+          <select id="birth_month" name="birth_month" class="custom-invoice-input" required>
+            <option value="">Mes</option>
+            <option value="01">Ene</option>
+            <option value="02">Feb</option>
+            <option value="03">Mar</option>
+            <option value="04">Abr</option>
+            <option value="05">May</option>
+            <option value="06">Jun</option>
+            <option value="07">Jul</option>
+            <option value="08">Ago</option>
+            <option value="09">Sep</option>
+            <option value="10">Oct</option>
+            <option value="11">Nov</option>
+            <option value="12">Dic</option>
+          </select>
+          <select id="birth_year" name="birth_year" class="custom-invoice-input" required>
+            <option value="">Año</option>
+            {% assign current_year = 'now' | date: '%Y' | plus: 0 %}
+            {% assign min_year = current_year | minus: 120 %}
+            {% for year in (min_year..current_year) reversed %}
+              <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <input type="hidden" id="birth_date" name="birth_date" />
         <span class="custom-invoice-error" id="birth_date_error"></span>
       </div>
 
       <div class="custom-invoice-form-group">
         <label for="gender" class="custom-invoice-label">
-          Género <span class="required">*</span>
-        </label>
+          Género        </label>
         <select id="gender" name="gender" class="custom-invoice-input" required>
           <option value="">Seleccione</option>
           <option value="M">Masculino</option>
           <option value="F">Femenino</option>
-          <option value="X">Prefiero no decir / Otro</option>
+          <option value="X">Otro</option>
+          <option value="X">Prefiero no decir</option>
         </select>
         <span class="custom-invoice-error" id="gender_error"></span>
       </div>
@@ -96,14 +123,14 @@
 
     <div class="custom-invoice-form-group">
       <label for="phone" class="custom-invoice-label">
-        Celular <span class="required">*</span>
+        Celular
       </label>
       <input 
         type="text" 
         id="phone" 
         name="phone" 
         class="custom-invoice-input" 
-        placeholder="1234567890"
+        placeholder="61234567"
         required
         inputmode="numeric"
       />
@@ -112,7 +139,7 @@
 
     <div class="custom-invoice-form-group">
       <label for="country" class="custom-invoice-label">
-        País <span class="required">*</span>
+        País
       </label>
       <select id="country" name="country" class="custom-invoice-input" required>
         <option value="">Seleccione un país</option>
@@ -124,13 +151,13 @@
 
   <!-- Sección 2: Información de Facturación (condicional) -->
   <div class="form-section" id="billing-section" style="display: none;">
-    <h3 class="form-section-title">Información de Facturación</h3>
+    <h3 class="form-section-title">Información de facturación</h3>
 
     <!-- Campos para Extranjero (país ≠ Panamá) -->
     <div id="foreign-billing-fields" style="display: none;">
       <div class="custom-invoice-form-group">
         <label for="tax_id_foreign" class="custom-invoice-label">
-          Pasaporte o Identificación <span class="required">*</span>
+          Pasaporte o Identificación
         </label>
         <input 
           type="text" 
@@ -143,7 +170,7 @@
 
       <div class="custom-invoice-form-group">
         <label for="customer_type_foreign" class="custom-invoice-label">
-          Tipo de Cliente <span class="required">*</span>
+          Tipo de cliente
         </label>
         <select id="customer_type_foreign" name="customer_type_foreign" class="custom-invoice-input">
           <option value="04">Extranjero</option>
@@ -156,7 +183,7 @@
     <div id="panama-billing-fields" style="display: none;">
       <div class="custom-invoice-form-group">
         <label for="customer_type" class="custom-invoice-label">
-          Tipo de Cliente <span class="required">*</span>
+          Tipo de cliente
         </label>
         <select id="customer_type" name="customer_type" class="custom-invoice-input">
           <option value="">Seleccione</option>
@@ -170,7 +197,7 @@
       <div id="contribuyente-fields" style="display: none;">
         <div class="custom-invoice-form-group">
           <label for="tax_id_contribuyente" class="custom-invoice-label">
-            Cédula o RUC <span class="required">*</span>
+            Cédula o RUC
           </label>
           <input 
             type="text" 
@@ -183,8 +210,7 @@
 
         <div class="custom-invoice-form-group">
           <label for="customer_dv" class="custom-invoice-label">
-            DV <span class="required">*</span>
-          </label>
+            DV          </label>
           <input 
             type="text" 
             id="customer_dv" 
@@ -196,7 +222,7 @@
 
         <div class="custom-invoice-form-group">
           <label for="taxpayer_name_contribuyente" class="custom-invoice-label">
-            Razón Social <span class="required">*</span>
+            Razón social
           </label>
           <input 
             type="text" 
@@ -209,7 +235,7 @@
 
         <div class="custom-invoice-form-group">
           <label for="taxpayer_kind_contribuyente" class="custom-invoice-label">
-            Tipo de Contribuyente <span class="required">*</span>
+            Tipo de contribuyente
           </label>
           <select id="taxpayer_kind_contribuyente" name="taxpayer_kind_contribuyente" class="custom-invoice-input">
             <option value="">Seleccione</option>
@@ -224,7 +250,7 @@
       <div id="consumidor-fields" style="display: none;">
         <div class="custom-invoice-form-group">
           <label for="tax_id_consumidor" class="custom-invoice-label">
-            Cédula <span class="required">*</span>
+            Cédula
           </label>
           <input 
             type="text" 
@@ -237,7 +263,7 @@
 
         <div class="custom-invoice-form-group">
           <label for="taxpayer_name_consumidor" class="custom-invoice-label">
-            Razón Social
+            Razón social
           </label>
           <input 
             type="text" 
@@ -250,7 +276,7 @@
 
         <div class="custom-invoice-form-group">
           <label for="taxpayer_kind_consumidor" class="custom-invoice-label">
-            Tipo de Contribuyente <span class="required">*</span>
+            Tipo de contribuyente
           </label>
           <select id="taxpayer_kind_consumidor" name="taxpayer_kind_consumidor" class="custom-invoice-input">
             <option value="">Seleccione</option>
@@ -265,7 +291,7 @@
       <div class="custom-invoice-form-row">
         <div class="custom-invoice-form-group">
           <label for="province" class="custom-invoice-label">
-            Provincia <span class="required">*</span>
+            Provincia
           </label>
           <select id="province" name="province" class="custom-invoice-input">
             <option value="">Seleccione</option>
@@ -276,7 +302,7 @@
 
         <div class="custom-invoice-form-group">
           <label for="district" class="custom-invoice-label">
-            Distrito <span class="required">*</span>
+            Distrito
           </label>
           <select id="district" name="district" class="custom-invoice-input">
             <option value="">Seleccione</option>
@@ -288,7 +314,7 @@
 
       <div class="custom-invoice-form-group">
         <label for="corregimiento" class="custom-invoice-label">
-          Corregimiento <span class="required">*</span>
+          Corregimiento
         </label>
         <select id="corregimiento" name="corregimiento" class="custom-invoice-input">
           <option value="">Seleccione</option>

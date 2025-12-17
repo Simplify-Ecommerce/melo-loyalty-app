@@ -175,23 +175,33 @@ export function validateCustomerData(data) {
     errors.push("Código de país del teléfono es requerido");
   }
 
-  const provinceValidation = validateRequiredField(data.province, "Provincia");
-  if (!provinceValidation.valid) {
-    errors.push(provinceValidation.error);
-  }
+  // Los campos de ubicación (province, district, corregimiento) solo son requeridos
+  // para clientes de Panamá (document_type !== 'pasaporte')
+  // Los extranjeros (document_type === 'pasaporte') no necesitan estos campos
+  if (data.document_type !== "pasaporte") {
+    // Cliente de Panamá - requiere campos de ubicación
+    const provinceValidation = validateRequiredField(
+      data.province,
+      "Provincia",
+    );
+    if (!provinceValidation.valid) {
+      errors.push(provinceValidation.error);
+    }
 
-  const districtValidation = validateRequiredField(data.district, "Distrito");
-  if (!districtValidation.valid) {
-    errors.push(districtValidation.error);
-  }
+    const districtValidation = validateRequiredField(data.district, "Distrito");
+    if (!districtValidation.valid) {
+      errors.push(districtValidation.error);
+    }
 
-  const corregimientoValidation = validateRequiredField(
-    data.corregimiento,
-    "Corregimiento",
-  );
-  if (!corregimientoValidation.valid) {
-    errors.push(corregimientoValidation.error);
+    const corregimientoValidation = validateRequiredField(
+      data.corregimiento,
+      "Corregimiento",
+    );
+    if (!corregimientoValidation.valid) {
+      errors.push(corregimientoValidation.error);
+    }
   }
+  // Si es extranjero (pasaporte), no validamos los campos de ubicación
 
   return {
     valid: errors.length === 0,
