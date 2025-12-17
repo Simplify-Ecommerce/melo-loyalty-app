@@ -352,6 +352,13 @@
         skeleton.style.opacity = '0';
       }
       
+      // Restaurar el texto del botón "Actualizar" al abrir el modal
+      const actionUpdateBtn = document.getElementById('action-update-btn');
+      if (actionUpdateBtn) {
+        actionUpdateBtn.textContent = 'Actualizar';
+        actionUpdateBtn.disabled = false;
+      }
+      
       modal.showModal();
       
       // Establecer altura inicial del modal para que la animación funcione
@@ -1473,20 +1480,25 @@
       // Permitir HTML en el mensaje para formatear mejor
       d.innerHTML = m.replace(/\n/g, '<br>');
       d.className = `custom-invoice-message ${t}`;
-      d.style.visibility = 'visible';
-      d.style.opacity = '1';
+      // Asegurar que los estilos inline tengan prioridad
+      d.style.setProperty('visibility', 'visible', 'important');
+      d.style.setProperty('opacity', '1', 'important');
+      d.style.setProperty('display', 'block', 'important');
       // Hacer scroll al action-container para que el mensaje sea visible
       const actionContainer = document.querySelector('.action-container');
       if (actionContainer) {
         actionContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
       setTimeout(() => {
-        d.style.opacity = '0';
+        d.style.setProperty('opacity', '0', 'important');
         setTimeout(() => {
-          d.style.visibility = 'hidden';
+          d.style.setProperty('visibility', 'hidden', 'important');
+          d.style.setProperty('display', 'none', 'important');
           d.innerHTML = '';
         }, 300);
       }, 5000);
+    } else {
+      console.error('form-message element not found');
     }
   }
 
@@ -1630,6 +1642,11 @@
         throw error;
       }
       if (isUp) {
+        // Restaurar el texto del botón inmediatamente después del éxito
+        if (actionUpdateBtn) {
+          actionUpdateBtn.disabled = false;
+          actionUpdateBtn.textContent = originalText || 'Actualizar';
+        }
         showFormMsg('Actualizado correctamente', 'success');
         setTimeout(() => {
           closeModal();
