@@ -1,17 +1,9 @@
-{% doc %}
-  Formulario para registro/actualización de datos del cliente para factura personalizada.
-  Reestructurado para usar metafields exchanger.
-  
-  @param {boolean} is_update - Si es true, es un formulario de actualización (oculta email)
-  @param {object} customer - Objeto del cliente (solo para actualización)
-{% enddoc %}
 
 <form id="custom-invoice-form" class="custom-invoice-form">
   {% if is_update and customer %}
     <input type="hidden" id="customer_id" name="customer_id" value="{{ customer.id }}" />
   {% endif %}
 
-  <!-- Sección 1: Datos Personales -->
   <div class="form-section">
     <h3 class="form-section-title">Datos personales</h3>
     
@@ -25,7 +17,7 @@
           id="first_name" 
           name="first_name" 
           class="custom-invoice-input" 
-          placeholder="Ariel"
+          placeholder="Escribe tu nombre"
           required
           pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
           minlength="1"
@@ -42,7 +34,7 @@
           id="last_name" 
           name="last_name" 
           class="custom-invoice-input" 
-          placeholder="García"
+          placeholder="Escribe tu apellido"
           required
           pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
           minlength="1"
@@ -60,7 +52,7 @@
         id="email" 
         name="email" 
         class="custom-invoice-input" 
-        placeholder="ariel.garcia@ejemplo.com"
+        placeholder="Escribe tu correo electrónico"
         required
         {% if is_update and customer %}readonly value="{{ customer.email }}"{% endif %}
       />
@@ -121,39 +113,47 @@
       </div>
     </div>
 
-    <div class="custom-invoice-form-group">
-      <label for="phone" class="custom-invoice-label">
-        Celular
-      </label>
-      <input 
-        type="text" 
-        id="phone" 
-        name="phone" 
-        class="custom-invoice-input" 
-        placeholder="61234567"
-        required
-        inputmode="numeric"
-      />
-      <span class="custom-invoice-error" id="phone_error"></span>
-    </div>
+    <div class="custom-invoice-form-row">
+      <div class="custom-invoice-form-group">
+        <label for="phone" class="custom-invoice-label">
+          Celular
+        </label>
+        <input 
+          type="text" 
+          id="phone" 
+          name="phone" 
+          class="custom-invoice-input" 
+          placeholder="61234567"
+          required
+          inputmode="numeric"
+        />
+        <span class="custom-invoice-error" id="phone_error"></span>
+      </div>
 
-    <div class="custom-invoice-form-group">
-      <label for="country" class="custom-invoice-label">
-        País
-      </label>
-      <select id="country" name="country" class="custom-invoice-input" required>
-        <option value="">Seleccione un país</option>
-        <!-- Los países se cargarán dinámicamente desde JavaScript -->
-      </select>
-      <span class="custom-invoice-error" id="country_error"></span>
+      <div class="custom-invoice-form-group">
+        <label class="custom-invoice-label">
+          ¿Resides en Panamá?
+        </label>
+        <div class="radix-radio-group" role="radiogroup" aria-label="¿Resides en Panamá?">
+          <label class="radix-radio-item">
+            <input type="radio" name="resides_panama" id="resides_panama_yes" value="yes" class="radix-radio-input" checked required>
+            <span class="radix-radio-indicator"></span>
+            <span class="radix-radio-label">Sí</span>
+          </label>
+          <label class="radix-radio-item">
+            <input type="radio" name="resides_panama" id="resides_panama_no" value="no" class="radix-radio-input" required>
+            <span class="radix-radio-indicator"></span>
+            <span class="radix-radio-label">No</span>
+          </label>
+        </div>
+        <span class="custom-invoice-error" id="country_error"></span>
+      </div>
     </div>
   </div>
 
-  <!-- Sección 2: Información de Facturación (condicional) -->
   <div class="form-section" id="billing-section" style="display: none;">
     <h3 class="form-section-title">Información de facturación</h3>
 
-    <!-- Campos para Extranjero (país ≠ Panamá) -->
     <div id="foreign-billing-fields" style="display: none;">
       <div class="custom-invoice-form-group">
         <label for="tax_id_foreign" class="custom-invoice-label">
@@ -182,67 +182,149 @@
     <!-- Campos para Panamá -->
     <div id="panama-billing-fields" style="display: none;">
       <div class="custom-invoice-form-group">
-        <label for="customer_type" class="custom-invoice-label">
+        <label class="custom-invoice-label">
           Tipo de cliente
         </label>
-        <select id="customer_type" name="customer_type" class="custom-invoice-input">
-          <option value="">Seleccione</option>
-          <option value="01">Contribuyente</option>
-          <option value="02">Consumidor final</option>
-        </select>
+        <div class="radio-cards-group" role="radiogroup" aria-label="Tipo de cliente">
+          <label class="radio-card">
+            <input type="radio" name="customer_type" id="customer_type_01" value="01" class="radio-card-input" checked>
+            <div class="radio-card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#000" d="M16 3a3 3 0 0 1 2.995 2.824L19 6v10h.75c.647 0 1.18.492 1.244 1.122l.006.128V19a3 3 0 0 1-2.824 2.995L18 22H8a3 3 0 0 1-2.995-2.824L5 19V9H3.25a1.25 1.25 0 0 1-1.244-1.122L2 7.75V6a3 3 0 0 1 2.824-2.995L5 3zm3 15h-9v1c0 .35-.06.687-.17 1H18a1 1 0 0 0 1-1zm-7-6h-2a1 1 0 0 0-.117 1.993L10 14h2a1 1 0 0 0 .117-1.993zm2-4h-4a1 1 0 0 0 0 2h4a1 1 0 1 0 0-2M5 5a1 1 0 0 0-1 1v1h1z"/></g></svg>
+            </div>
+            <div class="radio-card-content">
+              <div class="radio-card-title">Contribuyente</div>
+              <div class="radio-card-description">Persona que realiza actividades económicas</div>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="customer_type" id="customer_type_02" value="02" class="radio-card-input">
+            <div class="radio-card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#000" d="M7.5 19a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m10 0a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3M3 2c1.726 0 3.023 1.283 3.145 3h13.657a2 2 0 0 1 1.968 2.358l-1.637 9A2 2 0 0 1 18.165 18H6.931a2 2 0 0 1-1.995-1.858l-.8-11.213C4.09 4.31 3.564 4 3 4a1 1 0 0 1 0-2"/></g></svg>
+            </div>
+            <div class="radio-card-content">
+              <div class="radio-card-title">Consumidor final</div>
+              <div class="radio-card-description">Adquisición para uso personal</div>
+            </div>
+          </label>
+        </div>
         <span class="custom-invoice-error" id="customer_type_error"></span>
       </div>
 
-      <!-- Campos para Contribuyente -->
       <div id="contribuyente-fields" style="display: none;">
-        <div class="custom-invoice-form-group">
-          <label for="tax_id_contribuyente" class="custom-invoice-label">
-            Cédula o RUC
-          </label>
-          <input 
-            type="text" 
-            id="tax_id_contribuyente" 
-            name="tax_id_contribuyente" 
-            class="custom-invoice-input" 
-          />
-          <span class="custom-invoice-error" id="tax_id_contribuyente_error"></span>
+        <div class="contribuyente-section contribuyente-section-identification">
+          <div class="custom-invoice-form-group custom-invoice-form-group-with-validation">
+            <label for="tax_id_contribuyente" class="custom-invoice-label">
+              Cédula o RUC <span class="label-subdued">(con guiones)</span>
+            </label>
+            <div class="input-with-validation">
+              <input 
+                type="text" 
+                id="tax_id_contribuyente" 
+                name="tax_id_contribuyente" 
+                class="custom-invoice-input" 
+                placeholder="8-123-4567"
+              />
+              <span class="validation-indicator" id="tax_id_contribuyente_validation"></span>
+            </div>
+            <span class="custom-invoice-error" id="tax_id_contribuyente_error"></span>
+          </div>
+
+          <div class="custom-invoice-form-group">
+            <label class="custom-invoice-label">
+              Tipo de contribuyente
+            </label>
+            <div class="radio-cards-group" role="radiogroup" aria-label="Tipo de contribuyente">
+              <label class="radio-card">
+                <input type="radio" name="taxpayer_kind_contribuyente" id="taxpayer_kind_contribuyente_1" value="1" class="radio-card-input">
+                <div class="radio-card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#000" d="M16 14a5 5 0 0 1 4.995 4.783L21 19v1a2 2 0 0 1-1.85 1.995L19 22H5a2 2 0 0 1-1.995-1.85L3 20v-1a5 5 0 0 1 4.783-4.995L8 14zM12 2a5 5 0 1 1 0 10a5 5 0 0 1 0-10"/></g></svg>
+                </div>
+                <div class="radio-card-content">
+                  <div class="radio-card-title">Natural</div>
+                  <div class="radio-card-description">Persona física</div>
+                </div>
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="taxpayer_kind_contribuyente" id="taxpayer_kind_contribuyente_2" value="2" class="radio-card-input">
+                <div class="radio-card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#000" d="M3 19h1V6.36a1.5 1.5 0 0 1 1.026-1.423l8-2.666A1.5 1.5 0 0 1 15 3.694V19h1V9.99a.5.5 0 0 1 .598-.49l2.196.44A1.5 1.5 0 0 1 20 11.41V19h1a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2"/></g></svg>
+                </div>
+                <div class="radio-card-content">
+                  <div class="radio-card-title">Jurídico</div>
+                  <div class="radio-card-description">Persona jurídica o empresa</div>
+                </div>
+              </label>
+            </div>
+            <span class="custom-invoice-error" id="taxpayer_kind_contribuyente_error"></span>
+          </div>
         </div>
 
-        <div class="custom-invoice-form-group">
-          <label for="customer_dv" class="custom-invoice-label">
-            DV          </label>
-          <input 
-            type="text" 
-            id="customer_dv" 
-            name="customer_dv" 
-            class="custom-invoice-input" 
-          />
-          <span class="custom-invoice-error" id="customer_dv_error"></span>
+        <div class="contribuyente-section contribuyente-section-validation">
+          <div class="custom-invoice-form-row-dv-razon">
+            <div class="custom-invoice-form-group">
+              <label for="taxpayer_name_contribuyente" class="custom-invoice-label">
+                Razón social
+              </label>
+              <input 
+                type="text" 
+                id="taxpayer_name_contribuyente" 
+                name="taxpayer_name_contribuyente" 
+                class="custom-invoice-input" 
+                readonly
+              />
+              <span class="custom-invoice-error" id="taxpayer_name_contribuyente_error"></span>
+            </div>
+
+            <div class="custom-invoice-form-group">
+              <label for="customer_dv" class="custom-invoice-label">
+                DV
+              </label>
+              <input 
+                type="text" 
+                id="customer_dv" 
+                name="customer_dv" 
+                class="custom-invoice-input" 
+                readonly
+              />
+              <span class="custom-invoice-error" id="customer_dv_error"></span>
+            </div>
+          </div>
+          <div class="validation-message" id="contribuyente-validation-message" style="display: none;"></div>
         </div>
 
-        <div class="custom-invoice-form-group">
-          <label for="taxpayer_name_contribuyente" class="custom-invoice-label">
-            Razón social
-          </label>
-          <input 
-            type="text" 
-            id="taxpayer_name_contribuyente" 
-            name="taxpayer_name_contribuyente" 
-            class="custom-invoice-input" 
-          />
-          <span class="custom-invoice-error" id="taxpayer_name_contribuyente_error"></span>
-        </div>
+        <div class="contribuyente-section contribuyente-section-location">
+          <input type="hidden" id="location_code" name="location_code" />
+          <div class="custom-invoice-form-row">
+            <div class="custom-invoice-form-group">
+              <label for="province" class="custom-invoice-label">
+                Provincia
+              </label>
+              <select id="province" name="province" class="custom-invoice-input">
+                <option value="">Seleccione</option>
+              </select>
+              <span class="custom-invoice-error" id="province_error"></span>
+            </div>
 
-        <div class="custom-invoice-form-group">
-          <label for="taxpayer_kind_contribuyente" class="custom-invoice-label">
-            Tipo de contribuyente
-          </label>
-          <select id="taxpayer_kind_contribuyente" name="taxpayer_kind_contribuyente" class="custom-invoice-input">
-            <option value="">Seleccione</option>
-            <option value="1">Natural</option>
-            <option value="2">Jurídico</option>
-          </select>
-          <span class="custom-invoice-error" id="taxpayer_kind_contribuyente_error"></span>
+            <div class="custom-invoice-form-group">
+              <label for="district" class="custom-invoice-label">
+                Distrito
+              </label>
+              <select id="district" name="district" class="custom-invoice-input" disabled>
+                <option value="">Seleccione</option>
+              </select>
+              <span class="custom-invoice-error" id="district_error"></span>
+            </div>
+          </div>
+
+          <div class="custom-invoice-form-group">
+            <label for="corregimiento" class="custom-invoice-label">
+              Corregimiento
+            </label>
+            <select id="corregimiento" name="corregimiento" class="custom-invoice-input" disabled>
+              <option value="">Seleccione</option>
+            </select>
+            <span class="custom-invoice-error" id="corregimiento_error"></span>
+          </div>
         </div>
       </div>
 
@@ -275,53 +357,35 @@
         </div>
 
         <div class="custom-invoice-form-group">
-          <label for="taxpayer_kind_consumidor" class="custom-invoice-label">
+          <label class="custom-invoice-label">
             Tipo de contribuyente
           </label>
-          <select id="taxpayer_kind_consumidor" name="taxpayer_kind_consumidor" class="custom-invoice-input">
-            <option value="">Seleccione</option>
-            <option value="1">Natural</option>
-            <option value="2">Jurídico</option>
-          </select>
+          <div class="radio-cards-group" role="radiogroup" aria-label="Tipo de contribuyente">
+            <label class="radio-card">
+              <input type="radio" name="taxpayer_kind_consumidor" id="taxpayer_kind_consumidor_1" value="1" class="radio-card-input" checked>
+              <div class="radio-card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#000" d="M16 14a5 5 0 0 1 4.995 4.783L21 19v1a2 2 0 0 1-1.85 1.995L19 22H5a2 2 0 0 1-1.995-1.85L3 20v-1a5 5 0 0 1 4.783-4.995L8 14zM12 2a5 5 0 1 1 0 10a5 5 0 0 1 0-10"/></g></svg>
+              </div>
+              <div class="radio-card-content">
+                <div class="radio-card-title">Natural</div>
+                <div class="radio-card-description">Persona física</div>
+              </div>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="taxpayer_kind_consumidor" id="taxpayer_kind_consumidor_2" value="2" class="radio-card-input">
+              <div class="radio-card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#000" d="M3 19h1V6.36a1.5 1.5 0 0 1 1.026-1.423l8-2.666A1.5 1.5 0 0 1 15 3.694V19h1V9.99a.5.5 0 0 1 .598-.49l2.196.44A1.5 1.5 0 0 1 20 11.41V19h1a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2"/></g></svg>
+              </div>
+              <div class="radio-card-content">
+                <div class="radio-card-title">Jurídico</div>
+                <div class="radio-card-description">Persona jurídica o empresa</div>
+              </div>
+            </label>
+          </div>
           <span class="custom-invoice-error" id="taxpayer_kind_consumidor_error"></span>
         </div>
       </div>
 
-      <!-- Campos de ubicación (solo para Panamá) -->
-      <div class="custom-invoice-form-row">
-        <div class="custom-invoice-form-group">
-          <label for="province" class="custom-invoice-label">
-            Provincia
-          </label>
-          <select id="province" name="province" class="custom-invoice-input">
-            <option value="">Seleccione</option>
-            <option value="test">Test</option>
-          </select>
-          <span class="custom-invoice-error" id="province_error"></span>
-        </div>
-
-        <div class="custom-invoice-form-group">
-          <label for="district" class="custom-invoice-label">
-            Distrito
-          </label>
-          <select id="district" name="district" class="custom-invoice-input">
-            <option value="">Seleccione</option>
-            <option value="test">Test</option>
-          </select>
-          <span class="custom-invoice-error" id="district_error"></span>
-        </div>
-      </div>
-
-      <div class="custom-invoice-form-group">
-        <label for="corregimiento" class="custom-invoice-label">
-          Corregimiento
-        </label>
-        <select id="corregimiento" name="corregimiento" class="custom-invoice-input">
-          <option value="">Seleccione</option>
-          <option value="test">Test</option>
-        </select>
-        <span class="custom-invoice-error" id="corregimiento_error"></span>
-      </div>
     </div>
   </div>
 </form>

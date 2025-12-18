@@ -100,6 +100,15 @@ export const action = async ({ request }) => {
       },
     ];
 
+    if (body.location_code) {
+      metafields.push({
+        namespace: "exchanger",
+        key: "ex_customer_location_code",
+        type: "single_line_text_field",
+        value: body.location_code,
+      });
+    }
+
     const createCustomerMutation = `
       mutation customerCreate($input: CustomerInput!) {
         customerCreate(input: $input) {

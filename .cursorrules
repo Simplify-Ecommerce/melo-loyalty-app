@@ -3,14 +3,17 @@
 ## Reglas para Theme App Extensions
 
 ### 1. NO usar `{% stylesheet %}` en App Blocks
+
 **Error común:** Usar `{% stylesheet %}` dentro de archivos `.liquid` de app blocks causa el error: "Cannot use stylesheet tag in app blocks"
 
 **Solución:**
+
 - Crear archivos CSS separados en la carpeta `assets/`
 - Referenciar el CSS en el schema del bloque usando `"stylesheet": "nombre-archivo.css"`
 - NO usar `{% stylesheet %}` dentro de archivos `.liquid` de app blocks o snippets
 
 **Ejemplo correcto:**
+
 ```liquid
 {% schema %}
 {
@@ -22,6 +25,7 @@
 ```
 
 **Ejemplo incorrecto:**
+
 ```liquid
 {% stylesheet %}
   .mi-clase { color: red; }
@@ -29,14 +33,17 @@
 ```
 
 ### 2. NO usar `{% javascript %}` en App Blocks
+
 **Error común:** Usar `{% javascript %}` dentro de archivos `.liquid` de app blocks causa el error: "Cannot use javascript tag in app blocks"
 
 **Solución:**
+
 - Usar `<script>` de HTML estándar dentro del archivo `.liquid`
 - O crear archivos JavaScript separados en `assets/` y referenciarlos en el schema con `"javascript": "nombre-archivo.js"`
 - Si necesitas usar tags Liquid dentro del JavaScript, usar `<script>` con el código JavaScript directamente
 
 **Ejemplo correcto:**
+
 ```liquid
 <script>
   const customerId = '{{ customer.id }}';
@@ -45,6 +52,7 @@
 ```
 
 **Ejemplo incorrecto:**
+
 ```liquid
 {% javascript %}
   const customerId = '{{ customer.id }}';
@@ -52,23 +60,28 @@
 ```
 
 ### 3. Tamaño de archivos JavaScript
+
 **Error común:** Archivos JavaScript que exceden 10KB causan el error: "The file size for 'archivo.js' exceeds the configured threshold (10000 B)"
 
 **Solución:**
+
 - Mantener archivos JavaScript bajo 10KB (comprimidos)
 - Si es necesario, dividir el código en múltiples archivos
 - Minificar el código cuando sea posible
 - Mover código repetitivo a funciones reutilizables
 
 ### 4. Tags Liquid dentro de JavaScript
+
 **Error común:** Mezclar tags Liquid (`{% if %}`, `{% endif %}`) dentro de código JavaScript minificado causa errores de sintaxis
 
 **Solución:**
+
 - Definir variables JavaScript usando Liquid ANTES del código JavaScript
 - Usar constantes JavaScript en lugar de tags Liquid dentro del código
 - Mantener el código JavaScript legible cuando se usan tags Liquid
 
 **Ejemplo correcto:**
+
 ```liquid
 <script>
   {% if customer %}
@@ -77,7 +90,7 @@
   {% else %}
   const IS_LOGGED_IN = false;
   {% endif %}
-  
+
   // Ahora usar IS_LOGGED_IN y CUSTOMER_ID en el código JavaScript
   if (IS_LOGGED_IN) {
     // código
@@ -86,6 +99,7 @@
 ```
 
 **Ejemplo incorrecto:**
+
 ```liquid
 <script>
   function checkUser() {
@@ -101,14 +115,17 @@
 ## Reglas para React Router / Shopify App Backend
 
 ### 5. NO usar `json` de `@react-router/node`
+
 **Error común:** Importar `json` de `@react-router/node` causa el error: "The requested module '@react-router/node' does not provide an export named 'json'"
 
 **Solución:**
+
 - Usar `Response.json()` que es la API nativa de JavaScript/Web API
 - NO importar `json` de `@react-router/node`
 - Usar `Response.json(data, options)` en lugar de `json(data, options)`
 
 **Ejemplo correcto:**
+
 ```javascript
 export const loader = async ({ request }) => {
   try {
@@ -121,6 +138,7 @@ export const loader = async ({ request }) => {
 ```
 
 **Ejemplo incorrecto:**
+
 ```javascript
 import { json } from "@react-router/node";
 
@@ -130,7 +148,9 @@ export const loader = async ({ request }) => {
 ```
 
 ### 6. Manejo de respuestas JSON
+
 **Regla general:**
+
 - Siempre usar `Response.json()` para respuestas JSON
 - El segundo parámetro es un objeto con opciones como `{ status: 200 }`
 - Para leer JSON del request, usar `await request.json()` (esto sí es correcto)
@@ -147,15 +167,18 @@ export const loader = async ({ request }) => {
 ## Reglas para Vite y Rutas con Espacios
 
 ### 7. Rutas con espacios en el nombre
+
 **Error común:** Si la ruta del proyecto contiene espacios (ej: "Simplify office", "Formulario de Melo"), Vite puede tener problemas con el optimizador de dependencias mostrando errores como: "The file does not exist at ... which is in the optimize deps directory"
 
 **Solución:**
+
 - Limpiar el caché de Vite: `rm -rf node_modules/.vite`
 - Asegurarse de que `vite.config.js` tenga configuraciones adecuadas para `optimizeDeps`
 - Si el problema persiste, considerar mover el proyecto a una ruta sin espacios (recomendado)
 - Alternativamente, usar rutas cortas de Windows (8.3) o crear un symlink
 
 **Configuración recomendada en vite.config.js:**
+
 ```javascript
 optimizeDeps: {
   include: ["@shopify/app-bridge-react"],
@@ -169,6 +192,7 @@ cacheDir: "node_modules/.vite",
 ```
 
 **Si el problema persiste:**
+
 1. Mover el proyecto a una ruta sin espacios (ej: `C:/Users/SimplifyOffice/Desktop/FormularioDeMelo/...`)
 2. O usar una ruta más corta sin espacios
 3. Limpiar caché: `rm -rf node_modules/.vite` y reiniciar el servidor
@@ -180,4 +204,3 @@ cacheDir: "node_modules/.vite",
 - El schema del bloque debe referenciar los archivos de assets correctamente
 - Para JavaScript inline con Liquid, siempre usar `<script>` de HTML
 - **Evitar espacios en las rutas del proyecto** - puede causar problemas con Vite y otras herramientas
-

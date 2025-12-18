@@ -171,6 +171,16 @@ export const action = async ({ request }) => {
       },
     ];
 
+    if (body.location_code) {
+      metafields.push({
+        ownerId: body.customer_id,
+        namespace: "exchanger",
+        key: "ex_customer_location_code",
+        type: "single_line_text_field",
+        value: body.location_code,
+      });
+    }
+
     const updateCustomerMutation = `
       mutation customerUpdate($input: CustomerInput!) {
         customerUpdate(input: $input) {

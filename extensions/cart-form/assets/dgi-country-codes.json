@@ -1,0 +1,2514 @@
+[
+  {
+    "name": "BOCAS DEL TORO / BOCAS DEL TORO / BOCAS DEL TORO (CABECERA)",
+    "code": "1-1-1"
+  },
+  {
+    "name": "BOCAS DEL TORO / BOCAS DEL TORO / BASTIMENTOS",
+    "code": "1-1-2"
+  },
+  {
+    "name": "BOCAS DEL TORO / BOCAS DEL TORO / CAUCHERO",
+    "code": "1-1-3"
+  },
+  {
+    "name": "BOCAS DEL TORO / BOCAS DEL TORO / PUNTA LAUREL",
+    "code": "1-1-4"
+  },
+  {
+    "name": "BOCAS DEL TORO / BOCAS DEL TORO / TIERRA OSCURA",
+    "code": "1-1-5"
+  },
+  {
+    "name": "BOCAS DEL TORO / CHANGUINOLA / CHANGUINOLA (CABECERA)",
+    "code": "1-2-1"
+  },
+  {
+    "name": "BOCAS DEL TORO / CHANGUINOLA / ALMIRANTE",
+    "code": "1-2-2"
+  },
+  {
+    "name": "BOCAS DEL TORO / CHANGUINOLA / GUABITO",
+    "code": "1-2-3"
+  },
+  {
+    "name": "BOCAS DEL TORO / CHANGUINOLA / TERIBE",
+    "code": "1-2-4"
+  },
+  {
+    "name": "BOCAS DEL TORO / CHANGUINOLA / VALLE DEL RISCO",
+    "code": "1-2-5"
+  },
+  {
+    "name": "BOCAS DEL TORO / CHANGUINOLA / EL EMPALME",
+    "code": "1-2-6"
+  },
+  {
+    "name": "BOCAS DEL TORO / CHANGUINOLA / LAS TABLAS",
+    "code": "1-2-7"
+  },
+  {
+    "name": "BOCAS DEL TORO / CHIRIQUI GRANDE / CHIRIQUI GRANDE (CABECERA)",
+    "code": "1-3-1"
+  },
+  {
+    "name": "BOCAS DEL TORO / CHIRIQUI GRANDE / MIRAMAR",
+    "code": "1-3-2"
+  },
+  {
+    "name": "BOCAS DEL TORO / CHIRIQUI GRANDE / PUNTA PEÑA",
+    "code": "1-3-3"
+  },
+  {
+    "name": "BOCAS DEL TORO / CHIRIQUI GRANDE / PUNTA ROBALO",
+    "code": "1-3-4"
+  },
+  {
+    "name": "BOCAS DEL TORO / CHIRIQUI GRANDE / RAMBALA",
+    "code": "1-3-5"
+  },
+  {
+    "name": "COCLE / AGUADULCE / AGUADULCE (CABECERA)",
+    "code": "2-1-1"
+  },
+  {
+    "name": "COCLE / AGUADULCE / EL CRISTO",
+    "code": "2-1-2"
+  },
+  {
+    "name": "COCLE / AGUADULCE / EL ROBLE",
+    "code": "2-1-3"
+  },
+  {
+    "name": "COCLE / AGUADULCE / POCRI",
+    "code": "2-1-4"
+  },
+  {
+    "name": "COCLE / AGUADULCE / BARRIOS UNIDOS",
+    "code": "2-1-5"
+  },
+  {
+    "name": "COCLE / ANTON / ANTON (CABECERA)",
+    "code": "2-2-1"
+  },
+  {
+    "name": "COCLE / ANTON / CABUYA",
+    "code": "2-2-2"
+  },
+  {
+    "name": "COCLE / ANTON / EL CHIRU",
+    "code": "2-2-3"
+  },
+  {
+    "name": "COCLE / ANTON / EL RETIRO",
+    "code": "2-2-4"
+  },
+  {
+    "name": "COCLE / ANTON / EL VALLE",
+    "code": "2-2-5"
+  },
+  {
+    "name": "COCLE / ANTON / JUAN DIAZ",
+    "code": "2-2-6"
+  },
+  {
+    "name": "COCLE / ANTON / RIO HATO",
+    "code": "2-2-7"
+  },
+  {
+    "name": "COCLE / ANTON / SAN JUAN DE DIOS",
+    "code": "2-2-8"
+  },
+  {
+    "name": "COCLE / ANTON / SANTA RITA",
+    "code": "2-2-9"
+  },
+  {
+    "name": "COCLE / ANTON / CABALLERO",
+    "code": "2-2-10"
+  },
+  {
+    "name": "COCLE / LA PINTADA / LA PINTADA (CABECERA)",
+    "code": "2-3-1"
+  },
+  {
+    "name": "COCLE / LA PINTADA / EL HARINO",
+    "code": "2-3-2"
+  },
+  {
+    "name": "COCLE / LA PINTADA / EL POTRERO",
+    "code": "2-3-3"
+  },
+  {
+    "name": "COCLE / LA PINTADA / LLANO GRANDE",
+    "code": "2-3-4"
+  },
+  {
+    "name": "COCLE / LA PINTADA / PIEDRAS GORDAS",
+    "code": "2-3-5"
+  },
+  {
+    "name": "COCLE / LA PINTADA / LAS LOMAS",
+    "code": "2-3-6"
+  },
+  {
+    "name": "COCLE / NATA / NATA (CABECERA)",
+    "code": "2-4-1"
+  },
+  {
+    "name": "COCLE / NATA / CAPELLANIA",
+    "code": "2-4-2"
+  },
+  {
+    "name": "COCLE / NATA / EL CAÑO",
+    "code": "2-4-3"
+  },
+  {
+    "name": "COCLE / NATA / GUZMAN",
+    "code": "2-4-4"
+  },
+  {
+    "name": "COCLE / NATA / LAS HUACAS",
+    "code": "2-4-5"
+  },
+  {
+    "name": "COCLE / NATA / TOZA",
+    "code": "2-4-6"
+  },
+  {
+    "name": "COCLE / OLA / OLA (CABECERA)",
+    "code": "2-5-1"
+  },
+  {
+    "name": "COCLE / OLA / EL COPE",
+    "code": "2-5-2"
+  },
+  {
+    "name": "COCLE / OLA / EL PALMAR",
+    "code": "2-5-3"
+  },
+  {
+    "name": "COCLE / OLA / EL PICACHO",
+    "code": "2-5-4"
+  },
+  {
+    "name": "COCLE / OLA / LA PAVA",
+    "code": "2-5-5"
+  },
+  {
+    "name": "COCLE / PENONOME / PENONOME (CABECERA)",
+    "code": "2-6-1"
+  },
+  {
+    "name": "COCLE / PENONOME / CAÑAVERAL",
+    "code": "2-6-2"
+  },
+  {
+    "name": "COCLE / PENONOME / COCLE",
+    "code": "2-6-3"
+  },
+  {
+    "name": "COCLE / PENONOME / CHIGUIRI ARRIBA",
+    "code": "2-6-4"
+  },
+  {
+    "name": "COCLE / PENONOME / EL COCO",
+    "code": "2-6-5"
+  },
+  {
+    "name": "COCLE / PENONOME / PAJONAL",
+    "code": "2-6-6"
+  },
+  {
+    "name": "COCLE / PENONOME / RIO GRANDE",
+    "code": "2-6-7"
+  },
+  {
+    "name": "COCLE / PENONOME / RIO INDIO",
+    "code": "2-6-8"
+  },
+  {
+    "name": "COCLE / PENONOME / TOABRE",
+    "code": "2-6-9"
+  },
+  {
+    "name": "COCLE / PENONOME / TULU",
+    "code": "2-6-10"
+  },
+  {
+    "name": "COLON / COLON / BARRIO NORTE",
+    "code": "3-1-1"
+  },
+  {
+    "name": "COLON / COLON / BARRIO SUR",
+    "code": "3-1-2"
+  },
+  {
+    "name": "COLON / COLON / BUENA VISTA",
+    "code": "3-1-3"
+  },
+  {
+    "name": "COLON / COLON / CATIVA",
+    "code": "3-1-4"
+  },
+  {
+    "name": "COLON / COLON / CIRICITO",
+    "code": "3-1-5"
+  },
+  {
+    "name": "COLON / COLON / CRISTOBAL",
+    "code": "3-1-6"
+  },
+  {
+    "name": "COLON / COLON / ESCOBAL",
+    "code": "3-1-7"
+  },
+  {
+    "name": "COLON / COLON / LIMON",
+    "code": "3-1-8"
+  },
+  {
+    "name": "COLON / COLON / NUEVA PROVIDENCIA",
+    "code": "3-1-9"
+  },
+  {
+    "name": "COLON / COLON / PUERTO PILON",
+    "code": "3-1-10"
+  },
+  {
+    "name": "COLON / COLON / SABANITAS",
+    "code": "3-1-11"
+  },
+  {
+    "name": "COLON / COLON / SALAMANCA",
+    "code": "3-1-12"
+  },
+  {
+    "name": "COLON / COLON / SAN JUAN",
+    "code": "3-1-13"
+  },
+  {
+    "name": "COLON / COLON / SANTA ROSA",
+    "code": "3-1-14"
+  },
+  {
+    "name": "COLON / CHAGRES / NUEVO CHAGRES (CABECERA)",
+    "code": "3-2-1"
+  },
+  {
+    "name": "COLON / CHAGRES / ACHIOTE",
+    "code": "3-2-2"
+  },
+  {
+    "name": "COLON / CHAGRES / EL GUABO",
+    "code": "3-2-3"
+  },
+  {
+    "name": "COLON / CHAGRES / LA ENCANTADA",
+    "code": "3-2-4"
+  },
+  {
+    "name": "COLON / CHAGRES / PALMAS BELLAS",
+    "code": "3-2-5"
+  },
+  {
+    "name": "COLON / CHAGRES / PIÑA",
+    "code": "3-2-6"
+  },
+  {
+    "name": "COLON / CHAGRES / SALUD",
+    "code": "3-2-7"
+  },
+  {
+    "name": "COLON / DONOSO / MIGUEL DE LA BORDA (CABECERA)",
+    "code": "3-3-1"
+  },
+  {
+    "name": "COLON / DONOSO / COCLE DEL NORTE",
+    "code": "3-3-2"
+  },
+  {
+    "name": "COLON / DONOSO / EL GUASIMO",
+    "code": "3-3-3"
+  },
+  {
+    "name": "COLON / DONOSO / GOBEA",
+    "code": "3-3-4"
+  },
+  {
+    "name": "COLON / DONOSO / RIO INDIO",
+    "code": "3-3-5"
+  },
+  {
+    "name": "COLON / DONOSO / SAN JOSE DEL GENERAL",
+    "code": "3-3-6"
+  },
+  {
+    "name": "COLON / PORTOBELO / PORTOBELO (CABECERA)",
+    "code": "3-4-1"
+  },
+  {
+    "name": "COLON / PORTOBELO / CACIQUE",
+    "code": "3-4-2"
+  },
+  {
+    "name": "COLON / PORTOBELO / GARROTE",
+    "code": "3-4-3"
+  },
+  {
+    "name": "COLON / PORTOBELO / ISLA GRANDE",
+    "code": "3-4-4"
+  },
+  {
+    "name": "COLON / PORTOBELO / MARIA CHIQUITA",
+    "code": "3-4-5"
+  },
+  {
+    "name": "COLON / SANTA ISABEL / PALENQUE (CABECERA)",
+    "code": "3-5-1"
+  },
+  {
+    "name": "COLON / SANTA ISABEL / CUANGO",
+    "code": "3-5-2"
+  },
+  {
+    "name": "COLON / SANTA ISABEL / MIRAMAR",
+    "code": "3-5-3"
+  },
+  {
+    "name": "COLON / SANTA ISABEL / NOMBRE DE DIOS",
+    "code": "3-5-4"
+  },
+  {
+    "name": "COLON / SANTA ISABEL / PALMIRA",
+    "code": "3-5-5"
+  },
+  {
+    "name": "COLON / SANTA ISABEL / PLAYA CHIQUITA",
+    "code": "3-5-6"
+  },
+  {
+    "name": "COLON / SANTA ISABEL / SANTA ISABEL",
+    "code": "3-5-7"
+  },
+  {
+    "name": "COLON / SANTA ISABEL / VIENTO FRIO",
+    "code": "3-5-8"
+  },
+  {
+    "name": "CHIRIQUI / ALANJE / ALANJE (CABECERA)",
+    "code": "4-1-1"
+  },
+  {
+    "name": "CHIRIQUI / ALANJE / DIVALA",
+    "code": "4-1-2"
+  },
+  {
+    "name": "CHIRIQUI / ALANJE / EL TEJAR",
+    "code": "4-1-3"
+  },
+  {
+    "name": "CHIRIQUI / ALANJE / GUARUMAL",
+    "code": "4-1-4"
+  },
+  {
+    "name": "CHIRIQUI / ALANJE / PALO GRANDE",
+    "code": "4-1-5"
+  },
+  {
+    "name": "CHIRIQUI / ALANJE / QUEREVALO",
+    "code": "4-1-6"
+  },
+  {
+    "name": "CHIRIQUI / ALANJE / SANTO TOMAS",
+    "code": "4-1-7"
+  },
+  {
+    "name": "CHIRIQUI / ALANJE / CANTA GALLO",
+    "code": "4-1-8"
+  },
+  {
+    "name": "CHIRIQUI / ALANJE / NUEVO MEXICO",
+    "code": "4-1-9"
+  },
+  {
+    "name": "CHIRIQUI / BARU / PUERTO ARMUELLES (CABECERA)",
+    "code": "4-2-1"
+  },
+  {
+    "name": "CHIRIQUI / BARU / LIMONES",
+    "code": "4-2-2"
+  },
+  {
+    "name": "CHIRIQUI / BARU / PROGRESO",
+    "code": "4-2-3"
+  },
+  {
+    "name": "CHIRIQUI / BARU / BACO",
+    "code": "4-2-4"
+  },
+  {
+    "name": "CHIRIQUI / BARU / RODOLFO AGUILAR DELGADO",
+    "code": "4-2-5"
+  },
+  {
+    "name": "CHIRIQUI / BOQUERON / BOQUERON (CABECERA)",
+    "code": "4-3-1"
+  },
+  {
+    "name": "CHIRIQUI / BOQUERON / BAGALA",
+    "code": "4-3-2"
+  },
+  {
+    "name": "CHIRIQUI / BOQUERON / CORDILLERA",
+    "code": "4-3-3"
+  },
+  {
+    "name": "CHIRIQUI / BOQUERON / GUABAL",
+    "code": "4-3-4"
+  },
+  {
+    "name": "CHIRIQUI / BOQUERON / GUAYABAL",
+    "code": "4-3-5"
+  },
+  {
+    "name": "CHIRIQUI / BOQUERON / PARAISO",
+    "code": "4-3-6"
+  },
+  {
+    "name": "CHIRIQUI / BOQUERON / PEDREGAL",
+    "code": "4-3-7"
+  },
+  {
+    "name": "CHIRIQUI / BOQUERON / TIJERAS",
+    "code": "4-3-8"
+  },
+  {
+    "name": "CHIRIQUI / BOQUETE / BAJO BOQUETE (CABECERA)",
+    "code": "4-4-1"
+  },
+  {
+    "name": "CHIRIQUI / BOQUETE / CALDERA",
+    "code": "4-4-2"
+  },
+  {
+    "name": "CHIRIQUI / BOQUETE / PALMIRA",
+    "code": "4-4-3"
+  },
+  {
+    "name": "CHIRIQUI / BOQUETE / ALTO BOQUETE",
+    "code": "4-4-4"
+  },
+  {
+    "name": "CHIRIQUI / BOQUETE / JARAMILLO",
+    "code": "4-4-5"
+  },
+  {
+    "name": "CHIRIQUI / BOQUETE / LOS NARANJOS",
+    "code": "4-4-6"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / LA CONCEPCION (CABECERA)",
+    "code": "4-5-1"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / ASERRIO DE GARICHE",
+    "code": "4-5-2"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / BUGABA",
+    "code": "4-5-3"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / CERRO PUNTA",
+    "code": "4-5-4"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / GOMEZ",
+    "code": "4-5-5"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / LA ESTRELLA",
+    "code": "4-5-6"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / SAN ANDRES",
+    "code": "4-5-7"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / SANTA MARTA",
+    "code": "4-5-8"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / SANTA ROSA",
+    "code": "4-5-9"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / SANTO DOMINGO",
+    "code": "4-5-10"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / SORTOVA",
+    "code": "4-5-11"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / VOLCAN",
+    "code": "4-5-12"
+  },
+  {
+    "name": "CHIRIQUI / BUGABA / EL BONGO",
+    "code": "4-5-13"
+  },
+  {
+    "name": "CHIRIQUI / DAVID / DAVID (CABECERA)",
+    "code": "4-6-1"
+  },
+  {
+    "name": "CHIRIQUI / DAVID / BIJAGUAL",
+    "code": "4-6-2"
+  },
+  {
+    "name": "CHIRIQUI / DAVID / COCHEA",
+    "code": "4-6-3"
+  },
+  {
+    "name": "CHIRIQUI / DAVID / CHIRIQUI",
+    "code": "4-6-4"
+  },
+  {
+    "name": "CHIRIQUI / DAVID / GUACA",
+    "code": "4-6-5"
+  },
+  {
+    "name": "CHIRIQUI / DAVID / LAS LOMAS",
+    "code": "4-6-6"
+  },
+  {
+    "name": "CHIRIQUI / DAVID / PEDREGAL",
+    "code": "4-6-7"
+  },
+  {
+    "name": "CHIRIQUI / DAVID / SAN CARLOS",
+    "code": "4-6-8"
+  },
+  {
+    "name": "CHIRIQUI / DAVID / SAN PABLO NUEVO",
+    "code": "4-6-9"
+  },
+  {
+    "name": "CHIRIQUI / DAVID / SAN PABLO VIEJO",
+    "code": "4-6-10"
+  },
+  {
+    "name": "CHIRIQUI / DOLEGA / DOLEGA (CABECERA)",
+    "code": "4-7-1"
+  },
+  {
+    "name": "CHIRIQUI / DOLEGA / DOS RIOS",
+    "code": "4-7-2"
+  },
+  {
+    "name": "CHIRIQUI / DOLEGA / LOS ANASTACIOS",
+    "code": "4-7-3"
+  },
+  {
+    "name": "CHIRIQUI / DOLEGA / POTRERILLOS",
+    "code": "4-7-4"
+  },
+  {
+    "name": "CHIRIQUI / DOLEGA / POTRERILLOS ABAJO",
+    "code": "4-7-5"
+  },
+  {
+    "name": "CHIRIQUI / DOLEGA / ROVIRA",
+    "code": "4-7-6"
+  },
+  {
+    "name": "CHIRIQUI / DOLEGA / TINAJAS",
+    "code": "4-7-7"
+  },
+  {
+    "name": "CHIRIQUI / DOLEGA / LOS ALGARRROBOS",
+    "code": "4-7-8"
+  },
+  {
+    "name": "CHIRIQUI / GUALACA / GUALACA (CABECERA)",
+    "code": "4-8-1"
+  },
+  {
+    "name": "CHIRIQUI / GUALACA / HORNITO",
+    "code": "4-8-2"
+  },
+  {
+    "name": "CHIRIQUI / GUALACA / LOS ANGELES",
+    "code": "4-8-3"
+  },
+  {
+    "name": "CHIRIQUI / GUALACA / PAJA DE SOMBRERO",
+    "code": "4-8-4"
+  },
+  {
+    "name": "CHIRIQUI / GUALACA / RINCON",
+    "code": "4-8-5"
+  },
+  {
+    "name": "CHIRIQUI / REMEDIOS / REMEDIOS (CABECERA)",
+    "code": "4-9-1"
+  },
+  {
+    "name": "CHIRIQUI / REMEDIOS / EL NANCITO",
+    "code": "4-9-2"
+  },
+  {
+    "name": "CHIRIQUI / REMEDIOS / EL PORVENIR",
+    "code": "4-9-3"
+  },
+  {
+    "name": "CHIRIQUI / REMEDIOS / EL PUERTO",
+    "code": "4-9-4"
+  },
+  {
+    "name": "CHIRIQUI / REMEDIOS / SANTA LUCIA",
+    "code": "4-9-5"
+  },
+  {
+    "name": "CHIRIQUI / RENACIMIENTO / RIO SERENO (CABECERA)",
+    "code": "4-10-1"
+  },
+  {
+    "name": "CHIRIQUI / RENACIMIENTO / BREÑON",
+    "code": "4-10-2"
+  },
+  {
+    "name": "CHIRIQUI / RENACIMIENTO / CAÑAS GORDAS",
+    "code": "4-10-3"
+  },
+  {
+    "name": "CHIRIQUI / RENACIMIENTO / MONTE LIRIO",
+    "code": "4-10-4"
+  },
+  {
+    "name": "CHIRIQUI / RENACIMIENTO / PLAZA CAISAN",
+    "code": "4-10-5"
+  },
+  {
+    "name": "CHIRIQUI / RENACIMIENTO / SANTA CRUZ",
+    "code": "4-10-6"
+  },
+  {
+    "name": "CHIRIQUI / RENACIMIENTO / DOMINICAL",
+    "code": "4-10-7"
+  },
+  {
+    "name": "CHIRIQUI / RENACIMIENTO / SANTA CLARA",
+    "code": "4-10-8"
+  },
+  {
+    "name": "CHIRIQUI / SAN FELIX / LAS LAJAS (CABECERA)",
+    "code": "4-11-1"
+  },
+  {
+    "name": "CHIRIQUI / SAN FELIX / JUAY",
+    "code": "4-11-2"
+  },
+  {
+    "name": "CHIRIQUI / SAN FELIX / LAJAS ADENTRO",
+    "code": "4-11-3"
+  },
+  {
+    "name": "CHIRIQUI / SAN FELIX / SAN FELIX",
+    "code": "4-11-4"
+  },
+  {
+    "name": "CHIRIQUI / SAN FELIX / SANTA CRUZ",
+    "code": "4-11-5"
+  },
+  {
+    "name": "CHIRIQUI / SAN LORENZO / HORCONCITOS (CABECERA)",
+    "code": "4-12-1"
+  },
+  {
+    "name": "CHIRIQUI / SAN LORENZO / BOCA CHICA",
+    "code": "4-12-2"
+  },
+  {
+    "name": "CHIRIQUI / SAN LORENZO / BOCA DEL MONTE",
+    "code": "4-12-3"
+  },
+  {
+    "name": "CHIRIQUI / SAN LORENZO / SAN JUAN",
+    "code": "4-12-4"
+  },
+  {
+    "name": "CHIRIQUI / SAN LORENZO / SAN LORENZO",
+    "code": "4-12-5"
+  },
+  {
+    "name": "CHIRIQUI / TOLE / TOLE (CABECERA)",
+    "code": "4-13-1"
+  },
+  {
+    "name": "CHIRIQUI / TOLE / BELLA VISTA",
+    "code": "4-13-2"
+  },
+  {
+    "name": "CHIRIQUI / TOLE / CERRO VIEJO",
+    "code": "4-13-3"
+  },
+  {
+    "name": "CHIRIQUI / TOLE / EL CRISTO",
+    "code": "4-13-4"
+  },
+  {
+    "name": "CHIRIQUI / TOLE / JUSTO FIDEL PALACIOS",
+    "code": "4-13-5"
+  },
+  {
+    "name": "CHIRIQUI / TOLE / LAJAS DE TOLE",
+    "code": "4-13-6"
+  },
+  {
+    "name": "CHIRIQUI / TOLE / POTRERO DE CAÑA",
+    "code": "4-13-7"
+  },
+  {
+    "name": "CHIRIQUI / TOLE / QUEBRADA DE PIEDRA",
+    "code": "4-13-8"
+  },
+  {
+    "name": "CHIRIQUI / TOLE / VELADERO",
+    "code": "4-13-9"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / LA PALMA (CABECERA)",
+    "code": "5-1-1"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / CAMOGANTI",
+    "code": "5-1-2"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / CHEPIGANA",
+    "code": "5-1-3"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / GARACHINE",
+    "code": "5-1-4"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / JAQUE",
+    "code": "5-1-5"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / PUERTO PIÑA",
+    "code": "5-1-6"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / RIO CONGO",
+    "code": "5-1-7"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / RIO IGLESIAS",
+    "code": "5-1-8"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / SAMBU",
+    "code": "5-1-9"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / SETEGANTI",
+    "code": "5-1-10"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / TAIMATI",
+    "code": "5-1-11"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / TUCUTI",
+    "code": "5-1-12"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / AGUA FRIA",
+    "code": "5-1-13"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / CUCUNATI",
+    "code": "5-1-14"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / RIO CONGO ARRIBA",
+    "code": "5-1-15"
+  },
+  {
+    "name": "DARIEN / CHEPIGANA / SANTA FE",
+    "code": "5-1-16"
+  },
+  {
+    "name": "DARIEN / PINOGANA / EL REAL DE SANTA MARIA (CABECERA)",
+    "code": "5-2-1"
+  },
+  {
+    "name": "DARIEN / PINOGANA / BOCA DE CUPE",
+    "code": "5-2-2"
+  },
+  {
+    "name": "DARIEN / PINOGANA / PAYA",
+    "code": "5-2-3"
+  },
+  {
+    "name": "DARIEN / PINOGANA / PINOGANA",
+    "code": "5-2-4"
+  },
+  {
+    "name": "DARIEN / PINOGANA / PUCURO",
+    "code": "5-2-5"
+  },
+  {
+    "name": "DARIEN / PINOGANA / YAPE",
+    "code": "5-2-6"
+  },
+  {
+    "name": "DARIEN / PINOGANA / YAVIZA",
+    "code": "5-2-7"
+  },
+  {
+    "name": "DARIEN / PINOGANA / METETI",
+    "code": "5-2-8"
+  },
+  {
+    "name": "DARIEN / PINOGANA / COMARCA KUNA DE WARGANDI",
+    "code": "5-2-9"
+  },
+  {
+    "name": "HERRERA / CHITRE / CHITRE (CABECERA)",
+    "code": "6-1-1"
+  },
+  {
+    "name": "HERRERA / CHITRE / LA ARENA",
+    "code": "6-1-2"
+  },
+  {
+    "name": "HERRERA / CHITRE / MONAGRILLO",
+    "code": "6-1-3"
+  },
+  {
+    "name": "HERRERA / CHITRE / LLANO BONITO",
+    "code": "6-1-4"
+  },
+  {
+    "name": "HERRERA / CHITRE / SAN JUAN BAUTISTA",
+    "code": "6-1-5"
+  },
+  {
+    "name": "HERRERA / LAS MINAS / LAS MINAS (CABECERA)",
+    "code": "6-2-1"
+  },
+  {
+    "name": "HERRERA / LAS MINAS / CHEPO",
+    "code": "6-2-2"
+  },
+  {
+    "name": "HERRERA / LAS MINAS / CHUMICAL",
+    "code": "6-2-3"
+  },
+  {
+    "name": "HERRERA / LAS MINAS / EL TORO",
+    "code": "6-2-4"
+  },
+  {
+    "name": "HERRERA / LAS MINAS / LEONES",
+    "code": "6-2-5"
+  },
+  {
+    "name": "HERRERA / LAS MINAS / QUEBRADA DEL ROSARIO",
+    "code": "6-2-6"
+  },
+  {
+    "name": "HERRERA / LAS MINAS / QUEBRADA EL CIPRIAN",
+    "code": "6-2-7"
+  },
+  {
+    "name": "HERRERA / LOS POZOS / LOS POZOS (CABECERA)",
+    "code": "6-3-1"
+  },
+  {
+    "name": "HERRERA / LOS POZOS / CAPURI",
+    "code": "6-3-2"
+  },
+  {
+    "name": "HERRERA / LOS POZOS / EL CALABACITO",
+    "code": "6-3-3"
+  },
+  {
+    "name": "HERRERA / LOS POZOS / EL CEDRO",
+    "code": "6-3-4"
+  },
+  {
+    "name": "HERRERA / LOS POZOS / LA ARENA",
+    "code": "6-3-5"
+  },
+  {
+    "name": "HERRERA / LOS POZOS / LA PITALOSA",
+    "code": "6-3-6"
+  },
+  {
+    "name": "HERRERA / LOS POZOS / LOS CERRITOS",
+    "code": "6-3-7"
+  },
+  {
+    "name": "HERRERA / LOS POZOS / LOS CERROS DE PAJA",
+    "code": "6-3-8"
+  },
+  {
+    "name": "HERRERA / LOS POZOS / LAS LLANAS",
+    "code": "6-3-9"
+  },
+  {
+    "name": "HERRERA / OCU / OCU (CABECERA)",
+    "code": "6-4-1"
+  },
+  {
+    "name": "HERRERA / OCU / CERRO LARGO",
+    "code": "6-4-2"
+  },
+  {
+    "name": "HERRERA / OCU / LOS LLANOS",
+    "code": "6-4-3"
+  },
+  {
+    "name": "HERRERA / OCU / LLANO GRANDE",
+    "code": "6-4-4"
+  },
+  {
+    "name": "HERRERA / OCU / PEÑAS CHATAS",
+    "code": "6-4-5"
+  },
+  {
+    "name": "HERRERA / OCU / EL TIJERA",
+    "code": "6-4-6"
+  },
+  {
+    "name": "HERRERA / OCU / MENCHACA",
+    "code": "6-4-7"
+  },
+  {
+    "name": "HERRERA / PARITA / PARITA (CABECERA)",
+    "code": "6-5-1"
+  },
+  {
+    "name": "HERRERA / PARITA / CABUYA",
+    "code": "6-5-2"
+  },
+  {
+    "name": "HERRERA / PARITA / LOS CASTILLOS",
+    "code": "6-5-3"
+  },
+  {
+    "name": "HERRERA / PARITA / LLANO DE LA CRUZ",
+    "code": "6-5-4"
+  },
+  {
+    "name": "HERRERA / PARITA / PARIS",
+    "code": "6-5-5"
+  },
+  {
+    "name": "HERRERA / PARITA / PORTOBELILLO",
+    "code": "6-5-6"
+  },
+  {
+    "name": "HERRERA / PARITA / POTUGA",
+    "code": "6-5-7"
+  },
+  {
+    "name": "HERRERA / PESE / PESE (CABECERA)",
+    "code": "6-6-1"
+  },
+  {
+    "name": "HERRERA / PESE / LAS CABRAS",
+    "code": "6-6-2"
+  },
+  {
+    "name": "HERRERA / PESE / EL PAJARO",
+    "code": "6-6-3"
+  },
+  {
+    "name": "HERRERA / PESE / EL BARRERO",
+    "code": "6-6-4"
+  },
+  {
+    "name": "HERRERA / PESE / EL PEDREGOSO",
+    "code": "6-6-5"
+  },
+  {
+    "name": "HERRERA / PESE / EL CIRUELO",
+    "code": "6-6-6"
+  },
+  {
+    "name": "HERRERA / PESE / SABANAGRANDE",
+    "code": "6-6-7"
+  },
+  {
+    "name": "HERRERA / PESE / RINCON HONDO",
+    "code": "6-6-8"
+  },
+  {
+    "name": "HERRERA / SANTA MARIA / SANTA MARIA (CABECERA)",
+    "code": "6-7-1"
+  },
+  {
+    "name": "HERRERA / SANTA MARIA / CHUPAMPA",
+    "code": "6-7-2"
+  },
+  {
+    "name": "HERRERA / SANTA MARIA / EL RINCON",
+    "code": "6-7-3"
+  },
+  {
+    "name": "HERRERA / SANTA MARIA / EL LIMON",
+    "code": "6-7-4"
+  },
+  {
+    "name": "HERRERA / SANTA MARIA / LOS CANELOS",
+    "code": "6-7-5"
+  },
+  {
+    "name": "LOS SANTOS / GUARARE / GUARARE (CABECERA)",
+    "code": "7-1-1"
+  },
+  {
+    "name": "LOS SANTOS / GUARARE / EL ESPINAL",
+    "code": "7-1-2"
+  },
+  {
+    "name": "LOS SANTOS / GUARARE / EL MACANO",
+    "code": "7-1-3"
+  },
+  {
+    "name": "LOS SANTOS / GUARARE / GUARARE ARRIBA",
+    "code": "7-1-4"
+  },
+  {
+    "name": "LOS SANTOS / GUARARE / LA ENEA",
+    "code": "7-1-5"
+  },
+  {
+    "name": "LOS SANTOS / GUARARE / LA PASERA",
+    "code": "7-1-6"
+  },
+  {
+    "name": "LOS SANTOS / GUARARE / LAS TRANCAS",
+    "code": "7-1-7"
+  },
+  {
+    "name": "LOS SANTOS / GUARARE / LLANO ABAJO",
+    "code": "7-1-8"
+  },
+  {
+    "name": "LOS SANTOS / GUARARE / EL HATO",
+    "code": "7-1-9"
+  },
+  {
+    "name": "LOS SANTOS / GUARARE / PERALES",
+    "code": "7-1-10"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / LAS TABLAS (CABECERA)",
+    "code": "7-2-1"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / BAJO CORRAL",
+    "code": "7-2-2"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / BAYANO",
+    "code": "7-2-3"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / EL CARATE",
+    "code": "7-2-4"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / EL COCAL",
+    "code": "7-2-5"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / EL MANANTIAL",
+    "code": "7-2-6"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / EL MUÑOZ",
+    "code": "7-2-7"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / EL PEDREGOSO",
+    "code": "7-2-8"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / LA LAJA",
+    "code": "7-2-9"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / LA MIEL",
+    "code": "7-2-10"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / LA PALMA",
+    "code": "7-2-11"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / LA TIZA",
+    "code": "7-2-12"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / LAS PALMITAS",
+    "code": "7-2-13"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / LAS TABLAS ABAJO",
+    "code": "7-2-14"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / NUARIO",
+    "code": "7-2-15"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / PALMIRA",
+    "code": "7-2-16"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / PEÑA BLANCA",
+    "code": "7-2-17"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / RIO HONDO",
+    "code": "7-2-18"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / SAN JOSE",
+    "code": "7-2-19"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / SAN MIGUEL",
+    "code": "7-2-20"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / SANTO DOMINGO",
+    "code": "7-2-21"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / SESTEADERO",
+    "code": "7-2-22"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / VALLE RICO",
+    "code": "7-2-23"
+  },
+  {
+    "name": "LOS SANTOS / LAS TABLAS / VALLERIQUITO",
+    "code": "7-2-24"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / LA VILLA DE LOS SANTOS (CABECE",
+    "code": "7-3-1"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / EL GUASIMO",
+    "code": "7-3-2"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / LA COLORADA",
+    "code": "7-3-3"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / LA ESPIGADILLA",
+    "code": "7-3-4"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / LAS CRUCES",
+    "code": "7-3-5"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / LAS GUABAS",
+    "code": "7-3-6"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / LOS ANGELES",
+    "code": "7-3-7"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / LOS OLIVOS",
+    "code": "7-3-8"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / LLANO LARGO",
+    "code": "7-3-9"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / SABANAGRANDE",
+    "code": "7-3-10"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / SANTA ANA",
+    "code": "7-3-11"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / TRES QUEBRADAS",
+    "code": "7-3-12"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / AGUA BUENA",
+    "code": "7-3-13"
+  },
+  {
+    "name": "LOS SANTOS / LOS SANTOS / VILLA LOURDES",
+    "code": "7-3-14"
+  },
+  {
+    "name": "LOS SANTOS / MACARACAS / MACARACAS (CABECERA)",
+    "code": "7-4-1"
+  },
+  {
+    "name": "LOS SANTOS / MACARACAS / BAHIA HONDA",
+    "code": "7-4-2"
+  },
+  {
+    "name": "LOS SANTOS / MACARACAS / BAJOS DE GUERA",
+    "code": "7-4-3"
+  },
+  {
+    "name": "LOS SANTOS / MACARACAS / COROZAL",
+    "code": "7-4-4"
+  },
+  {
+    "name": "LOS SANTOS / MACARACAS / CHUPA",
+    "code": "7-4-5"
+  },
+  {
+    "name": "LOS SANTOS / MACARACAS / EL CEDRO",
+    "code": "7-4-6"
+  },
+  {
+    "name": "LOS SANTOS / MACARACAS / ESPINO AMARILLO",
+    "code": "7-4-7"
+  },
+  {
+    "name": "LOS SANTOS / MACARACAS / LA MESA",
+    "code": "7-4-8"
+  },
+  {
+    "name": "LOS SANTOS / MACARACAS / LAS PALMAS",
+    "code": "7-4-9"
+  },
+  {
+    "name": "LOS SANTOS / MACARACAS / LLANO DE PIEDRA",
+    "code": "7-4-10"
+  },
+  {
+    "name": "LOS SANTOS / MACARACAS / MOGOLLON",
+    "code": "7-4-11"
+  },
+  {
+    "name": "LOS SANTOS / PEDASI / PEDASI (CABECERA)",
+    "code": "7-5-1"
+  },
+  {
+    "name": "LOS SANTOS / PEDASI / LOS ASIENTOS",
+    "code": "7-5-2"
+  },
+  {
+    "name": "LOS SANTOS / PEDASI / MARIABE",
+    "code": "7-5-3"
+  },
+  {
+    "name": "LOS SANTOS / PEDASI / PURIO",
+    "code": "7-5-4"
+  },
+  {
+    "name": "LOS SANTOS / PEDASI / ORIA ARRIBA",
+    "code": "7-5-5"
+  },
+  {
+    "name": "LOS SANTOS / POCRI / POCRI",
+    "code": "7-6-1"
+  },
+  {
+    "name": "LOS SANTOS / POCRI / EL CAÑAFISTULO",
+    "code": "7-6-2"
+  },
+  {
+    "name": "LOS SANTOS / POCRI / LAJAMINA",
+    "code": "7-6-3"
+  },
+  {
+    "name": "LOS SANTOS / POCRI / PARAISO",
+    "code": "7-6-4"
+  },
+  {
+    "name": "LOS SANTOS / POCRI / PARITILLA",
+    "code": "7-6-5"
+  },
+  {
+    "name": "LOS SANTOS / TONOSI / TONOSI (CABECERA)",
+    "code": "7-7-1"
+  },
+  {
+    "name": "LOS SANTOS / TONOSI / ALTOS DE GUERA",
+    "code": "7-7-2"
+  },
+  {
+    "name": "LOS SANTOS / TONOSI / CAÑAS",
+    "code": "7-7-3"
+  },
+  {
+    "name": "LOS SANTOS / TONOSI / EL BEBEDERO",
+    "code": "7-7-4"
+  },
+  {
+    "name": "LOS SANTOS / TONOSI / EL CACAO",
+    "code": "7-7-5"
+  },
+  {
+    "name": "LOS SANTOS / TONOSI / EL CORTEZO",
+    "code": "7-7-6"
+  },
+  {
+    "name": "LOS SANTOS / TONOSI / FLORES",
+    "code": "7-7-7"
+  },
+  {
+    "name": "LOS SANTOS / TONOSI / GUANICO",
+    "code": "7-7-8"
+  },
+  {
+    "name": "LOS SANTOS / TONOSI / LA TRONOSA",
+    "code": "7-7-9"
+  },
+  {
+    "name": "LOS SANTOS / TONOSI / CAMBUTAL",
+    "code": "7-7-10"
+  },
+  {
+    "name": "LOS SANTOS / TONOSI / ISLA DE CAQAS",
+    "code": "7-7-11"
+  },
+  {
+    "name": "PANAMA / BALBOA / SAN MIGUEL (CABECERA)",
+    "code": "8-2-1"
+  },
+  {
+    "name": "PANAMA / BALBOA / LA ENSENADA",
+    "code": "8-2-2"
+  },
+  {
+    "name": "PANAMA / BALBOA / LA ESMERALDA",
+    "code": "8-2-3"
+  },
+  {
+    "name": "PANAMA / BALBOA / LA GUINEA",
+    "code": "8-2-4"
+  },
+  {
+    "name": "PANAMA / BALBOA / PEDRO GONZALEZ",
+    "code": "8-2-5"
+  },
+  {
+    "name": "PANAMA / BALBOA / SABOGA",
+    "code": "8-2-6"
+  },
+  {
+    "name": "PANAMA / CHEPO / CHEPO (CABECERA)",
+    "code": "8-5-1"
+  },
+  {
+    "name": "PANAMA / CHEPO / CAÑITA",
+    "code": "8-5-2"
+  },
+  {
+    "name": "PANAMA / CHEPO / CHEPILLO",
+    "code": "8-5-3"
+  },
+  {
+    "name": "PANAMA / CHEPO / EL LLANO",
+    "code": "8-5-4"
+  },
+  {
+    "name": "PANAMA / CHEPO / LAS MARGARITAS",
+    "code": "8-5-5"
+  },
+  {
+    "name": "PANAMA / CHEPO / SANTA CRUZ DE CHININA",
+    "code": "8-5-6"
+  },
+  {
+    "name": "PANAMA / CHEPO / COMARCA KUNA DE MADUNGANDI",
+    "code": "8-5-7"
+  },
+  {
+    "name": "PANAMA / CHEPO / TORTI",
+    "code": "8-5-8"
+  },
+  {
+    "name": "PANAMA / CHIMAN / CHIMAN (CABECERA)",
+    "code": "8-6-1"
+  },
+  {
+    "name": "PANAMA / CHIMAN / BRUJAS",
+    "code": "8-6-2"
+  },
+  {
+    "name": "PANAMA / CHIMAN / GONZALO VASQUEZ",
+    "code": "8-6-3"
+  },
+  {
+    "name": "PANAMA / CHIMAN / PASIGA",
+    "code": "8-6-4"
+  },
+  {
+    "name": "PANAMA / CHIMAN / UNION SANTEÑA",
+    "code": "8-6-5"
+  },
+  {
+    "name": "PANAMA / PANAMA / SAN FELIPE",
+    "code": "8-8-1"
+  },
+  {
+    "name": "PANAMA / PANAMA / EL CHORRILLO",
+    "code": "8-8-2"
+  },
+  {
+    "name": "PANAMA / PANAMA / SANTA ANA",
+    "code": "8-8-3"
+  },
+  {
+    "name": "PANAMA / PANAMA / LA EXPOSICION O CALIDONIA",
+    "code": "8-8-4"
+  },
+  {
+    "name": "PANAMA / PANAMA / CURUNDU",
+    "code": "8-8-5"
+  },
+  {
+    "name": "PANAMA / PANAMA / BETANIA",
+    "code": "8-8-6"
+  },
+  {
+    "name": "PANAMA / PANAMA / BELLA VISTA",
+    "code": "8-8-7"
+  },
+  {
+    "name": "PANAMA / PANAMA / PUEBLO NUEVO",
+    "code": "8-8-8"
+  },
+  {
+    "name": "PANAMA / PANAMA / SAN FRANCISCO",
+    "code": "8-8-9"
+  },
+  {
+    "name": "PANAMA / PANAMA / PARQUE LEFEVRE",
+    "code": "8-8-10"
+  },
+  {
+    "name": "PANAMA / PANAMA / RIO ABAJO",
+    "code": "8-8-11"
+  },
+  {
+    "name": "PANAMA / PANAMA / JUAN DIAZ",
+    "code": "8-8-12"
+  },
+  {
+    "name": "PANAMA / PANAMA / PEDREGAL",
+    "code": "8-8-13"
+  },
+  {
+    "name": "PANAMA / PANAMA / ANCON",
+    "code": "8-8-14"
+  },
+  {
+    "name": "PANAMA / PANAMA / CHILIBRE",
+    "code": "8-8-15"
+  },
+  {
+    "name": "PANAMA / PANAMA / LAS CUMBRES",
+    "code": "8-8-16"
+  },
+  {
+    "name": "PANAMA / PANAMA / PACORA",
+    "code": "8-8-17"
+  },
+  {
+    "name": "PANAMA / PANAMA / SAN MARTIN",
+    "code": "8-8-18"
+  },
+  {
+    "name": "PANAMA / PANAMA / TOCUMEN",
+    "code": "8-8-19"
+  },
+  {
+    "name": "PANAMA / PANAMA / LAS MAQANITAS",
+    "code": "8-8-20"
+  },
+  {
+    "name": "PANAMA / PANAMA / 24 DE DICIEMBRE",
+    "code": "8-8-21"
+  },
+  {
+    "name": "PANAMA / PANAMA / ERNESTO CORDOBA CAMPOS",
+    "code": "8-8-22"
+  },
+  {
+    "name": "PANAMA / PANAMA / ALCALDE DIAZ",
+    "code": "8-8-23"
+  },
+  {
+    "name": "PANAMA / PANAMA / CAIMITILLO",
+    "code": "8-8-24"
+  },
+  {
+    "name": "PANAMA / PANAMA / DON BOSCO",
+    "code": "8-8-25"
+  },
+  {
+    "name": "PANAMA / PANAMA / LAS GARZAS",
+    "code": "8-8-26"
+  },
+  {
+    "name": "PANAMA / SAN MIGUELITO / AMELIA DENIS DE ICAZA",
+    "code": "8-10-1"
+  },
+  {
+    "name": "PANAMA / SAN MIGUELITO / BELISARIO PORRAS",
+    "code": "8-10-2"
+  },
+  {
+    "name": "PANAMA / SAN MIGUELITO / JOSE DOMINGO ESPINAR",
+    "code": "8-10-3"
+  },
+  {
+    "name": "PANAMA / SAN MIGUELITO / MATEO ITURRALDE",
+    "code": "8-10-4"
+  },
+  {
+    "name": "PANAMA / SAN MIGUELITO / VICTORIANO LORENZO",
+    "code": "8-10-5"
+  },
+  {
+    "name": "PANAMA / SAN MIGUELITO / ARNULFO ARIAS",
+    "code": "8-10-6"
+  },
+  {
+    "name": "PANAMA / SAN MIGUELITO / BELISARIO FRIAS",
+    "code": "8-10-7"
+  },
+  {
+    "name": "PANAMA / SAN MIGUELITO / OMAR TORRIJOS",
+    "code": "8-10-8"
+  },
+  {
+    "name": "PANAMA / SAN MIGUELITO / RUFINA ALFARO",
+    "code": "8-10-9"
+  },
+  {
+    "name": "PANAMA / TABOGA / TABOGA (CABECERA)",
+    "code": "8-11-1"
+  },
+  {
+    "name": "PANAMA / TABOGA / OTOQUE ORIENTE",
+    "code": "8-11-2"
+  },
+  {
+    "name": "PANAMA / TABOGA / OTOQUE OCCIDENTE",
+    "code": "8-11-3"
+  },
+  {
+    "name": "VERAGUAS / ATALAYA / ATALAYA (CABECERA)",
+    "code": "9-1-1"
+  },
+  {
+    "name": "VERAGUAS / ATALAYA / EL BARRITO",
+    "code": "9-1-2"
+  },
+  {
+    "name": "VERAGUAS / ATALAYA / LA MONTAÑUELA",
+    "code": "9-1-3"
+  },
+  {
+    "name": "VERAGUAS / ATALAYA / LA CARRILLO",
+    "code": "9-1-4"
+  },
+  {
+    "name": "VERAGUAS / ATALAYA / SAN ANTONIO",
+    "code": "9-1-5"
+  },
+  {
+    "name": "VERAGUAS / CALOBRE / CALOBRE (CABECERA)",
+    "code": "9-2-1"
+  },
+  {
+    "name": "VERAGUAS / CALOBRE / BARNIZAL",
+    "code": "9-2-2"
+  },
+  {
+    "name": "VERAGUAS / CALOBRE / CHITRA",
+    "code": "9-2-3"
+  },
+  {
+    "name": "VERAGUAS / CALOBRE / EL COCLA",
+    "code": "9-2-4"
+  },
+  {
+    "name": "VERAGUAS / CALOBRE / EL POTRERO",
+    "code": "9-2-5"
+  },
+  {
+    "name": "VERAGUAS / CALOBRE / LA LAGUNA",
+    "code": "9-2-6"
+  },
+  {
+    "name": "VERAGUAS / CALOBRE / LA RAYA DE CALOBRE",
+    "code": "9-2-7"
+  },
+  {
+    "name": "VERAGUAS / CALOBRE / LA TETILLA",
+    "code": "9-2-8"
+  },
+  {
+    "name": "VERAGUAS / CALOBRE / LA YEGUADA",
+    "code": "9-2-9"
+  },
+  {
+    "name": "VERAGUAS / CALOBRE / LAS GUIAS",
+    "code": "9-2-10"
+  },
+  {
+    "name": "VERAGUAS / CALOBRE / MONJARAS",
+    "code": "9-2-11"
+  },
+  {
+    "name": "VERAGUAS / CALOBRE / SAN JOSE",
+    "code": "9-2-12"
+  },
+  {
+    "name": "VERAGUAS / CAÑAZAS / CAÑAZAS (CABECERA)",
+    "code": "9-3-1"
+  },
+  {
+    "name": "VERAGUAS / CAÑAZAS / CERRO PLATA",
+    "code": "9-3-2"
+  },
+  {
+    "name": "VERAGUAS / CAÑAZAS / EL PICADOR",
+    "code": "9-3-3"
+  },
+  {
+    "name": "VERAGUAS / CAÑAZAS / LOS VALLES",
+    "code": "9-3-4"
+  },
+  {
+    "name": "VERAGUAS / CAÑAZAS / SAN JOSE",
+    "code": "9-3-5"
+  },
+  {
+    "name": "VERAGUAS / CAÑAZAS / SAN MARCELO",
+    "code": "9-3-6"
+  },
+  {
+    "name": "VERAGUAS / CAÑAZAS / EL AROMILLO",
+    "code": "9-3-7"
+  },
+  {
+    "name": "VERAGUAS / LA MEZA / LA MESA (CABECERA)",
+    "code": "9-4-1"
+  },
+  {
+    "name": "VERAGUAS / LA MEZA / BISVALLES",
+    "code": "9-4-2"
+  },
+  {
+    "name": "VERAGUAS / LA MEZA / BORO",
+    "code": "9-4-3"
+  },
+  {
+    "name": "VERAGUAS / LA MEZA / LLANO GRANDE",
+    "code": "9-4-4"
+  },
+  {
+    "name": "VERAGUAS / LA MEZA / SAN BARTOLO",
+    "code": "9-4-5"
+  },
+  {
+    "name": "VERAGUAS / LA MEZA / LOS MILAGROS",
+    "code": "9-4-6"
+  },
+  {
+    "name": "VERAGUAS / LAS PALMAS / LAS PALMAS (CABECERA)",
+    "code": "9-5-1"
+  },
+  {
+    "name": "VERAGUAS / LAS PALMAS / CERRO DE CASA",
+    "code": "9-5-2"
+  },
+  {
+    "name": "VERAGUAS / LAS PALMAS / COROZAL",
+    "code": "9-5-3"
+  },
+  {
+    "name": "VERAGUAS / LAS PALMAS / EL MARIA",
+    "code": "9-5-4"
+  },
+  {
+    "name": "VERAGUAS / LAS PALMAS / EL PRADO",
+    "code": "9-5-5"
+  },
+  {
+    "name": "VERAGUAS / LAS PALMAS / EL RINCON",
+    "code": "9-5-6"
+  },
+  {
+    "name": "VERAGUAS / LAS PALMAS / LOLA",
+    "code": "9-5-7"
+  },
+  {
+    "name": "VERAGUAS / LAS PALMAS / PIXVAE",
+    "code": "9-5-8"
+  },
+  {
+    "name": "VERAGUAS / LAS PALMAS / PUERTO VIDAL",
+    "code": "9-5-9"
+  },
+  {
+    "name": "VERAGUAS / LAS PALMAS / SAN MARTIN DE PORRES",
+    "code": "9-5-10"
+  },
+  {
+    "name": "VERAGUAS / LAS PALMAS / VIGUI",
+    "code": "9-5-11"
+  },
+  {
+    "name": "VERAGUAS / LAS PALMAS / ZAPOTILLO",
+    "code": "9-5-12"
+  },
+  {
+    "name": "VERAGUAS / MONTIJO / MONTIJO (CABECERA)",
+    "code": "9-6-1"
+  },
+  {
+    "name": "VERAGUAS / MONTIJO / ARENAS",
+    "code": "9-6-2"
+  },
+  {
+    "name": "VERAGUAS / MONTIJO / GOBERNADORA",
+    "code": "9-6-3"
+  },
+  {
+    "name": "VERAGUAS / MONTIJO / LA GARCEANA",
+    "code": "9-6-4"
+  },
+  {
+    "name": "VERAGUAS / MONTIJO / LEONES",
+    "code": "9-6-5"
+  },
+  {
+    "name": "VERAGUAS / MONTIJO / CEBACO",
+    "code": "9-6-6"
+  },
+  {
+    "name": "VERAGUAS / MONTIJO / COSTA HERMOSA",
+    "code": "9-6-7"
+  },
+  {
+    "name": "VERAGUAS / MONTIJO / UNION DEL NORTE",
+    "code": "9-6-8"
+  },
+  {
+    "name": "VERAGUAS / MONTIJO / TEBARIO",
+    "code": "9-6-9"
+  },
+  {
+    "name": "VERAGUAS / MONTIJO / EL PILON",
+    "code": "9-6-10"
+  },
+  {
+    "name": "VERAGUAS / RIO DE JESUS / RIO DE JESUS (CABECERA)",
+    "code": "9-7-1"
+  },
+  {
+    "name": "VERAGUAS / RIO DE JESUS / LAS HUACAS",
+    "code": "9-7-2"
+  },
+  {
+    "name": "VERAGUAS / RIO DE JESUS / LOS CASTILLOS",
+    "code": "9-7-3"
+  },
+  {
+    "name": "VERAGUAS / RIO DE JESUS / UTIRA",
+    "code": "9-7-4"
+  },
+  {
+    "name": "VERAGUAS / RIO DE JESUS / CATORCE DE NOVIEMBRE",
+    "code": "9-7-5"
+  },
+  {
+    "name": "VERAGUAS / SAN FRANCISCO / SAN FRANCISCO (CABECERA)",
+    "code": "9-8-1"
+  },
+  {
+    "name": "VERAGUAS / SAN FRANCISCO / CORRAL FALSO",
+    "code": "9-8-2"
+  },
+  {
+    "name": "VERAGUAS / SAN FRANCISCO / LOS HATILLOS",
+    "code": "9-8-3"
+  },
+  {
+    "name": "VERAGUAS / SAN FRANCISCO / REMANCE",
+    "code": "9-8-4"
+  },
+  {
+    "name": "VERAGUAS / SAN FRANCISCO / SAN JUAN",
+    "code": "9-8-5"
+  },
+  {
+    "name": "VERAGUAS / SAN FRANCISCO / SAN JOSE",
+    "code": "9-8-6"
+  },
+  {
+    "name": "VERAGUAS / SANTA FE / SANTA FE (CABECERA)",
+    "code": "9-9-1"
+  },
+  {
+    "name": "VERAGUAS / SANTA FE / CALOVEBORA",
+    "code": "9-9-2"
+  },
+  {
+    "name": "VERAGUAS / SANTA FE / EL ALTO",
+    "code": "9-9-3"
+  },
+  {
+    "name": "VERAGUAS / SANTA FE / EL CUAY",
+    "code": "9-9-4"
+  },
+  {
+    "name": "VERAGUAS / SANTA FE / EL PANTANO",
+    "code": "9-9-5"
+  },
+  {
+    "name": "VERAGUAS / SANTA FE / GATU O GATUCITO",
+    "code": "9-9-6"
+  },
+  {
+    "name": "VERAGUAS / SANTA FE / RIO LUIS",
+    "code": "9-9-7"
+  },
+  {
+    "name": "VERAGUAS / SANTIAGO / SANTIAGO (CABECERA)",
+    "code": "9-10-1"
+  },
+  {
+    "name": "VERAGUAS / SANTIAGO / LA COLORADA",
+    "code": "9-10-2"
+  },
+  {
+    "name": "VERAGUAS / SANTIAGO / LA PEÑA",
+    "code": "9-10-3"
+  },
+  {
+    "name": "VERAGUAS / SANTIAGO / LA RAYA DE SANTA MARIA",
+    "code": "9-10-4"
+  },
+  {
+    "name": "VERAGUAS / SANTIAGO / PONUGA",
+    "code": "9-10-5"
+  },
+  {
+    "name": "VERAGUAS / SANTIAGO / SAN PEDRO DEL ESPINO",
+    "code": "9-10-6"
+  },
+  {
+    "name": "VERAGUAS / SANTIAGO / CANTO DEL LLANO",
+    "code": "9-10-7"
+  },
+  {
+    "name": "VERAGUAS / SANTIAGO / LOS ALGARROBOS",
+    "code": "9-10-8"
+  },
+  {
+    "name": "VERAGUAS / SANTIAGO / CARLOS SANTANA AVILA",
+    "code": "9-10-9"
+  },
+  {
+    "name": "VERAGUAS / SANTIAGO / EDWIN FABREGA",
+    "code": "9-10-10"
+  },
+  {
+    "name": "VERAGUAS / SANTIAGO / SAN MARTIN DE PORRES",
+    "code": "9-10-11"
+  },
+  {
+    "name": "VERAGUAS / SANTIAGO / URRACA",
+    "code": "9-10-12"
+  },
+  {
+    "name": "VERAGUAS / SONA / SONA (CABECERA)",
+    "code": "9-11-1"
+  },
+  {
+    "name": "VERAGUAS / SONA / BAHIA HONDA",
+    "code": "9-11-2"
+  },
+  {
+    "name": "VERAGUAS / SONA / CALIDONIA",
+    "code": "9-11-3"
+  },
+  {
+    "name": "VERAGUAS / SONA / CATIVE",
+    "code": "9-11-4"
+  },
+  {
+    "name": "VERAGUAS / SONA / EL MARAÑON",
+    "code": "9-11-5"
+  },
+  {
+    "name": "VERAGUAS / SONA / GUARUMAL",
+    "code": "9-11-6"
+  },
+  {
+    "name": "VERAGUAS / SONA / LA SOLEDAD",
+    "code": "9-11-7"
+  },
+  {
+    "name": "VERAGUAS / SONA / QUEBRADA DE ORO",
+    "code": "9-11-8"
+  },
+  {
+    "name": "VERAGUAS / SONA / RIO GRANDE",
+    "code": "9-11-9"
+  },
+  {
+    "name": "VERAGUAS / SONA / RODEO VIEJO",
+    "code": "9-11-10"
+  },
+  {
+    "name": "VERAGUAS / MARIATO / LLANO DE CATIVAL O MARIATO (CABECERA)",
+    "code": "9-12-1"
+  },
+  {
+    "name": "VERAGUAS / MARIATO / ARENAS",
+    "code": "9-12-2"
+  },
+  {
+    "name": "VERAGUAS / MARIATO / EL CACAO",
+    "code": "9-12-3"
+  },
+  {
+    "name": "VERAGUAS / MARIATO / QUEBRO",
+    "code": "9-12-4"
+  },
+  {
+    "name": "VERAGUAS / MARIATO / TEBARIO",
+    "code": "9-12-5"
+  },
+  {
+    "name": "COMARCA KUNA YALA / COMARCA KUNA YALA / NARGANA (CABECERA)",
+    "code": "10-1-1"
+  },
+  {
+    "name": "COMARCA KUNA YALA / COMARCA KUNA YALA / AILIGANDI",
+    "code": "10-1-2"
+  },
+  {
+    "name": "COMARCA KUNA YALA / COMARCA KUNA YALA / PUERTO OBALDIA",
+    "code": "10-1-3"
+  },
+  {
+    "name": "COMARCA KUNA YALA / COMARCA KUNA YALA / TUBUALA",
+    "code": "10-1-4"
+  },
+  {
+    "name": "COMARCA EMBERA-WOUNAAN / CEMACO / CIRILO GUAINORA (CABECERA)",
+    "code": "11-1-1"
+  },
+  {
+    "name": "COMARCA EMBERA-WOUNAAN / CEMACO / LAJAS BLANCAS",
+    "code": "11-1-2"
+  },
+  {
+    "name": "COMARCA EMBERA-WOUNAAN / CEMACO / MANUEL ORTEGA",
+    "code": "11-1-3"
+  },
+  {
+    "name": "COMARCA EMBERA-WOUNAAN / SAMBU / RIO SABALO",
+    "code": "11-2-1"
+  },
+  {
+    "name": "COMARCA EMBERA-WOUNAAN / SAMBU / JINGURUDO",
+    "code": "11-2-2"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / BESIKO / SOLOY (CABECERA)",
+    "code": "12-1-1"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / BESIKO / BOCA DE BALSA",
+    "code": "12-1-2"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / BESIKO / CAMARON ARRIBA",
+    "code": "12-1-3"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / BESIKO / CERRO BANCO",
+    "code": "12-1-4"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / BESIKO / CERRO DE PATENA",
+    "code": "12-1-5"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / BESIKO / EMPLANADA DE CHORCHA",
+    "code": "12-1-6"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / BESIKO / NAMNONI",
+    "code": "12-1-7"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / BESIKO / NIBA",
+    "code": "12-1-8"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MIRONO / HATO PILON (CABECERA)",
+    "code": "12-2-1"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MIRONO / CASCABEL",
+    "code": "12-2-2"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MIRONO / HATO COROTU",
+    "code": "12-2-3"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MIRONO / HATO CULANTRO",
+    "code": "12-2-4"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MIRONO / HATO JOBO",
+    "code": "12-2-5"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MIRONO / HATO JULI",
+    "code": "12-2-6"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MIRONO / QUEBRADA DE LORO",
+    "code": "12-2-7"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MIRONO / SALTO DUPI",
+    "code": "12-2-8"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MUNA / CHICHICA (CABECERA)",
+    "code": "12-3-1"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MUNA / ALTO CABALLERO",
+    "code": "12-3-2"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MUNA / BAKAMA",
+    "code": "12-3-3"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MUNA / CERRO CAÑA",
+    "code": "12-3-4"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MUNA / CERRO PUERCO",
+    "code": "12-3-5"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MUNA / KRUA",
+    "code": "12-3-6"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MUNA / MARACA",
+    "code": "12-3-7"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MUNA / NIBRA",
+    "code": "12-3-8"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MUNA / PEÑA BLANCA",
+    "code": "12-3-9"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MUNA / ROKA",
+    "code": "12-3-10"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MUNA / SITIO PRADO",
+    "code": "12-3-11"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / MUNA / UMANI",
+    "code": "12-3-12"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NOLE DUIMA / CERRO IGLESIAS (CABECERA)",
+    "code": "12-4-1"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NOLE DUIMA / HATO CHAMI",
+    "code": "12-4-2"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NOLE DUIMA / JADEBERI",
+    "code": "12-4-3"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NOLE DUIMA / LAJERO",
+    "code": "12-4-4"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NOLE DUIMA / SUSAMA",
+    "code": "12-4-5"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NURUM / BUENOS AIRES (CABECERA)",
+    "code": "12-5-1"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NURUM / AGUA DE SALUD",
+    "code": "12-5-2"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NURUM / ALTO DE JESUS",
+    "code": "12-5-3"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NURUM / CERRO PELADO",
+    "code": "12-5-4"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NURUM / EL BALE",
+    "code": "12-5-5"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NURUM / EL PAREDON",
+    "code": "12-5-6"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NURUM / EL PIRO",
+    "code": "12-5-7"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NURUM / GUAYABITO",
+    "code": "12-5-8"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / NURUM / GUIBALE",
+    "code": "12-5-9"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KANKINTU / BISIRA (CABECERA)",
+    "code": "12-6-1"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KANKINTU / BURI",
+    "code": "12-6-2"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KANKINTU / GUARIVIARA",
+    "code": "12-6-3"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KANKINTU / GUORONI",
+    "code": "12-6-4"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KANKINTU / KANKINTU",
+    "code": "12-6-5"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KANKINTU / MUNUNI",
+    "code": "12-6-6"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KANKINTU / PIEDRA ROJA",
+    "code": "12-6-7"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KANKINTU / TUWAI",
+    "code": "12-6-8"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KANKINTU / MAN CREEK",
+    "code": "12-6-9"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KUSAPIN / KUSAPIN (CABECERA)",
+    "code": "12-7-1"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KUSAPIN / BAHIA AZUL",
+    "code": "12-7-2"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KUSAPIN / CALOVEBORA O SANTA CATALINA",
+    "code": "12-7-3"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KUSAPIN / LOMA YUCA",
+    "code": "12-7-4"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KUSAPIN / RIO CHIRIQUI",
+    "code": "12-7-5"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KUSAPIN / TOBOBE",
+    "code": "12-7-6"
+  },
+  {
+    "name": "COMARCA NGÄBE-BUGLÉ / KUSAPIN / VALLE BONITO",
+    "code": "12-7-7"
+  },
+  {
+    "name": "PANAMA OESTE / ARRAIJAN / ARRAIJAN (CABECERA)",
+    "code": "13-1-1"
+  },
+  {
+    "name": "PANAMA OESTE / ARRAIJAN / BURUNGA",
+    "code": "13-1-2"
+  },
+  {
+    "name": "PANAMA OESTE / ARRAIJAN / CERRO SILVESTRE",
+    "code": "13-1-3"
+  },
+  {
+    "name": "PANAMA OESTE / ARRAIJAN / JUAN DEMOSTENES AROSEMENA",
+    "code": "13-1-4"
+  },
+  {
+    "name": "PANAMA OESTE / ARRAIJAN / NUEVO EMPERADOR",
+    "code": "13-1-5"
+  },
+  {
+    "name": "PANAMA OESTE / ARRAIJAN / SANTA CLARA",
+    "code": "13-1-6"
+  },
+  {
+    "name": "PANAMA OESTE / ARRAIJAN / VERACRUZ",
+    "code": "13-1-7"
+  },
+  {
+    "name": "PANAMA OESTE / ARRAIJAN / VISTA ALEGRE",
+    "code": "13-1-8"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / CAPIRA (CABECERA)",
+    "code": "13-2-1"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / CAIMITO",
+    "code": "13-2-2"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / CAMPANA",
+    "code": "13-2-3"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / CERMEÑO",
+    "code": "13-2-4"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / CIRI DE LOS SOTOS",
+    "code": "13-2-5"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / CIRI GRANDE",
+    "code": "13-2-6"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / EL CACAO",
+    "code": "13-2-7"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / LA TRINIDAD",
+    "code": "13-2-8"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / LAS OLLAS ARRIBA",
+    "code": "13-2-9"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / LIDICE",
+    "code": "13-2-10"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / VILLA CARMEN",
+    "code": "13-2-11"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / VILLA ROSARIO",
+    "code": "13-2-12"
+  },
+  {
+    "name": "PANAMA OESTE / CAPIRA / SANTA ROSA",
+    "code": "13-2-13"
+  },
+  {
+    "name": "PANAMA OESTE / CHAME / CHAME (CABECERA)",
+    "code": "13-3-1"
+  },
+  {
+    "name": "PANAMA OESTE / CHAME / BEJUCO",
+    "code": "13-3-2"
+  },
+  {
+    "name": "PANAMA OESTE / CHAME / BUENOS AIRES",
+    "code": "13-3-3"
+  },
+  {
+    "name": "PANAMA OESTE / CHAME / CABUYA",
+    "code": "13-3-4"
+  },
+  {
+    "name": "PANAMA OESTE / CHAME / CHICA",
+    "code": "13-3-5"
+  },
+  {
+    "name": "PANAMA OESTE / CHAME / EL LIBANO",
+    "code": "13-3-6"
+  },
+  {
+    "name": "PANAMA OESTE / CHAME / LAS LAJAS",
+    "code": "13-3-7"
+  },
+  {
+    "name": "PANAMA OESTE / CHAME / NUEVA GORGONA",
+    "code": "13-3-8"
+  },
+  {
+    "name": "PANAMA OESTE / CHAME / PUNTA CHAME",
+    "code": "13-3-9"
+  },
+  {
+    "name": "PANAMA OESTE / CHAME / SAJALICES",
+    "code": "13-3-10"
+  },
+  {
+    "name": "PANAMA OESTE / CHAME / SORA",
+    "code": "13-3-11"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / BARRIO BALBOA",
+    "code": "13-4-1"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / BARRIO COLON",
+    "code": "13-4-2"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / AMADOR",
+    "code": "13-4-3"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / AROSEMENA",
+    "code": "13-4-4"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / EL ARADO",
+    "code": "13-4-5"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / EL COCO",
+    "code": "13-4-6"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / FEUILLET",
+    "code": "13-4-7"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / GUADALUPE",
+    "code": "13-4-8"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / HERRERA",
+    "code": "13-4-9"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / HURTADO",
+    "code": "13-4-10"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / ITURRALDE",
+    "code": "13-4-11"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / LA REPRESA",
+    "code": "13-4-12"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / LOS DIAZ",
+    "code": "13-4-13"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / MENDOZA",
+    "code": "13-4-14"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / OBALDIA",
+    "code": "13-4-15"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / PLAYA LEONA",
+    "code": "13-4-16"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / PUERTO CAIMITO",
+    "code": "13-4-17"
+  },
+  {
+    "name": "PANAMA OESTE / LA CHORRERA / SANTA RITA",
+    "code": "13-4-18"
+  },
+  {
+    "name": "PANAMA OESTE / SAN CARLOS / SAN CARLOS (CABECERA)",
+    "code": "13-5-1"
+  },
+  {
+    "name": "PANAMA OESTE / SAN CARLOS / EL ESPINO",
+    "code": "13-5-2"
+  },
+  {
+    "name": "PANAMA OESTE / SAN CARLOS / EL HIGO",
+    "code": "13-5-3"
+  },
+  {
+    "name": "PANAMA OESTE / SAN CARLOS / GUAYABITO",
+    "code": "13-5-4"
+  },
+  {
+    "name": "PANAMA OESTE / SAN CARLOS / LA ERMITA",
+    "code": "13-5-5"
+  },
+  {
+    "name": "PANAMA OESTE / SAN CARLOS / LA LAGUNA",
+    "code": "13-5-6"
+  },
+  {
+    "name": "PANAMA OESTE / SAN CARLOS / LAS UVAS",
+    "code": "13-5-7"
+  },
+  {
+    "name": "PANAMA OESTE / SAN CARLOS / LOS LLANITOS",
+    "code": "13-5-8"
+  },
+  {
+    "name": "PANAMA OESTE / SAN CARLOS / SAN JOSE",
+    "code": "13-5-9"
+  }
+]

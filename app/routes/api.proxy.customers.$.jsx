@@ -40,7 +40,7 @@ export const loader = async ({ request, params }) => {
             firstName
             lastName
             phone
-            metafields(first: 20, namespace: "exchanger") {
+            metafields(first: 25, namespace: "exchanger") {
               edges {
                 node {
                   id
@@ -273,6 +273,15 @@ export const action = async ({ request, params }) => {
         }
       }
 
+      if (body.location_code) {
+        metafields.push({
+          namespace: "exchanger",
+          key: "ex_customer_location_code",
+          type: "single_line_text_field",
+          value: body.location_code,
+        });
+      }
+
       const createCustomerMutation = `
         mutation customerCreate($input: CustomerInput!) {
           customerCreate(input: $input) {
@@ -499,6 +508,16 @@ export const action = async ({ request, params }) => {
             value: body.taxpayer_kind,
           });
         }
+      }
+
+      if (body.location_code) {
+        metafieldsToSet.push({
+          ownerId: customerId,
+          namespace: "exchanger",
+          key: "ex_customer_location_code",
+          type: "single_line_text_field",
+          value: body.location_code,
+        });
       }
 
       const updateCustomerMutation = `
