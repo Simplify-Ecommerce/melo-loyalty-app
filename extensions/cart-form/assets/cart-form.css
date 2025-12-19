@@ -195,7 +195,7 @@
 /* Radio Cards Styles */
 .radio-cards-group {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   width: 100%;
 }
 
@@ -509,7 +509,23 @@
 .custom-invoice-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 1.5rem;
+}
+
+.custom-invoice-form-row > .custom-invoice-form-group {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.custom-invoice-form-row > .custom-invoice-form-group > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.custom-invoice-form-row > .custom-invoice-form-group .custom-invoice-label {
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .custom-invoice-form-row-dv-razon {
@@ -562,7 +578,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
 }
 
 .contribuyente-section {
@@ -604,6 +620,10 @@
   font-size: 1.4rem;
   transition: border-color 0.3s;
   background: #f3f3f3;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .custom-invoice-input:disabled {
@@ -624,14 +644,24 @@ select.custom-invoice-input option:not(:first-child) {
   color: #000;
 }
 
-/* Estilo para selects cuando tienen el valor de placeholder */
+/* Estilo para selects cuando tienen el valor de placeholder (vacío) */
 select.custom-invoice-input:invalid,
-select.custom-invoice-input[value=""],
+select.custom-invoice-input[value=""] {
+  color: #b3b3b3;
+}
+
+/* Estilo para selects cuando tienen un valor válido seleccionado */
+select.custom-invoice-input:not(:invalid):not([value=""]),
+select.custom-invoice-input[value]:not([value=""]) {
+  color: #000;
+}
+
+/* Asegurar que las opciones seleccionadas muestren el color correcto */
 select.custom-invoice-input option[value=""]:checked {
   color: #b3b3b3;
 }
 
-select.custom-invoice-input:not(:invalid) {
+select.custom-invoice-input option:checked:not([value=""]) {
   color: #000;
 }
 

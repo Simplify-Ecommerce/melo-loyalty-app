@@ -774,7 +774,17 @@
     if (c && c.metafields) {
       populateForm(c);
 
+      // Asegurar que todos los selects tengan el estilo correcto después de cargar datos
       setTimeout(() => {
+        const form = document.getElementById("custom-invoice-form");
+        if (form) {
+          const allSelects = form.querySelectorAll(
+            "select.custom-invoice-input",
+          );
+          allSelects.forEach((select) => {
+            updateSelectPlaceholderStyle(select);
+          });
+        }
         animateModalHeight();
       }, 100);
     } else {
@@ -813,14 +823,26 @@
         const birthMonth = document.getElementById("birth_month");
         const birthYear = document.getElementById("birth_year");
 
-        if (birthDay) birthDay.value = String(parseInt(day, 10));
-        if (birthMonth) birthMonth.value = month;
-        if (birthYear) birthYear.value = year;
+        if (birthDay) {
+          birthDay.value = String(parseInt(day, 10));
+          updateSelectPlaceholderStyle(birthDay);
+        }
+        if (birthMonth) {
+          birthMonth.value = month;
+          updateSelectPlaceholderStyle(birthMonth);
+        }
+        if (birthYear) {
+          birthYear.value = year;
+          updateSelectPlaceholderStyle(birthYear);
+        }
 
         updateBirthDateField();
       }
     }
-    if (genderField && mf.ex_gender) genderField.value = mf.ex_gender;
+    if (genderField && mf.ex_gender) {
+      genderField.value = mf.ex_gender;
+      updateSelectPlaceholderStyle(genderField);
+    }
     if (phoneField && mf.ex_phone) phoneField.value = mf.ex_phone;
 
     const customerType = mf.ex_customer_type;
@@ -910,26 +932,26 @@
         const taxpayerNameConsumidor = document.getElementById(
           "taxpayer_name_consumidor",
         );
-        const taxpayerKindConsumidor = document.getElementById(
-          "taxpayer_kind_consumidor",
-        );
 
         if (taxIdConsumidor && mf.ex_tax_id)
           taxIdConsumidor.value = mf.ex_tax_id;
         if (taxpayerNameConsumidor && mf.ex_taxpayer_name)
           taxpayerNameConsumidor.value = mf.ex_taxpayer_name;
 
-        if (taxpayerKindConsumidor) {
-          const taxpayerKindValue = mf.ex_taxpayer_kind || "1";
-          const taxpayerKindRadio = document.getElementById(
-            `taxpayer_kind_consumidor_${taxpayerKindValue}`,
-          );
-          if (taxpayerKindRadio) {
-            taxpayerKindRadio.checked = true;
-            taxpayerKindRadio.dispatchEvent(
-              new Event("change", { bubbles: true }),
-            );
-          }
+        // Ocultar el campo de tipo de contribuyente y establecer automáticamente "Natural" (1)
+        const taxpayerKindConsumidorGroup = document.getElementById(
+          "taxpayer_kind_consumidor_group",
+        );
+        if (taxpayerKindConsumidorGroup) {
+          taxpayerKindConsumidorGroup.style.display = "none";
+        }
+
+        // Establecer automáticamente el valor "Natural" (1)
+        const taxpayerKindConsumidor1 = document.getElementById(
+          "taxpayer_kind_consumidor_1",
+        );
+        if (taxpayerKindConsumidor1) {
+          taxpayerKindConsumidor1.checked = true;
         }
       }
 
@@ -1471,6 +1493,26 @@
     } else if (customerType === "02") {
       if (contribuyenteFields) contribuyenteFields.style.display = "none";
       if (consumidorFields) consumidorFields.style.display = "block";
+
+      // Ocultar el campo de tipo de contribuyente y establecer automáticamente "Natural" (1)
+      const taxpayerKindConsumidorGroup = document.getElementById(
+        "taxpayer_kind_consumidor_group",
+      );
+      if (taxpayerKindConsumidorGroup) {
+        taxpayerKindConsumidorGroup.style.display = "none";
+      }
+
+      // Establecer automáticamente el valor "Natural" (1)
+      const taxpayerKindConsumidor1 = document.getElementById(
+        "taxpayer_kind_consumidor_1",
+      );
+      if (taxpayerKindConsumidor1) {
+        taxpayerKindConsumidor1.checked = true;
+        taxpayerKindConsumidor1.dispatchEvent(
+          new Event("change", { bubbles: true }),
+        );
+      }
+
       setTimeout(() => {
         updateRazonSocial();
       }, 50);
@@ -1489,6 +1531,14 @@
     } else {
       if (contribuyenteFields) contribuyenteFields.style.display = "none";
       if (consumidorFields) consumidorFields.style.display = "none";
+
+      // Ocultar también el campo de tipo de contribuyente de consumidor
+      const taxpayerKindConsumidorGroup = document.getElementById(
+        "taxpayer_kind_consumidor_group",
+      );
+      if (taxpayerKindConsumidorGroup) {
+        taxpayerKindConsumidorGroup.style.display = "none";
+      }
 
       taxpayerKindSelected = false;
       hideValidationIndicator();
@@ -2084,24 +2134,14 @@
           }
         });
 
-        const taxpayerKind01 = document.getElementById(
+        // Para Consumidor final, el tipo de contribuyente siempre es "Natural" (1)
+        // No es necesario validar porque el campo está oculto y el valor se establece automáticamente
+        const taxpayerKindConsumidor1 = document.getElementById(
           "taxpayer_kind_consumidor_1",
         );
-        const taxpayerKind02 = document.getElementById(
-          "taxpayer_kind_consumidor_2",
-        );
-        const taxpayerKind = taxpayerKind01?.checked
-          ? "1"
-          : taxpayerKind02?.checked
-            ? "2"
-            : "";
-        if (!taxpayerKind) {
-          showFormError(
-            "taxpayer_kind_consumidor_error",
-            "Este campo es requerido",
-          );
-          valid = false;
-          if (taxpayerKind01) errorFields.push(taxpayerKind01);
+        // Asegurar que siempre esté marcado como "Natural" (1)
+        if (taxpayerKindConsumidor1) {
+          taxpayerKindConsumidor1.checked = true;
         }
       }
 
@@ -2263,17 +2303,15 @@
           document.getElementById("taxpayer_name_consumidor")?.value?.trim() ||
           "";
 
+        // Para Consumidor final, el tipo de contribuyente siempre es "Natural" (1)
+        // Asegurar que el radio button esté marcado
         const taxpayerKindConsumidor01 = document.getElementById(
           "taxpayer_kind_consumidor_1",
         );
-        const taxpayerKindConsumidor02 = document.getElementById(
-          "taxpayer_kind_consumidor_2",
-        );
-        d.taxpayer_kind = taxpayerKindConsumidor01?.checked
-          ? "1"
-          : taxpayerKindConsumidor02?.checked
-            ? "2"
-            : "";
+        if (taxpayerKindConsumidor01) {
+          taxpayerKindConsumidor01.checked = true;
+        }
+        d.taxpayer_kind = "1"; // Siempre "Natural" para Consumidor final
       }
 
       d.province = document.getElementById("province")?.value || "";
