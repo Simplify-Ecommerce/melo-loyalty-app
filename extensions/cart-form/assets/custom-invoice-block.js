@@ -775,6 +775,7 @@
       populateForm(c);
 
       // Asegurar que todos los selects tengan el estilo correcto después de cargar datos
+      // También verificar que el valor de la provincia persista
       setTimeout(() => {
         const form = document.getElementById("custom-invoice-form");
         if (form) {
@@ -784,9 +785,47 @@
           allSelects.forEach((select) => {
             updateSelectPlaceholderStyle(select);
           });
+
+          // Verificar que la provincia tenga su valor si hay un location_code
+          const locationCodeInput = document.getElementById("location_code");
+          if (locationCodeInput && locationCodeInput.value) {
+            const locationCode = locationCodeInput.value;
+            loadLocationData().then(() => {
+              if (locationHierarchy) {
+                for (const provincia in locationHierarchy) {
+                  for (const distrito in locationHierarchy[provincia]) {
+                    for (const corregimiento in locationHierarchy[provincia][
+                      distrito
+                    ]) {
+                      if (
+                        locationHierarchy[provincia][distrito][
+                          corregimiento
+                        ] === locationCode
+                      ) {
+                        const provinceSelect =
+                          document.getElementById("province");
+                        if (
+                          provinceSelect &&
+                          provinceSelect.value !== provincia
+                        ) {
+                          // Asegurar que el select de provincia esté poblado
+                          if (provinceSelect.options.length <= 1) {
+                            populateProvinceSelect();
+                          }
+                          provinceSelect.value = provincia;
+                          updateSelectPlaceholderStyle(provinceSelect);
+                        }
+                        return;
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          }
         }
         animateModalHeight();
-      }, 100);
+      }, 200);
     } else {
       setTimeout(() => {
         animateModalHeight();
@@ -871,8 +910,19 @@
       const customerTypeForeign = document.getElementById(
         "customer_type_foreign",
       );
+
+      // Ocultar el campo de tipo de cliente y establecer automáticamente "Extranjero" (04)
+      const customerTypeForeignGroup = document.getElementById(
+        "customer_type_foreign_group",
+      );
+      if (customerTypeForeignGroup) {
+        customerTypeForeignGroup.style.display = "none";
+      }
+
       if (taxIdForeign && mf.ex_tax_id) taxIdForeign.value = mf.ex_tax_id;
-      if (customerTypeForeign) customerTypeForeign.value = "04";
+      if (customerTypeForeign) {
+        customerTypeForeign.value = "04";
+      }
     } else if (customerType === "01" || customerType === "02") {
       const customerType01 = document.getElementById("customer_type_01");
       const customerType02 = document.getElementById("customer_type_02");
@@ -964,6 +1014,10 @@
 
         loadLocationData().then(() => {
           if (locationHierarchy) {
+            // Primero poblar el select de provincia
+            populateProvinceSelect();
+
+            // Luego buscar y establecer los valores
             for (const provincia in locationHierarchy) {
               for (const distrito in locationHierarchy[provincia]) {
                 for (const corregimiento in locationHierarchy[provincia][
@@ -979,21 +1033,38 @@
                       document.getElementById("corregimiento");
 
                     if (provinceSelect) {
+                      // Establecer el valor de la provincia después de poblar el select
                       provinceSelect.value = provincia;
+                      updateSelectPlaceholderStyle(provinceSelect);
                       populateDistrictSelect(provincia);
 
                       setTimeout(() => {
                         if (districtSelect) {
                           districtSelect.value = distrito;
+                          updateSelectPlaceholderStyle(districtSelect);
                           populateCorregimientoSelect(provincia, distrito);
 
                           setTimeout(() => {
                             if (corregimientoSelect) {
                               corregimientoSelect.value = corregimiento;
+                              updateSelectPlaceholderStyle(corregimientoSelect);
                             }
-                          }, 50);
+
+                            // Asegurar que el valor de la provincia persista después de todos los timeouts
+                            const currentProvinceSelect =
+                              document.getElementById("province");
+                            if (
+                              currentProvinceSelect &&
+                              currentProvinceSelect.value !== provincia
+                            ) {
+                              currentProvinceSelect.value = provincia;
+                              updateSelectPlaceholderStyle(
+                                currentProvinceSelect,
+                              );
+                            }
+                          }, 150);
                         }
-                      }, 50);
+                      }, 150);
                     }
                     return;
                   }
@@ -1068,9 +1139,12 @@
     return hierarchy;
   }
 
-  function populateProvinceSelect() {
+  function populateProvinceSelect(preserveValue = false) {
     const provinceSelect = document.getElementById("province");
     if (!provinceSelect || !locationHierarchy) return;
+
+    // Guardar el valor actual si se debe preservar
+    const currentValue = preserveValue ? provinceSelect.value : "";
 
     provinceSelect.innerHTML = '<option value="">Seleccione</option>';
 
@@ -1081,6 +1155,11 @@
       option.textContent = province;
       provinceSelect.appendChild(option);
     });
+
+    // Restaurar el valor si se debe preservar
+    if (preserveValue && currentValue) {
+      provinceSelect.value = currentValue;
+    }
 
     updateSelectPlaceholderStyle(provinceSelect);
   }
@@ -1444,10 +1523,20 @@
       if (foreignFields) foreignFields.style.display = "block";
       if (panamaFields) panamaFields.style.display = "none";
 
+      // Ocultar el campo de tipo de cliente y establecer automáticamente "Extranjero" (04)
+      const customerTypeForeignGroup = document.getElementById(
+        "customer_type_foreign_group",
+      );
+      if (customerTypeForeignGroup) {
+        customerTypeForeignGroup.style.display = "none";
+      }
+
       const customerTypeForeign = document.getElementById(
         "customer_type_foreign",
       );
-      if (customerTypeForeign) customerTypeForeign.value = "04";
+      if (customerTypeForeign) {
+        customerTypeForeign.value = "04";
+      }
     }
   }
 
@@ -2257,7 +2346,15 @@
     let documentType = "";
 
     if (!isPanama) {
-      finalCustomerType = customerTypeForeign || "04";
+      // Para extranjeros, el tipo de cliente siempre es "Extranjero" (04)
+      // Asegurar que el select tenga el valor correcto
+      const customerTypeForeignSelect = document.getElementById(
+        "customer_type_foreign",
+      );
+      if (customerTypeForeignSelect) {
+        customerTypeForeignSelect.value = "04";
+      }
+      finalCustomerType = "04"; // Siempre "Extranjero" para no residentes en Panamá
       documentNumber =
         document.getElementById("tax_id_foreign")?.value?.trim() || "";
       documentType = "pasaporte"; // Extranjero usa pasaporte

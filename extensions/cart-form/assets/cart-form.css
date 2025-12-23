@@ -291,7 +291,7 @@
   border: none;
   border-radius: 8px;
   padding: 0;
-  max-width: 600px;
+  max-width: 640px;
   width: 90%;
   max-height: 90vh;
   overflow: hidden;
@@ -531,7 +531,6 @@
 .custom-invoice-form-row-dv-razon {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
 @media (min-width: 768px) {
@@ -572,6 +571,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0.75rem;
+}
+@media screen and (min-width: 769px) {
+  .birth-date-fields {
+    grid-template-columns: 1fr 1.2fr 1.4fr;
+  }
 }
 
 .custom-invoice-form-group {
@@ -1050,6 +1054,12 @@ select.custom-invoice-input {
 @media (max-width: 768px) {
   .custom-invoice-form-row {
     grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .radio-cards-group {
+    flex-direction: column;
+    gap: 8px;
   }
 
   .cedula-input-group {
