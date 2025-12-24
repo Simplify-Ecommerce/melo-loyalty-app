@@ -175,15 +175,12 @@ export function validateCustomerData(data) {
     errors.push("Código de país del teléfono es requerido");
   }
 
-  // Los campos de ubicación (province, district, corregimiento) solo son requeridos
-  // para clientes de Panamá (document_type !== 'pasaporte')
-  // Los extranjeros (document_type === 'pasaporte') no necesitan estos campos
-  if (data.document_type !== "pasaporte") {
-    // Cliente de Panamá - requiere campos de ubicación
-    const provinceValidation = validateRequiredField(
-      data.province,
-      "Provincia",
-    );
+  // Campos de ubicación:
+  // - Requeridos solo para contribuyentes en Panamá (customer_type === '01' y document_type !== 'pasaporte')
+  // - No requeridos para consumidor final (customer_type === '02')
+  // - No requeridos para extranjeros (document_type === 'pasaporte')
+  if (data.document_type !== "pasaporte" && data.customer_type === "01") {
+    const provinceValidation = validateRequiredField(data.province, "Provincia");
     if (!provinceValidation.valid) {
       errors.push(provinceValidation.error);
     }
@@ -201,7 +198,6 @@ export function validateCustomerData(data) {
       errors.push(corregimientoValidation.error);
     }
   }
-  // Si es extranjero (pasaporte), no validamos los campos de ubicación
 
   return {
     valid: errors.length === 0,

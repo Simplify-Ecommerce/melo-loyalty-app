@@ -345,7 +345,7 @@
 
         <div class="custom-invoice-form-group">
           <label for="taxpayer_name_consumidor" class="custom-invoice-label">
-            Razón social
+            Nombre
           </label>
           <input 
             type="text" 
@@ -386,6 +386,32 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3 class="form-section-title">Información sobre tus mascotas</h3>
+    <label class="custom-invoice-label" style="margin-bottom: 0.6rem; display: block;">
+      Selecciona tus mascotas
+    </label>
+    <div class="checkbox-cards-group" role="group" aria-label="Mascotas">
+      {% assign pet_options = "Perro,Gato,Aves,Peces,Tortugas,Hámster,Cobayo,Conejo,Hurón,Erizo" | split: "," %}
+      {% for pet in pet_options %}
+        {% assign pet_id = pet | downcase | replace: " ", "_" | replace: "á", "a" | replace: "é", "e" | replace: "í", "i" | replace: "ó", "o" | replace: "ú", "u" | replace: "ü", "u" %}
+        <label class="checkbox-card" for="pet_{{ pet_id }}">
+          <input
+            type="checkbox"
+            name="pets[]"
+            value="{{ pet }}"
+            class="checkbox-card-input"
+            id="pet_{{ pet_id }}"
+          />
+          <div class="checkbox-card-box" aria-hidden="true" style="display: flex;"></div>
+          <div class="checkbox-card-content">
+            <div class="checkbox-card-title">{{ pet }}</div>
+          </div>
+        </label>
+      {% endfor %}
     </div>
   </div>
 </form>

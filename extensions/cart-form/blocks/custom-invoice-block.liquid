@@ -23,6 +23,7 @@
         </button>
         <span class="custom-invoice-toggle-text" id="toggle-text"> No, no quiero una factura personalizada </span>
       </label>
+      <span class="custom-invoice-error" id="checkout-blocked-error"></span>
     </div>
 
     {% if customer %}
@@ -106,7 +107,8 @@ window.config = {
   LOGIN_URL: '{{ routes.storefront_login_url }}',
   CUSTOMER_ID: '{% if customer %}{{ customer.id }}{% endif %}',
   IS_LOGGED_IN: {% if customer %}true{% else %}false{% endif %},
-  DGI_COUNTRY_CODES_URL: '{{ "dgi-country-codes.json" | asset_url }}'
+  DGI_COUNTRY_CODES_URL: '{{ "dgi-country-codes.json" | asset_url }}',
+  SUPPORT_LINK: '{% if block.settings.support_link %}{{ block.settings.support_link }}{% else %}#{% endif %}'
 };
 </script>
 <script src="{{ "custom-invoice-block.js" | asset_url }}" defer></script>
@@ -133,6 +135,12 @@ window.config = {
       "id": "subtitle",
       "label": "Subtítulo",
       "default": "Completa tus datos para generar una factura personalizada"
+    },
+    {
+      "type": "url",
+      "id": "support_link",
+      "label": "Link de contacto con soporte",
+      "info": "URL a mostrar cuando el usuario intenta modificar datos que no se pueden cambiar"
     }
   ]
 }

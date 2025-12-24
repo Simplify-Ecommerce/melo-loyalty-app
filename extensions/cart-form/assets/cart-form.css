@@ -18,6 +18,19 @@
   margin: 1.5rem 0;
 }
 
+.immutable-field-warning {
+  margin-top: 0.4rem;
+}
+
+.immutable-field-warning a {
+  color: #000;
+  text-decoration: underline;
+}
+
+.immutable-field-warning a:hover {
+  text-decoration: none;
+}
+
 .custom-invoice-card {
   background: #fff;
   border: 1px solid #e0e0e0;
@@ -243,6 +256,84 @@
   gap: 0.4rem;
 }
 
+/* Checkbox cards para selección de mascotas */
+.checkbox-cards-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.checkbox-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid #d9d9d9;
+  border-radius: 0.8rem;
+  background: #fff;
+  cursor: pointer;
+  flex: 0 0 auto;
+  width: auto;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  position: relative;
+}
+
+.checkbox-card:hover {
+  border-color: #111;
+}
+
+.checkbox-card-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkbox-card-title {
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: #111;
+  user-select: none;
+}
+
+.checkbox-card-box {
+  width: 1.8rem;
+  height: 1.8rem;
+  border: 1.5px solid #c7c7c7;
+  border-radius: 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.checkbox-card:has(.checkbox-card-input:checked) {
+  border-color: #0066cc;
+}
+
+.checkbox-card:has(.checkbox-card-input:checked) .checkbox-card-box {
+  border-color: #0066cc;
+  background: #0066cc;
+}
+
+.checkbox-card:has(.checkbox-card-input:checked) .checkbox-card-box::after {
+  content: "";
+  width: 1rem;
+  height: 1rem;
+  display: block;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E")
+    center/contain no-repeat;
+}
+
+.checkbox-card:has(.checkbox-card-input:focus-visible) {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
 .radio-card-title {
   font-size: 1.4rem;
   font-weight: 600;
@@ -255,11 +346,6 @@
   font-weight: 400;
   color: #666666;
   line-height: 1.3;
-}
-
-.radio-card-input:checked ~ .radio-card-icon,
-.radio-card-input:checked ~ .radio-card-content {
-  /* Estilos cuando está seleccionado se aplican al contenedor padre */
 }
 
 .radio-card:has(.radio-card-input:checked) {
@@ -364,6 +450,7 @@
   line-height: 1.25;
   margin-top: 0;
   padding-right: 4rem;
+  padding-bottom: 3rem;
 }
 
 .custom-invoice-login-prompt {
@@ -426,8 +513,8 @@
 }
 
 .customer-data-summary {
-  margin-top: 1rem;
-  padding: 1rem;
+  margin-top: 3rem;
+  padding: 2rem;
   background: #f8f9fa;
   border-radius: 6px;
   border: 1px solid #e9ecef;
@@ -441,7 +528,7 @@
 
 .customer-data-summary-item {
   padding: 0.4rem 0;
-  font-size: 0.9rem;
+  font-size: 1.4rem;
   color: #495057;
   line-height: 1.5;
 }
@@ -472,7 +559,7 @@
   color: #0066cc;
   text-decoration: underline;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1.4rem;
   padding: 0.5rem 0;
   margin-top: 0.5rem;
   transition: color 0.2s;
@@ -837,12 +924,39 @@ select.custom-invoice-input {
 
 .custom-invoice-error {
   color: #eb4b6d;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   display: none;
 }
 
 .custom-invoice-error.show {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.custom-invoice-error.show svg {
+  width: 1.6rem;
+  height: 1.6rem;
+  flex-shrink: 0;
+}
+
+.custom-invoice-error.show span {
+  flex: 1;
+}
+
+.custom-invoice-error a {
+  color: #eb4b6d;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.custom-invoice-error a:hover {
+  text-decoration: none;
+}
+
+#checkout-blocked-error {
+  margin-top: 1rem;
 }
 
 .cedula-input-group {
@@ -956,22 +1070,47 @@ select.custom-invoice-input {
 }
 
 .custom-invoice-message {
-  padding: 0.75rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.3rem;
   line-height: 1.4;
 }
 
 .custom-invoice-message.success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  color: #22c55e;
+}
+
+.custom-invoice-message.success::before {
+  content: "";
+  display: block;
+  width: 1.6rem;
+  height: 1.6rem;
+  flex-shrink: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 .custom-invoice-message.error {
-  background: #f8d7da;
   color: #eb4b6d;
-  border: 1px solid #f5c6cb;
+}
+
+.custom-invoice-message.error::before {
+  content: "";
+  display: block;
+  width: 1.6rem;
+  height: 1.6rem;
+  flex-shrink: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23eb4b6d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'/%3E%3Cline x1='6' y1='6' x2='18' y2='18'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 /* Loader Styles */
@@ -1078,4 +1217,7 @@ select.custom-invoice-input {
   .phone-code {
     width: 100%;
   }
+}
+#consumidor-fields {
+  margin-top: 3rem;
 }

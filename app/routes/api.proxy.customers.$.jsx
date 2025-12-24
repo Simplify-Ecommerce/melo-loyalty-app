@@ -169,6 +169,7 @@ export const action = async ({ request, params }) => {
     const body = await request.json();
     console.log('[DEBUG PHONE API] Datos recibidos en API:', JSON.stringify(body, null, 2));
     console.log('[DEBUG PHONE API] Valor de phone en body:', body.phone);
+    const pets = Array.isArray(body.pets) ? body.pets.filter(Boolean) : [];
     
     // Mapear document_number a tax_id si existe (para compatibilidad con metafields exchanger)
     if (body.document_number && !body.tax_id) {
@@ -212,6 +213,15 @@ export const action = async ({ request, params }) => {
           value: body.customer_type,
         },
       ];
+
+      if (pets.length > 0) {
+        metafields.push({
+          namespace: "exchanger",
+          key: "ex_segmentation",
+          type: "list.single_line_text_field",
+          value: JSON.stringify(pets),
+        });
+      }
 
       // Agregar campos condicionales según tipo de cliente
       if (body.customer_type === "01" || body.customer_type === "02" || body.customer_type === "04") {
@@ -389,20 +399,47 @@ export const action = async ({ request, params }) => {
       const existingMetafields = customerData.data.customer.metafields.edges.map(
         (edge) => edge.node
       );
+      const existingByKey = {};
+      existingMetafields.forEach((mf) => {
+        existingByKey[mf.key] = mf;
+      });
 
       const existingTaxId = existingMetafields.find(
         (mf) => mf.key === "ex_tax_id"
       )?.value;
+      const existingCustomerType = existingMetafields.find(
+        (mf) => mf.key === "ex_customer_type"
+      )?.value;
+      const pets = Array.isArray(body.pets) ? body.pets.filter(Boolean) : [];
 
       const existingEmail = customerData.data.customer.email;
 
       // Validar que el tax_id/document_number no cambie si ya existe
+      // NO permitimos cambio del tax_id una vez asignado (es llave para integración externa)
       const taxIdValue = body.document_number || body.tax_id;
       if (existingTaxId && taxIdValue && taxIdValue !== existingTaxId) {
         return Response.json(
           { error: "El número de identificación no puede ser modificado" },
           { status: 400 }
         );
+      }
+
+      // Validar que "Resides en Panamá" no cambie si ya está guardado
+      const newCustomerType = body.customer_type;
+      if (
+        existingCustomerType &&
+        newCustomerType &&
+        existingCustomerType !== newCustomerType
+      ) {
+        // Si cambia de 01/02 (Panamá) a 04 (Extranjero) o viceversa, no permitir
+        const wasPanama = existingCustomerType === "01" || existingCustomerType === "02";
+        const isPanama = newCustomerType === "01" || newCustomerType === "02";
+        if (wasPanama !== isPanama) {
+          return Response.json(
+            { error: "No se puede cambiar si resides en Panamá o no" },
+            { status: 400 }
+          );
+        }
       }
 
       if (body.email !== existingEmail) {
@@ -443,20 +480,33 @@ export const action = async ({ request, params }) => {
           value: body.customer_type,
         },
       ];
+      const metafieldsKeysToDelete = [];
+
+      if (pets.length > 0) {
+        metafieldsToSet.push({
+          ownerId: customerId,
+          namespace: "exchanger",
+          key: "ex_segmentation",
+          type: "list.single_line_text_field",
+          value: JSON.stringify(pets),
+        });
+      } else if (existingByKey["ex_segmentation"]?.id) {
+        metafieldsKeysToDelete.push("ex_segmentation");
+      }
 
       // Agregar campos condicionales según tipo de cliente
-      if (body.customer_type === "01" || body.customer_type === "02" || body.customer_type === "04") {
-        // Usar document_number si existe, de lo contrario usar tax_id
-        const taxIdValue = body.document_number || body.tax_id;
-        if (taxIdValue) {
-          metafieldsToSet.push({
-            ownerId: customerId,
-            namespace: "exchanger",
-            key: "ex_tax_id",
-            type: "single_line_text_field",
-            value: taxIdValue,
-          });
-        }
+      // Siempre seteamos los metafields relevantes para limpiar los que no aplican
+      const taxIdValueUpdated = body.document_number || body.tax_id || "";
+      if (taxIdValueUpdated) {
+        metafieldsToSet.push({
+          ownerId: customerId,
+          namespace: "exchanger",
+          key: "ex_tax_id",
+          type: "single_line_text_field",
+          value: taxIdValueUpdated,
+        });
+      } else if (existingByKey["ex_tax_id"]?.id) {
+        metafieldsKeysToDelete.push("ex_tax_id");
       }
 
       if (body.customer_type === "01") {
@@ -469,47 +519,56 @@ export const action = async ({ request, params }) => {
             type: "single_line_text_field",
             value: body.customer_dv,
           });
+        } else if (existingByKey["ex_customer_dv"]?.id) {
+          metafieldsKeysToDelete.push("ex_customer_dv");
         }
-        if (body.taxpayer_name) {
-          metafieldsToSet.push({
-            ownerId: customerId,
-            namespace: "exchanger",
-            key: "ex_taxpayer_name",
-            type: "single_line_text_field",
-            value: body.taxpayer_name,
-          });
-        }
-        if (body.taxpayer_kind) {
-          metafieldsToSet.push({
-            ownerId: customerId,
-            namespace: "exchanger",
-            key: "ex_taxpayer_kind",
-            type: "single_line_text_field",
-            value: body.taxpayer_kind,
-          });
-        }
+        metafieldsToSet.push({
+          ownerId: customerId,
+          namespace: "exchanger",
+          key: "ex_taxpayer_name",
+          type: "single_line_text_field",
+          value: body.taxpayer_name || "",
+        });
+        metafieldsToSet.push({
+          ownerId: customerId,
+          namespace: "exchanger",
+          key: "ex_taxpayer_kind",
+          type: "single_line_text_field",
+          value: body.taxpayer_kind || "",
+        });
       } else if (body.customer_type === "02") {
-        // Consumidor final
-        if (body.taxpayer_name) {
-          metafieldsToSet.push({
-            ownerId: customerId,
-            namespace: "exchanger",
-            key: "ex_taxpayer_name",
-            type: "single_line_text_field",
-            value: body.taxpayer_name,
-          });
+        // Consumidor final (limpiar campos de contribuyente)
+        if (existingByKey["ex_customer_dv"]?.id) {
+          metafieldsKeysToDelete.push("ex_customer_dv");
         }
-        if (body.taxpayer_kind) {
-          metafieldsToSet.push({
-            ownerId: customerId,
-            namespace: "exchanger",
-            key: "ex_taxpayer_kind",
-            type: "single_line_text_field",
-            value: body.taxpayer_kind,
-          });
+        metafieldsToSet.push({
+          ownerId: customerId,
+          namespace: "exchanger",
+          key: "ex_taxpayer_name",
+          type: "single_line_text_field",
+          value: body.taxpayer_name || "",
+        });
+        metafieldsToSet.push({
+          ownerId: customerId,
+          namespace: "exchanger",
+          key: "ex_taxpayer_kind",
+          type: "single_line_text_field",
+          value: body.taxpayer_kind || "",
+        });
+      } else {
+        // Otros tipos: limpiar campos que no aplican
+        if (existingByKey["ex_customer_dv"]?.id) {
+          metafieldsKeysToDelete.push("ex_customer_dv");
+        }
+        if (existingByKey["ex_taxpayer_name"]?.id) {
+          metafieldsKeysToDelete.push("ex_taxpayer_name");
+        }
+        if (existingByKey["ex_taxpayer_kind"]?.id) {
+          metafieldsKeysToDelete.push("ex_taxpayer_kind");
         }
       }
 
+      // Siempre manejar location_code: set si viene valor, borrar si viene vacío
       if (body.location_code) {
         metafieldsToSet.push({
           ownerId: customerId,
@@ -518,6 +577,8 @@ export const action = async ({ request, params }) => {
           type: "single_line_text_field",
           value: body.location_code,
         });
+      } else if (existingByKey["ex_customer_location_code"]?.id) {
+        metafieldsKeysToDelete.push("ex_customer_location_code");
       }
 
       const updateCustomerMutation = `
@@ -559,6 +620,7 @@ export const action = async ({ request, params }) => {
         return Response.json({ error: errors }, { status: 400 });
       }
 
+      // Mutación para setear metafields
       const setMetafieldsMutation = `
         mutation metafieldsSet($metafields: [MetafieldsSetInput!]!) {
           metafieldsSet(metafields: $metafields) {
@@ -588,6 +650,51 @@ export const action = async ({ request, params }) => {
           .map((err) => err.message)
           .join(", ");
         return Response.json({ error: errors }, { status: 400 });
+      }
+
+      // Borrar metafields que deben limpiarse (bulk por owner/namespace/key)
+      if (metafieldsKeysToDelete.length > 0) {
+        const metafieldsDeleteMutation = `
+          mutation metafieldsDelete($metafields: [MetafieldIdentifierInput!]!) {
+            metafieldsDelete(metafields: $metafields) {
+              deletedMetafields {
+                ownerId
+                namespace
+                key
+              }
+              userErrors {
+                field
+                message
+              }
+            }
+          }
+        `;
+
+        const metafieldsDeleteInput = metafieldsKeysToDelete.map((key) => ({
+          ownerId: customerId,
+          namespace: "exchanger",
+          key,
+        }));
+
+        try {
+          const deleteResp = await admin.graphql(metafieldsDeleteMutation, {
+            variables: {
+              metafields: metafieldsDeleteInput,
+            },
+          });
+          const deleteData = await deleteResp.json();
+          if (
+            deleteData.data.metafieldsDelete.userErrors &&
+            deleteData.data.metafieldsDelete.userErrors.length > 0
+          ) {
+            const errors = deleteData.data.metafieldsDelete.userErrors
+              .map((err) => err.message)
+              .join(", ");
+            console.warn("No se pudo limpiar algunos metafields:", errors);
+          }
+        } catch (err) {
+          console.warn("Error eliminando metafields (continuando):", err);
+        }
       }
 
       return Response.json({

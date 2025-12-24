@@ -141,12 +141,31 @@
           showCustomerDataSummary(d.customer);
           enableCheckout();
         } else {
-          disableCheckout();
+          disableCheckout(d.missingFields || []);
         }
       })
       .catch((e) => {
-        disableCheckout();
+        disableCheckout([]);
       });
+  }
+
+  function getLocationFromCode(code) {
+    if (!locationHierarchy || !code) return null;
+
+    for (const provincia in locationHierarchy) {
+      for (const distrito in locationHierarchy[provincia]) {
+        for (const corregimiento in locationHierarchy[provincia][distrito]) {
+          if (locationHierarchy[provincia][distrito][corregimiento] === code) {
+            return {
+              province: provincia,
+              district: distrito,
+              corregimiento,
+            };
+          }
+        }
+      }
+    }
+    return null;
   }
 
   function showCustomerDataSummary(c) {
@@ -159,6 +178,7 @@
 
     if (c && c.metafields) {
       const mf = c.metafields || {};
+      const isContribuyente = mf.ex_customer_type === "01";
       const customerTypeLabel =
         mf.ex_customer_type === "01"
           ? "Contribuyente"
@@ -168,18 +188,59 @@
               ? "Extranjero"
               : "";
 
-      summaryContent.innerHTML = `
-        <div class="customer-data-summary-item">
-          <strong>${c.firstName || ""} ${c.lastName || ""}</strong>
-        </div>
-        <div class="customer-data-summary-item">
-          ${mf.ex_tax_id || ""} ${customerTypeLabel ? `(${customerTypeLabel})` : ""}
-        </div>
-        <div class="customer-data-summary-item">
-          ${c.email || ""}
-        </div>
-      `;
-      summaryContainer.style.display = "block";
+      loadLocationData().then(() => {
+        const locationData = getLocationFromCode(
+          mf.ex_customer_location_code || "",
+        );
+        const address = locationData
+          ? [
+              locationData.corregimiento,
+              locationData.district,
+              locationData.province,
+            ]
+              .filter(Boolean)
+              .join(", ")
+          : "";
+
+        const summaryItems = [];
+
+        summaryItems.push(
+          `<div class="customer-data-summary-item"><strong>${c.firstName || ""} ${c.lastName || ""}</strong></div>`,
+        );
+
+        if (customerTypeLabel) {
+          summaryItems.push(
+            `<div class="customer-data-summary-item">${customerTypeLabel}</div>`,
+          );
+        }
+
+        if (mf.ex_tax_id) {
+          summaryItems.push(
+            `<div class="customer-data-summary-item">${mf.ex_tax_id}</div>`,
+          );
+        }
+
+        if (mf.ex_taxpayer_name) {
+          summaryItems.push(
+            `<div class="customer-data-summary-item">${mf.ex_taxpayer_name}</div>`,
+          );
+        }
+
+        if (isContribuyente && mf.ex_customer_dv) {
+          summaryItems.push(
+            `<div class="customer-data-summary-item">DV: ${mf.ex_customer_dv}</div>`,
+          );
+        }
+
+        if (isContribuyente && address) {
+          summaryItems.push(
+            `<div class="customer-data-summary-item">${address}</div>`,
+          );
+        }
+
+        summaryContent.innerHTML = summaryItems.join("\n");
+        summaryContainer.style.display = "block";
+      });
     }
   }
 
@@ -321,35 +382,52 @@
       fetch(`${API_BASE}/get?customer_id=${CUSTOMER_ID}`)
         .then((r) => r.json())
         .then((d) => {
+          // DEBUG TEMPORAL: Mostrar respuesta del API
+          console.log("[DEBUG FRONTEND] Respuesta del API:", d);
+          console.log("[DEBUG FRONTEND] Datos completos:", d.complete);
+
           if (d.complete && d.customer) {
             enableCheckout();
             showCustomerDataSummary(d.customer);
           } else {
-            disableCheckout();
+            disableCheckout([]);
 
             if (openModalIfIncomplete) {
               openModal(true);
               setTimeout(() => {
                 loadCustomerData();
+                setTimeout(() => {
+                  validateEmptyFormFields();
+                }, 800);
               }, 100);
             }
           }
         })
         .catch((e) => {
-          disableCheckout();
+          console.error(
+            "[DEBUG FRONTEND] Error al obtener datos del cliente:",
+            e,
+          );
+          disableCheckout([]);
 
           if (openModalIfIncomplete) {
             openModal(true);
             setTimeout(() => {
               loadCustomerData();
+              setTimeout(() => {
+                validateEmptyFormFields();
+              }, 800);
             }, 100);
           }
         });
     } else {
-      disableCheckout();
+      disableCheckout([]);
 
       if (openModalIfIncomplete) {
         openModal(true);
+        setTimeout(() => {
+          validateEmptyFormFields();
+        }, 100);
       }
     }
   }
@@ -533,7 +611,7 @@
     }
   }
 
-  function disableCheckout() {
+  function disableCheckout(missingFields = []) {
     const cb = getCheckoutButton();
     if (!cb) return;
 
@@ -561,6 +639,26 @@
       cb.style.position = "relative";
       cb.appendChild(indicator);
     }
+
+    // Mostrar mensaje de error debajo del toggle
+    const errorElement = document.getElementById("checkout-blocked-error");
+    if (errorElement) {
+      errorElement.innerHTML = `
+        Te hacen falta datos por completar. 
+        <a href="#" id="open-form-link">Completa tus datos aquí</a>
+      `;
+      errorElement.classList.add("show");
+      errorElement.style.display = ""; // Remover cualquier display inline que pueda estar bloqueando
+
+      // Agregar listener al link
+      const openFormLink = document.getElementById("open-form-link");
+      if (openFormLink) {
+        openFormLink.addEventListener("click", function (e) {
+          e.preventDefault();
+          handleBlockedCheckoutClick(e);
+        });
+      }
+    }
   }
 
   function handleBlockedCheckoutClick(e) {
@@ -577,43 +675,305 @@
         openModal(true);
 
         setTimeout(() => {
-          const form = document.getElementById("custom-invoice-form");
-          if (form) {
-            form.classList.add("submitted");
-
-            const allFields = form.querySelectorAll(
-              "input[required], select[required]",
-            );
-            allFields.forEach((field) => {
-              if (!field.value || (field.value && field.value.trim() === "")) {
-                const fieldId = field.id;
-                if (fieldId) {
-                  showFormError(fieldId, "Este campo es requerido");
-                }
-              }
-            });
+          if (IS_LOGGED_IN) {
+            // Si está logueado, cargar datos y luego validar campos vacíos del formulario
+            loadCustomerData();
+            // Esperar más tiempo para que el formulario se cargue completamente
+            setTimeout(() => {
+              validateEmptyFormFields();
+            }, 800);
+          } else {
+            // Si no está logueado, validar todos los campos requeridos
+            const form = document.getElementById("custom-invoice-form");
+            if (form) {
+              form.classList.add("submitted");
+              validateEmptyFormFields();
+            }
           }
         }, 100);
+      }
+    }
+  }
 
-        if (!IS_LOGGED_IN) {
-        } else {
-          loadCustomerData();
+  function validateEmptyFormFields() {
+    const form = document.getElementById("custom-invoice-form");
+    if (!form) {
+      // Si el formulario no existe, intentar de nuevo después de un breve delay
+      setTimeout(() => validateEmptyFormFields(), 200);
+      return;
+    }
+
+    console.log("[DEBUG FRONTEND] Validando campos vacíos del formulario");
+
+    form.classList.add("submitted");
+
+    // Determinar el tipo de cliente y si reside en Panamá
+    const residesPanamaYes = document.getElementById("resides_panama_yes");
+    const residesPanamaNo = document.getElementById("resides_panama_no");
+    const isPanama = residesPanamaYes && residesPanamaYes.checked;
+    const isForeign = residesPanamaNo && residesPanamaNo.checked;
+
+    const customerType01 = document.getElementById("customer_type_01");
+    const customerType02 = document.getElementById("customer_type_02");
+    const customerType =
+      customerType01 && customerType01.checked
+        ? "01"
+        : customerType02 && customerType02.checked
+          ? "02"
+          : "";
+
+    // Campos siempre requeridos
+    const alwaysRequired = [
+      "first_name",
+      "last_name",
+      "email",
+      "gender",
+      "phone",
+    ];
+
+    // Validar campos siempre requeridos
+    alwaysRequired.forEach((fieldId) => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        const isEmpty =
+          !field.value || (field.value && field.value.trim() === "");
+        if (isEmpty) {
+          console.log(`[DEBUG FRONTEND] Campo vacío: ${fieldId}`);
+          showFormError(fieldId, "Este campo es requerido");
         }
+      }
+    });
+
+    // Validar fecha de nacimiento (tres selects)
+    const birthDay = document.getElementById("birth_day");
+    const birthMonth = document.getElementById("birth_month");
+    const birthYear = document.getElementById("birth_year");
+    if (birthDay && (!birthDay.value || birthDay.value === "")) {
+      console.log("[DEBUG FRONTEND] Campo vacío: birth_day");
+      showFormError("birth_day", "Este campo es requerido");
+    }
+    if (birthMonth && (!birthMonth.value || birthMonth.value === "")) {
+      console.log("[DEBUG FRONTEND] Campo vacío: birth_month");
+      showFormError("birth_month", "Este campo es requerido");
+    }
+    if (birthYear && (!birthYear.value || birthYear.value === "")) {
+      console.log("[DEBUG FRONTEND] Campo vacío: birth_year");
+      showFormError("birth_year", "Este campo es requerido");
+    }
+
+    // Validar "Resides en Panamá"
+    if (!isPanama && !isForeign) {
+      console.log("[DEBUG FRONTEND] Campo vacío: resides_panama");
+      showFormError("country_error", "Este campo es requerido");
+    }
+
+    // Validar tipo de cliente (solo si reside en Panamá)
+    if (isPanama && !customerType) {
+      console.log("[DEBUG FRONTEND] Campo vacío: customer_type");
+      showFormError("customer_type_error", "Este campo es requerido");
+      // Marcar los radio cards de tipo de cliente con error
+      if (customerType01) {
+        customerType01.classList.add("error");
+        const customerType01Label = customerType01.closest("label.radio-card");
+        if (customerType01Label) {
+          customerType01Label.classList.add("error");
+        }
+      }
+      if (customerType02) {
+        customerType02.classList.add("error");
+        const customerType02Label = customerType02.closest("label.radio-card");
+        if (customerType02Label) {
+          customerType02Label.classList.add("error");
+        }
+      }
+    }
+
+    // Validar campos según tipo de cliente
+    if (isPanama && customerType === "01") {
+      // Contribuyente
+      const taxIdContribuyente = document.getElementById(
+        "tax_id_contribuyente",
+      );
+      if (
+        taxIdContribuyente &&
+        (!taxIdContribuyente.value || taxIdContribuyente.value.trim() === "")
+      ) {
+        console.log("[DEBUG FRONTEND] Campo vacío: tax_id_contribuyente");
+        showFormError("tax_id_contribuyente", "Este campo es requerido");
+      }
+
+      const customerDv = document.getElementById("customer_dv");
+      if (customerDv && (!customerDv.value || customerDv.value.trim() === "")) {
+        console.log("[DEBUG FRONTEND] Campo vacío: customer_dv");
+        showFormError("customer_dv", "Este campo es requerido");
+      }
+
+      const taxpayerName = document.getElementById(
+        "taxpayer_name_contribuyente",
+      );
+      if (
+        taxpayerName &&
+        (!taxpayerName.value || taxpayerName.value.trim() === "")
+      ) {
+        console.log(
+          "[DEBUG FRONTEND] Campo vacío: taxpayer_name_contribuyente",
+        );
+        showFormError("taxpayer_name_contribuyente", "Este campo es requerido");
+      }
+
+      // Validar tipo de contribuyente (radio buttons)
+      const taxpayerKind1 = document.getElementById(
+        "taxpayer_kind_contribuyente_1",
+      );
+      const taxpayerKind2 = document.getElementById(
+        "taxpayer_kind_contribuyente_2",
+      );
+      const taxpayerKindSelected =
+        (taxpayerKind1 && taxpayerKind1.checked) ||
+        (taxpayerKind2 && taxpayerKind2.checked);
+
+      if (!taxpayerKindSelected) {
+        console.log(
+          "[DEBUG FRONTEND] Campo vacío: taxpayer_kind_contribuyente",
+        );
+        showFormError(
+          "taxpayer_kind_contribuyente_error",
+          "Este campo es requerido",
+        );
+        // Marcar los radio cards de tipo de contribuyente con error
+        if (taxpayerKind1) {
+          taxpayerKind1.classList.add("error");
+          const taxpayerKind1Label = taxpayerKind1.closest("label.radio-card");
+          if (taxpayerKind1Label) {
+            taxpayerKind1Label.classList.add("error");
+          }
+        }
+        if (taxpayerKind2) {
+          taxpayerKind2.classList.add("error");
+          const taxpayerKind2Label = taxpayerKind2.closest("label.radio-card");
+          if (taxpayerKind2Label) {
+            taxpayerKind2Label.classList.add("error");
+          }
+        }
+      }
+
+      // Campos de ubicación para contribuyente
+      const province = document.getElementById("province");
+      if (province && (!province.value || province.value === "")) {
+        console.log("[DEBUG FRONTEND] Campo vacío: province");
+        showFormError("province", "Este campo es requerido");
+      }
+
+      const district = document.getElementById("district");
+      if (district && (!district.value || district.value === "")) {
+        console.log("[DEBUG FRONTEND] Campo vacío: district");
+        showFormError("district", "Este campo es requerido");
+      }
+
+      const corregimiento = document.getElementById("corregimiento");
+      if (
+        corregimiento &&
+        (!corregimiento.value || corregimiento.value === "")
+      ) {
+        console.log("[DEBUG FRONTEND] Campo vacío: corregimiento");
+        showFormError("corregimiento", "Este campo es requerido");
+      }
+    } else if (isPanama && customerType === "02") {
+      // Consumidor final
+      const taxIdConsumidor = document.getElementById("tax_id_consumidor");
+      if (
+        taxIdConsumidor &&
+        (!taxIdConsumidor.value || taxIdConsumidor.value.trim() === "")
+      ) {
+        console.log("[DEBUG FRONTEND] Campo vacío: tax_id_consumidor");
+        showFormError("tax_id_consumidor", "Este campo es requerido");
+      }
+
+      // Validar tipo de contribuyente para consumidor final (radio buttons)
+      const taxpayerKindConsumidor1 = document.getElementById(
+        "taxpayer_kind_consumidor_1",
+      );
+      const taxpayerKindConsumidor2 = document.getElementById(
+        "taxpayer_kind_consumidor_2",
+      );
+      const taxpayerKindConsumidorSelected =
+        (taxpayerKindConsumidor1 && taxpayerKindConsumidor1.checked) ||
+        (taxpayerKindConsumidor2 && taxpayerKindConsumidor2.checked);
+
+      if (!taxpayerKindConsumidorSelected) {
+        console.log("[DEBUG FRONTEND] Campo vacío: taxpayer_kind_consumidor");
+        showFormError(
+          "taxpayer_kind_consumidor_error",
+          "Este campo es requerido",
+        );
+        // Marcar los radio cards de tipo de contribuyente con error
+        if (taxpayerKindConsumidor1) {
+          taxpayerKindConsumidor1.classList.add("error");
+          const taxpayerKindConsumidor1Label =
+            taxpayerKindConsumidor1.closest("label.radio-card");
+          if (taxpayerKindConsumidor1Label) {
+            taxpayerKindConsumidor1Label.classList.add("error");
+          }
+        }
+        if (taxpayerKindConsumidor2) {
+          taxpayerKindConsumidor2.classList.add("error");
+          const taxpayerKindConsumidor2Label =
+            taxpayerKindConsumidor2.closest("label.radio-card");
+          if (taxpayerKindConsumidor2Label) {
+            taxpayerKindConsumidor2Label.classList.add("error");
+          }
+        }
+      }
+    } else if (isForeign) {
+      // Extranjero
+      const taxIdForeign = document.getElementById("tax_id_foreign");
+      if (
+        taxIdForeign &&
+        (!taxIdForeign.value || taxIdForeign.value.trim() === "")
+      ) {
+        console.log("[DEBUG FRONTEND] Campo vacío: tax_id_foreign");
+        showFormError("tax_id_foreign", "Este campo es requerido");
       }
     }
   }
 
   function showFormError(fieldId, message) {
-    const field = document.getElementById(fieldId);
-    const errorElement = document.getElementById(`${fieldId}_error`);
+    // Si el fieldId ya termina en _error, es un elemento de error directo, no un campo
+    const isErrorElement = fieldId.endsWith("_error");
+    const errorElementId = isErrorElement ? fieldId : `${fieldId}_error`;
+    const errorElement = document.getElementById(errorElementId);
 
-    if (field) {
-      field.classList.add("error");
+    // Solo buscar el campo si NO es un elemento de error directo
+    if (!isErrorElement) {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.classList.add("error");
+        console.log(
+          `[DEBUG] Clase error agregada a campo: ${fieldId}, tiene clase error: ${field.classList.contains("error")}`,
+        );
+      } else {
+        console.warn(`[DEBUG] No se encontró campo: ${fieldId}`);
+      }
     }
 
     if (errorElement) {
-      errorElement.textContent = message;
+      // Limpiar contenido previo y establecer el ícono y texto del mensaje
+      // Insertar el ícono directamente en el HTML en lugar de usar ::before
+      const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#eb4b6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 1.6rem; height: 1.6rem; flex-shrink: 0;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+      errorElement.innerHTML = `${iconSvg}<span>${message}</span>`;
       errorElement.classList.add("show");
+      // Forzar display para asegurar que se muestre
+      errorElement.style.display = "flex";
+      errorElement.style.alignItems = "center";
+      errorElement.style.gap = "0.5rem";
+      errorElement.style.width = "100%";
+      console.log(
+        `[DEBUG] Error mostrado: ${errorElementId}, message="${message}", innerHTML="${errorElement.innerHTML.substring(0, 100)}..."`,
+      );
+    } else {
+      console.warn(
+        `[DEBUG] No se encontró elemento de error: ${errorElementId}`,
+      );
     }
   }
 
@@ -626,6 +986,7 @@
     cb.style.cursor = "pointer";
     cb.removeAttribute("aria-disabled");
     cb.removeAttribute("data-checkout-blocked");
+    cb.removeAttribute("data-missing-fields");
     cb.removeAttribute("title");
 
     const indicator = cb.querySelector(".checkout-blocked-indicator");
@@ -635,6 +996,14 @@
 
     if (cb.tagName === "A") {
       cb.style.pointerEvents = "auto";
+    }
+
+    // Ocultar mensaje de error
+    const errorElement = document.getElementById("checkout-blocked-error");
+    if (errorElement) {
+      errorElement.classList.remove("show");
+      errorElement.style.display = "none";
+      errorElement.innerHTML = "";
     }
   }
 
@@ -774,6 +1143,11 @@
     if (c && c.metafields) {
       populateForm(c);
 
+      // Setup immutable fields después de que todos los campos estén poblados
+      setTimeout(() => {
+        setupImmutableFields(c);
+      }, 300);
+
       // Asegurar que todos los selects tengan el estilo correcto después de cargar datos
       // También verificar que el valor de la provincia persista
       setTimeout(() => {
@@ -884,6 +1258,25 @@
     }
     if (phoneField && mf.ex_phone) phoneField.value = mf.ex_phone;
 
+    // Mascotas (ex_segmentation es una lista JSON)
+    if (mf.ex_segmentation) {
+      try {
+        const petsArray = JSON.parse(mf.ex_segmentation);
+        if (Array.isArray(petsArray)) {
+          petsArray.forEach((pet) => {
+            const checkbox = document.querySelector(
+              `input[name="pets[]"][value="${pet}"]`,
+            );
+            if (checkbox) {
+              checkbox.checked = true;
+            }
+          });
+        }
+      } catch (e) {
+        console.warn("No se pudo parsear ex_segmentation", e);
+      }
+    }
+
     const customerType = mf.ex_customer_type;
 
     const residesPanamaYes = document.getElementById("resides_panama_yes");
@@ -919,7 +1312,10 @@
         customerTypeForeignGroup.style.display = "none";
       }
 
-      if (taxIdForeign && mf.ex_tax_id) taxIdForeign.value = mf.ex_tax_id;
+      if (taxIdForeign && mf.ex_tax_id) {
+        taxIdForeign.value = mf.ex_tax_id;
+        // Marcar como inmutable para setupImmutableFields
+      }
       if (customerTypeForeign) {
         customerTypeForeign.value = "04";
       }
@@ -946,8 +1342,10 @@
           "taxpayer_name_contribuyente",
         );
 
-        if (taxIdContribuyente && mf.ex_tax_id)
+        if (taxIdContribuyente && mf.ex_tax_id) {
           taxIdContribuyente.value = mf.ex_tax_id;
+          // Marcar como inmutable para setupImmutableFields
+        }
         if (customerDv && mf.ex_customer_dv) {
           customerDv.value = mf.ex_customer_dv;
           const dvGroup = customerDv.closest(".custom-invoice-form-group");
@@ -983,8 +1381,10 @@
           "taxpayer_name_consumidor",
         );
 
-        if (taxIdConsumidor && mf.ex_tax_id)
+        if (taxIdConsumidor && mf.ex_tax_id) {
           taxIdConsumidor.value = mf.ex_tax_id;
+          // Marcar como inmutable para setupImmutableFields
+        }
         if (taxpayerNameConsumidor && mf.ex_taxpayer_name)
           taxpayerNameConsumidor.value = mf.ex_taxpayer_name;
 
@@ -1079,6 +1479,76 @@
         setTimeout(() => {
           updateRazonSocial();
         }, 100);
+      }
+    }
+  }
+
+  function setupImmutableFields(c) {
+    const mf = c.metafields || {};
+    const SUPPORT_LINK = window.config?.SUPPORT_LINK || "#";
+
+    // Deshabilitar campos de tax_id si ya tienen valor
+    const taxIdFields = [
+      "tax_id_contribuyente",
+      "tax_id_consumidor",
+      "tax_id_foreign",
+    ];
+
+    taxIdFields.forEach((fieldId) => {
+      const field = document.getElementById(fieldId);
+      if (field && mf.ex_tax_id && field.value && field.value.trim() !== "") {
+        field.disabled = true;
+        field.style.cursor = "default";
+        field.style.backgroundColor = "#f5f5f5";
+        field.style.color = "#666";
+
+        // Agregar mensaje de advertencia siempre visible
+        // Insertar después del contenedor .input-with-validation, no dentro de él
+        const warningId = `${fieldId}_immutable_warning`;
+        let warningElement = document.getElementById(warningId);
+        if (!warningElement) {
+          warningElement = document.createElement("div");
+          warningElement.id = warningId;
+          warningElement.className = "immutable-field-warning";
+          // Insertar después del contenedor .input-with-validation
+          const inputContainer = field.closest(".input-with-validation");
+          if (inputContainer && inputContainer.parentNode) {
+            inputContainer.parentNode.insertBefore(
+              warningElement,
+              inputContainer.nextSibling,
+            );
+          } else {
+            // Fallback: insertar después del campo si no se encuentra el contenedor
+            field.parentNode.insertBefore(warningElement, field.nextSibling);
+          }
+        }
+
+        warningElement.innerHTML = `
+          <div style="margin-top: 0.4rem; color: #666; font-size: 1.3rem; line-height: 1.4; user-select: none;">
+            Este dato no se puede modificar. Si necesitas cambiarlo, 
+            <a href="${SUPPORT_LINK}" target="_blank" style="color: #000; text-decoration: underline; user-select: none;">contáctanos</a>.
+          </div>
+        `;
+      }
+    });
+
+    // Deshabilitar cambio de "Resides en Panamá" si ya está guardado
+    const customerType = mf.ex_customer_type;
+    if (customerType) {
+      const residesPanamaYes = document.getElementById("resides_panama_yes");
+      const residesPanamaNo = document.getElementById("resides_panama_no");
+
+      if (residesPanamaYes && residesPanamaNo) {
+        residesPanamaYes.disabled = true;
+        residesPanamaNo.disabled = true;
+        residesPanamaYes.style.cursor = "not-allowed";
+        residesPanamaNo.style.cursor = "not-allowed";
+
+        // Ocultar visualmente pero mantener accesibilidad
+        const radioGroup = residesPanamaYes.closest(".radix-radio-group");
+        if (radioGroup) {
+          radioGroup.style.opacity = "0.6";
+        }
       }
     }
   }
@@ -1321,10 +1791,44 @@
     const customerType01 = document.getElementById("customer_type_01");
     const customerType02 = document.getElementById("customer_type_02");
     if (customerType01) {
-      customerType01.addEventListener("change", handleCustomerTypeChange);
+      customerType01.addEventListener("change", function () {
+        // Limpiar error de tipo de cliente cuando se selecciona una opción
+        if (customerType01.checked || customerType02?.checked) {
+          clearFormError(customerType01, true);
+          clearFormError(customerType02, true);
+          const errorElement = document.getElementById("customer_type_error");
+          if (errorElement) {
+            errorElement.classList.remove("show");
+            errorElement.innerHTML = "";
+          }
+          // Limpiar clase error de los labels
+          const label01 = customerType01.closest("label.radio-card");
+          const label02 = customerType02?.closest("label.radio-card");
+          if (label01) label01.classList.remove("error");
+          if (label02) label02.classList.remove("error");
+        }
+        handleCustomerTypeChange();
+      });
     }
     if (customerType02) {
-      customerType02.addEventListener("change", handleCustomerTypeChange);
+      customerType02.addEventListener("change", function () {
+        // Limpiar error de tipo de cliente cuando se selecciona una opción
+        if (customerType01?.checked || customerType02.checked) {
+          clearFormError(customerType01, true);
+          clearFormError(customerType02, true);
+          const errorElement = document.getElementById("customer_type_error");
+          if (errorElement) {
+            errorElement.classList.remove("show");
+            errorElement.innerHTML = "";
+          }
+          // Limpiar clase error de los labels
+          const label01 = customerType01?.closest("label.radio-card");
+          const label02 = customerType02.closest("label.radio-card");
+          if (label01) label01.classList.remove("error");
+          if (label02) label02.classList.remove("error");
+        }
+        handleCustomerTypeChange();
+      });
     }
 
     const firstNameInput = document.getElementById("first_name");
@@ -1386,10 +1890,104 @@
       "taxpayer_kind_contribuyente_2",
     );
     if (taxpayerKind01) {
-      taxpayerKind01.addEventListener("change", handleTaxpayerKindChange);
+      taxpayerKind01.addEventListener("change", function () {
+        // Limpiar error de tipo de contribuyente cuando se selecciona una opción
+        if (taxpayerKind01.checked || taxpayerKind02?.checked) {
+          clearFormError(taxpayerKind01, true);
+          clearFormError(taxpayerKind02, true);
+          const errorElement = document.getElementById(
+            "taxpayer_kind_contribuyente_error",
+          );
+          if (errorElement) {
+            errorElement.classList.remove("show");
+            errorElement.innerHTML = "";
+          }
+          // Limpiar clase error de los labels
+          const label01 = taxpayerKind01.closest("label.radio-card");
+          const label02 = taxpayerKind02?.closest("label.radio-card");
+          if (label01) label01.classList.remove("error");
+          if (label02) label02.classList.remove("error");
+        }
+        handleTaxpayerKindChange();
+      });
     }
     if (taxpayerKind02) {
-      taxpayerKind02.addEventListener("change", handleTaxpayerKindChange);
+      taxpayerKind02.addEventListener("change", function () {
+        // Limpiar error de tipo de contribuyente cuando se selecciona una opción
+        if (taxpayerKind01?.checked || taxpayerKind02.checked) {
+          clearFormError(taxpayerKind01, true);
+          clearFormError(taxpayerKind02, true);
+          const errorElement = document.getElementById(
+            "taxpayer_kind_contribuyente_error",
+          );
+          if (errorElement) {
+            errorElement.classList.remove("show");
+            errorElement.innerHTML = "";
+          }
+          // Limpiar clase error de los labels
+          const label01 = taxpayerKind01?.closest("label.radio-card");
+          const label02 = taxpayerKind02.closest("label.radio-card");
+          if (label01) label01.classList.remove("error");
+          if (label02) label02.classList.remove("error");
+        }
+        handleTaxpayerKindChange();
+      });
+    }
+
+    // Agregar listeners para tipo de contribuyente de consumidor final
+    const taxpayerKindConsumidor1 = document.getElementById(
+      "taxpayer_kind_consumidor_1",
+    );
+    const taxpayerKindConsumidor2 = document.getElementById(
+      "taxpayer_kind_consumidor_2",
+    );
+    if (taxpayerKindConsumidor1) {
+      taxpayerKindConsumidor1.addEventListener("change", function () {
+        // Limpiar error de tipo de contribuyente cuando se selecciona una opción
+        if (
+          taxpayerKindConsumidor1.checked ||
+          taxpayerKindConsumidor2?.checked
+        ) {
+          clearFormError(taxpayerKindConsumidor1, true);
+          clearFormError(taxpayerKindConsumidor2, true);
+          const errorElement = document.getElementById(
+            "taxpayer_kind_consumidor_error",
+          );
+          if (errorElement) {
+            errorElement.classList.remove("show");
+            errorElement.innerHTML = "";
+          }
+          // Limpiar clase error de los labels
+          const label01 = taxpayerKindConsumidor1.closest("label.radio-card");
+          const label02 = taxpayerKindConsumidor2?.closest("label.radio-card");
+          if (label01) label01.classList.remove("error");
+          if (label02) label02.classList.remove("error");
+        }
+      });
+    }
+    if (taxpayerKindConsumidor2) {
+      taxpayerKindConsumidor2.addEventListener("change", function () {
+        // Limpiar error de tipo de contribuyente cuando se selecciona una opción
+        if (
+          taxpayerKindConsumidor1?.checked ||
+          taxpayerKindConsumidor2.checked
+        ) {
+          clearFormError(taxpayerKindConsumidor1, true);
+          clearFormError(taxpayerKindConsumidor2, true);
+          const errorElement = document.getElementById(
+            "taxpayer_kind_consumidor_error",
+          );
+          if (errorElement) {
+            errorElement.classList.remove("show");
+            errorElement.innerHTML = "";
+          }
+          // Limpiar clase error de los labels
+          const label01 = taxpayerKindConsumidor1?.closest("label.radio-card");
+          const label02 = taxpayerKindConsumidor2.closest("label.radio-card");
+          if (label01) label01.classList.remove("error");
+          if (label02) label02.classList.remove("error");
+        }
+      });
     }
 
     loadLocationData().then(() => {
@@ -1466,9 +2064,48 @@
         ) {
           updateBirthDateField();
         }
+
+        // Validar email después de 500ms si es un nuevo registro
+        if (i.id === "email") {
+          const customerId = document.getElementById("customer_id")?.value;
+          const isUpdate = !!customerId;
+
+          if (!isUpdate) {
+            const email = i.value?.trim();
+            if (email && validateEmail(email)) {
+              // Delay de 500ms antes de validar
+              setTimeout(async () => {
+                // Verificar que el campo aún tiene el foco perdido y el email no cambió
+                if (document.activeElement !== i) {
+                  const currentEmail = i.value?.trim();
+                  if (currentEmail === email) {
+                    const emailExists = await checkEmailExists(email);
+                    if (emailExists) {
+                      showFormError(
+                        "email",
+                        "Este email ya está registrado. Usa otro email o inicia sesión",
+                      );
+                      i.classList.add("error");
+                    } else {
+                      clearFormError(i);
+                    }
+                  }
+                }
+              }, 500);
+            }
+          }
+        }
       });
       i.addEventListener("input", () => {
-        clearFormError(i);
+        // Solo limpiar el error si el campo tiene un valor válido
+        // Si el formulario está en modo "submitted" y el campo está vacío, mantener el error
+        const form = document.getElementById("custom-invoice-form");
+        const isSubmitted = form && form.classList.contains("submitted");
+        const hasValue = i.value && i.value.trim() !== "";
+
+        if (hasValue || !isSubmitted) {
+          clearFormError(i);
+        }
 
         if (formSubmitted) {
           validateField(i);
@@ -1503,6 +2140,9 @@
     const residesPanamaYes = document.getElementById("resides_panama_yes");
     const residesPanamaNo = document.getElementById("resides_panama_no");
     const isPanama = residesPanamaYes && residesPanamaYes.checked;
+
+    // Limpiar errores de campos de facturación al cambiar
+    clearBillingErrors();
 
     const billingSection = document.getElementById("billing-section");
     const foreignFields = document.getElementById("foreign-billing-fields");
@@ -1540,7 +2180,74 @@
     }
   }
 
+  function clearBillingErrors() {
+    // No limpiar errores si el formulario está en modo "submitted" (validación activa)
+    const form = document.getElementById("custom-invoice-form");
+    if (form && form.classList.contains("submitted")) {
+      // Si está en modo validación, no limpiar errores automáticamente
+      // Solo se limpiarán cuando el usuario seleccione una opción válida
+      return;
+    }
+
+    // Limpiar errores visuales de todos los campos de facturación
+    // (Solo si no está en modo validación)
+    const billingFieldIds = [
+      // Tipo de cliente
+      "customer_type_01",
+      "customer_type_02",
+      "customer_type_error",
+      // Contribuyente
+      "tax_id_contribuyente",
+      "customer_dv",
+      "taxpayer_name",
+      "taxpayer_kind_contribuyente_1",
+      "taxpayer_kind_contribuyente_2",
+      "taxpayer_kind_contribuyente_error",
+      // Consumidor final
+      "tax_id_consumidor",
+      "taxpayer_kind_consumidor_1",
+      "taxpayer_kind_consumidor_2",
+      "taxpayer_kind_consumidor_error",
+      // Extranjero
+      "tax_id_foreign",
+      // Ubicación
+      "province",
+      "district",
+      "corregimiento",
+    ];
+
+    billingFieldIds.forEach((fieldId) => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        clearFormError(field, true); // Forzar limpieza si no está en modo validación
+        // También limpiar la clase error de los labels de radio cards
+        const label = field.closest("label.radio-card");
+        if (label) {
+          label.classList.remove("error");
+        }
+      }
+    });
+
+    // Limpiar errores de los elementos de error directamente
+    const errorElementIds = [
+      "customer_type_error",
+      "taxpayer_kind_contribuyente_error",
+      "taxpayer_kind_consumidor_error",
+    ];
+
+    errorElementIds.forEach((errorId) => {
+      const errorElement = document.getElementById(errorId);
+      if (errorElement) {
+        errorElement.classList.remove("show");
+        errorElement.innerHTML = "";
+      }
+    });
+  }
+
   function handleCustomerTypeChange() {
+    // Limpiar errores de campos de facturación al cambiar tipo de cliente
+    clearBillingErrors();
+
     const customerType01 = document.getElementById("customer_type_01");
     const customerType02 = document.getElementById("customer_type_02");
     const customerType = customerType01?.checked
@@ -1577,7 +2284,7 @@
       }
 
       loadLocationData().then(() => {
-        populateProvinceSelect();
+        populateProvinceSelect(true);
       });
     } else if (customerType === "02") {
       if (contribuyenteFields) contribuyenteFields.style.display = "none";
@@ -1615,7 +2322,7 @@
       }
 
       loadLocationData().then(() => {
-        populateProvinceSelect();
+        populateProvinceSelect(true);
       });
     } else {
       if (contribuyenteFields) contribuyenteFields.style.display = "none";
@@ -1638,7 +2345,7 @@
       }
 
       loadLocationData().then(() => {
-        populateProvinceSelect();
+        populateProvinceSelect(true);
       });
     }
   }
@@ -1663,6 +2370,7 @@
   let validationTimeout = null;
   let isValidating = false;
   let taxpayerKindSelected = false;
+  let contribuyenteValidationSuccess = false; // Rastrear si la validación de la API fue exitosa
   let currentValidationToken = 0;
 
   function showValidationLoader() {
@@ -1753,6 +2461,8 @@
       dvField.value = dv || "";
       if (dv && dv.trim()) {
         if (dvGroup) dvGroup.style.display = "flex";
+        // Limpiar error si el campo tiene valor (autocompletado)
+        clearFormError(dvField, true);
       } else {
         if (dvGroup) dvGroup.style.display = "none";
       }
@@ -1761,6 +2471,8 @@
       razonSocialField.value = razonSocial || "";
       if (razonSocial && razonSocial.trim()) {
         if (razonGroup) razonGroup.style.display = "flex";
+        // Limpiar error si el campo tiene valor (autocompletado)
+        clearFormError(razonSocialField, true);
       } else {
         if (razonGroup) razonGroup.style.display = "none";
       }
@@ -1769,6 +2481,7 @@
 
   function clearContribuyenteFields() {
     populateContribuyenteFields("", "");
+    contribuyenteValidationSuccess = false; // Resetear validación al limpiar campos
     const dvGroup = document
       .getElementById("customer_dv")
       ?.closest(".custom-invoice-form-group");
@@ -1796,6 +2509,7 @@
     }
 
     isValidating = true;
+    contribuyenteValidationSuccess = false; // Resetear validación al iniciar nueva validación
     showValidationLoader();
     hideValidationMessage();
     clearContribuyenteFields();
@@ -1826,6 +2540,7 @@
       }
 
       if (data.success && data.data) {
+        contribuyenteValidationSuccess = true; // Marcar validación como exitosa
         showValidationIcon(true);
         populateContribuyenteFields(data.data.dDV, data.data.dNomb);
         showValidationMessage(
@@ -1841,7 +2556,26 @@
           ?.closest(".custom-invoice-form-group");
         if (dvGroup && data.data.dDV) dvGroup.style.display = "flex";
         if (razonGroup && data.data.dNomb) razonGroup.style.display = "flex";
+
+        // Asegurar que los errores se limpien después de autocompletar
+        setTimeout(() => {
+          const dvField = document.getElementById("customer_dv");
+          const razonField = document.getElementById(
+            "taxpayer_name_contribuyente",
+          );
+          if (dvField && dvField.value && dvField.value.trim() !== "") {
+            clearFormError(dvField, true);
+          }
+          if (
+            razonField &&
+            razonField.value &&
+            razonField.value.trim() !== ""
+          ) {
+            clearFormError(razonField, true);
+          }
+        }, 100);
       } else {
+        contribuyenteValidationSuccess = false; // Marcar validación como fallida
         showValidationIcon(false);
         clearContribuyenteFields();
         const errorMsg =
@@ -1854,6 +2588,7 @@
         return;
       }
 
+      contribuyenteValidationSuccess = false; // Marcar validación como fallida
       showValidationIcon(false);
       clearContribuyenteFields();
       showValidationMessage(
@@ -1875,6 +2610,7 @@
 
     currentValidationToken++;
     isValidating = false;
+    contribuyenteValidationSuccess = false; // Resetear validación al cambiar el RUC
 
     hideValidationIndicator();
     hideValidationMessage();
@@ -1938,6 +2674,7 @@
 
     currentValidationToken++;
     isValidating = false;
+    contribuyenteValidationSuccess = false; // Resetear validación al cambiar tipo de contribuyente
 
     if (!isSelected) {
       hideValidationIndicator();
@@ -2062,10 +2799,8 @@
 
     form.classList.add("submitted");
 
-    const allFields = form.querySelectorAll(".custom-invoice-input");
-    allFields.forEach((field) => {
-      clearFormError(field);
-    });
+    // No limpiar todos los errores al inicio de la validación
+    // Solo se limpiarán si los campos tienen valores válidos durante la validación
 
     let valid = true;
     const errorFields = [];
@@ -2181,6 +2916,34 @@
       }
 
       if (customerType === "01") {
+        // Verificar que la validación de la API fue exitosa
+        const taxIdContribuyente = document.getElementById(
+          "tax_id_contribuyente",
+        );
+        if (
+          taxIdContribuyente &&
+          taxIdContribuyente.value &&
+          taxIdContribuyente.value.trim() !== ""
+        ) {
+          // Si hay un RUC/Cédula ingresado, debe haber sido validado exitosamente
+          if (!contribuyenteValidationSuccess) {
+            showFormError(
+              "tax_id_contribuyente",
+              "Debe validar los datos del contribuyente antes de continuar",
+            );
+            valid = false;
+            errorFields.push(taxIdContribuyente);
+
+            // Mostrar mensaje de validación si existe
+            const validationMessage = document.getElementById(
+              "contribuyente-validation-message",
+            );
+            if (validationMessage) {
+              validationMessage.style.display = "flex";
+            }
+          }
+        }
+
         const contribuyenteFields = [
           "tax_id_contribuyente",
           "customer_dv",
@@ -2234,14 +2997,17 @@
         }
       }
 
-      const locationFields = ["province", "district", "corregimiento"];
-      locationFields.forEach((fieldId) => {
-        const field = document.getElementById(fieldId);
-        if (field && !validateField(field)) {
-          valid = false;
-          errorFields.push(field);
-        }
-      });
+      // Solo validamos dirección cuando el tipo de cliente es Contribuyente (01)
+      if (customerType === "01") {
+        const locationFields = ["province", "district", "corregimiento"];
+        locationFields.forEach((fieldId) => {
+          const field = document.getElementById(fieldId);
+          if (field && !validateField(field)) {
+            valid = false;
+            errorFields.push(field);
+          }
+        });
+      }
     }
 
     if (!valid && errorFields.length > 0) {
@@ -2257,14 +3023,47 @@
     return valid;
   }
 
-  function clearFormError(f) {
+  function clearFormError(f, forceClear = false) {
     if (!f) return;
     const id = f.id;
     const e = document.getElementById(`${id}_error`);
+
+    // No limpiar errores si el formulario está en modo "submitted" (validación activa)
+    // a menos que se fuerce la limpieza o el campo tenga un valor válido
+    const form = document.getElementById("custom-invoice-form");
+    if (form && form.classList.contains("submitted") && !forceClear) {
+      // Si el formulario está en modo validación, solo limpiar el error del campo si tiene valor
+      const hasValue =
+        (f.value && f.value.trim() !== "") ||
+        (f.checked !== undefined && f.checked) ||
+        (f.type === "radio" && f.checked);
+      if (hasValue) {
+        if (f) f.classList.remove("error");
+        if (e) {
+          e.innerHTML = "";
+          e.classList.remove("show");
+          e.style.display = "";
+        }
+        // También limpiar la clase error de los labels de radio cards
+        const label = f.closest("label.radio-card");
+        if (label) {
+          label.classList.remove("error");
+        }
+      }
+      return;
+    }
+
+    // Limpiar errores normalmente si no está en modo validación o si se fuerza
     if (f) f.classList.remove("error");
     if (e) {
-      e.textContent = "";
+      e.innerHTML = "";
       e.classList.remove("show");
+      e.style.display = "";
+    }
+    // También limpiar la clase error de los labels de radio cards
+    const label = f.closest("label.radio-card");
+    if (label) {
+      label.classList.remove("error");
     }
   }
 
@@ -2276,7 +3075,8 @@
 
       d.style.setProperty("visibility", "visible", "important");
       d.style.setProperty("opacity", "1", "important");
-      d.style.setProperty("display", "block", "important");
+      // Mantener el layout en flex para que el ícono quede en línea con el texto
+      d.style.setProperty("display", "flex", "important");
 
       const actionContainer = document.querySelector(".action-container");
       if (actionContainer) {
@@ -2331,6 +3131,10 @@
 
     updateBirthDateField();
 
+    const petsSelected = Array.from(
+      document.querySelectorAll('input[name="pets[]"]:checked'),
+    ).map((el) => el.value);
+
     const d = {
       first_name: document.getElementById("first_name")?.value?.trim() || "",
       last_name: document.getElementById("last_name")?.value?.trim() || "",
@@ -2339,6 +3143,7 @@
       gender: document.getElementById("gender")?.value || "",
       phone:
         document.getElementById("phone")?.value?.replace(/[^0-9]/g, "") || "",
+      pets: petsSelected,
     };
 
     let finalCustomerType = "";
@@ -2409,12 +3214,22 @@
           taxpayerKindConsumidor01.checked = true;
         }
         d.taxpayer_kind = "1"; // Siempre "Natural" para Consumidor final
+
+        // No aplicar DV ni dirección para Consumidor final
+        d.customer_dv = "";
+        d.province = "";
+        d.district = "";
+        d.corregimiento = "";
+        d.location_code = "";
       }
 
-      d.province = document.getElementById("province")?.value || "";
-      d.district = document.getElementById("district")?.value || "";
-      d.corregimiento = document.getElementById("corregimiento")?.value || "";
-      d.location_code = document.getElementById("location_code")?.value || "";
+      // Dirección solo aplica a Contribuyente (01)
+      if (finalCustomerType === "01") {
+        d.province = document.getElementById("province")?.value || "";
+        d.district = document.getElementById("district")?.value || "";
+        d.corregimiento = document.getElementById("corregimiento")?.value || "";
+        d.location_code = document.getElementById("location_code")?.value || "";
+      }
     }
 
     d.document_number = documentNumber;
@@ -2428,6 +3243,27 @@
     }
 
     return d;
+  }
+
+  async function checkEmailExists(email) {
+    try {
+      const response = await fetch(
+        "/apps/custom-invoice/customers/email-check",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        },
+      );
+
+      const data = await response.json();
+      return data.exists || false;
+    } catch (error) {
+      console.error("Error checking email:", error);
+      return false; // En caso de error, permitir continuar (no bloquear)
+    }
   }
 
   async function handleSubmit(e) {
@@ -2447,6 +3283,43 @@
       }
       return;
     }
+
+    // Validar que el email no esté registrado (solo para nuevos registros)
+    const customerId = document.getElementById("customer_id")?.value;
+    const isUpdate = !!customerId;
+
+    if (!isUpdate) {
+      const emailField = document.getElementById("email");
+      const email = emailField?.value?.trim();
+
+      if (email) {
+        const actionUpdateBtn = document.getElementById("action-update-btn");
+        const originalText = actionUpdateBtn ? actionUpdateBtn.textContent : "";
+        if (actionUpdateBtn) {
+          actionUpdateBtn.disabled = true;
+          actionUpdateBtn.textContent = "Verificando...";
+        }
+
+        const emailExists = await checkEmailExists(email);
+
+        if (actionUpdateBtn) {
+          actionUpdateBtn.disabled = false;
+          actionUpdateBtn.textContent = originalText || "Registrarse";
+        }
+
+        if (emailExists) {
+          showFormError(
+            "email",
+            "Este email ya está registrado. Usa otro email o inicia sesión",
+          );
+          emailField.classList.add("error");
+          emailField.scrollIntoView({ behavior: "smooth", block: "center" });
+          emailField.focus();
+          return;
+        }
+      }
+    }
+
     const fd = getFormData();
     if (!fd) return;
     const actionUpdateBtn = document.getElementById("action-update-btn");
@@ -2493,10 +3366,8 @@
           actionUpdateBtn.disabled = false;
           actionUpdateBtn.textContent = originalText || "Registrarse";
         }
-        const userEmail = fd.email;
-
         showFormMsg(
-          `Registro exitoso. Redirigiendo al login...<br><strong>Tu email: ${userEmail}</strong><br>Úsalo para iniciar sesión.`,
+          `Registro exitoso. Usa tu email para iniciar sesión`,
           "success",
         );
         setTimeout(() => {
