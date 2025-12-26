@@ -10,6 +10,7 @@
     <p class="custom-invoice-subtitle">{{ block.settings.subtitle }}</p>
 
     <div class="custom-invoice-toggle-wrapper">
+      <h4 class="custom-invoice-toggle-title">¿Quieres factura personalizada?</h4>
       <label class="custom-invoice-toggle-label" for="custom-invoice-toggle">
         <button
           type="button"
@@ -60,7 +61,7 @@
               </div>
             </div>
             <div id="customer-form-container" style="display: none;">
-              {% render 'custom-invoice-form', is_update: true, customer: customer %}
+              {% render 'custom-invoice-form', is_update: true, customer: customer, segmentation_section_title: block.settings.segmentation_section_title, segmentation_label: block.settings.segmentation_label, segmentation_options: block.settings.segmentation_options %}
             </div>
             <div id="form-skeleton-loader" style="display: none;">
               <div style="display: flex; justify-content: center; align-items: center; min-height: 300px; padding: 2rem;">
@@ -83,7 +84,7 @@
               <span>O regístrate con tus datos</span>
             </div>
             <div id="register-form-container">
-              {% render 'custom-invoice-form', is_update: false %}
+              {% render 'custom-invoice-form', is_update: false, segmentation_section_title: block.settings.segmentation_section_title, segmentation_label: block.settings.segmentation_label, segmentation_options: block.settings.segmentation_options %}
             </div>
           </div>
         {% endif %}
@@ -141,6 +142,31 @@ window.config = {
       "id": "support_link",
       "label": "Link de contacto con soporte",
       "info": "URL a mostrar cuando el usuario intenta modificar datos que no se pueden cambiar"
+    },
+    {
+      "type": "header",
+      "content": "Sección de Segmentación"
+    },
+    {
+      "type": "text",
+      "id": "segmentation_section_title",
+      "label": "Título de la sección",
+      "default": "Información sobre tus mascotas",
+      "info": "Título que se mostrará arriba de los checkboxes"
+    },
+    {
+      "type": "text",
+      "id": "segmentation_label",
+      "label": "Label de los checkboxes",
+      "default": "Selecciona tus mascotas",
+      "info": "Texto que aparece antes de los checkboxes"
+    },
+    {
+      "type": "text",
+      "id": "segmentation_options",
+      "label": "Opciones disponibles",
+      "default": "Perro,Gato,Aves,Peces,Tortugas,Hámster,Cobayo,Conejo,Hurón,Erizo",
+      "info": "Lista de opciones separadas por comas (ej: Perro,Gato,Aves)"
     }
   ]
 }

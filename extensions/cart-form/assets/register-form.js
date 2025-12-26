@@ -1,26 +1,23 @@
 (function () {
   "use strict";
 
-  // Verificar que window.config esté disponible
-  if (!window.config) {
+  // Verificar que window.registerFormConfig esté disponible
+  if (!window.registerFormConfig) {
     console.error(
-      "window.config no está disponible. Asegúrate de que el script de configuración se cargue antes.",
+      "window.registerFormConfig no está disponible. Asegúrate de que el script de configuración se cargue antes.",
     );
     return;
   }
 
-  const STORAGE_KEY = "customInvoicePreference";
   const API_BASE = "/apps/custom-invoice/customers";
-  const CART_URL = window.config.CART_URL;
-  const LOGIN_URL = window.config.LOGIN_URL;
-  const CUSTOMER_ID = window.config.CUSTOMER_ID;
-  const IS_LOGGED_IN = window.config.IS_LOGGED_IN;
+  const LOGIN_URL = window.registerFormConfig.LOGIN_URL;
+  const DGI_COUNTRY_CODES_URL = window.registerFormConfig.DGI_COUNTRY_CODES_URL;
+  const SUPPORT_LINK = window.registerFormConfig.SUPPORT_LINK || "#";
 
   // Variables de elementos del DOM - se inicializarán en init()
   let toggle;
   let toggleText;
-  let modal;
-  let modalClose;
+  let form;
 
   // Función auxiliar para actualizar el estilo del placeholder de selects
   function updateSelectPlaceholderStyle(select) {
@@ -33,95 +30,57 @@
 
   function init() {
     // Inicializar referencias a elementos del DOM
-    toggle = document.getElementById("custom-invoice-toggle");
-    toggleText = document.getElementById("toggle-text");
-    modal = document.getElementById("custom-invoice-modal");
-    modalClose = document.getElementById("modal-close");
+    form = document.getElementById("register-form");
 
-    // Verificar que los elementos esenciales existan
-    if (!toggle || !toggleText || !modal) {
-      console.error(
-        "Elementos esenciales del DOM no encontrados. Asegúrate de que el HTML esté cargado correctamente.",
+    // Verificar que el formulario exista
+    // Si no existe, puede ser que el usuario esté logueado y no necesite el formulario
+    if (!form) {
+      // Verificar si hay un customer logueado (hay un botón de logout)
+      const logoutBtn = document.getElementById("logout-btn");
+      if (logoutBtn) {
+        // El usuario está logueado, no necesitamos inicializar el formulario
+        return;
+      }
+      
+      // Si no hay botón de logout, intentar de nuevo (puede ser que el DOM aún no esté listo)
+      console.warn(
+        "Formulario no encontrado. Reintentando en 200ms...",
+        { form: !!form }
       );
+      setTimeout(init, 200);
       return;
     }
+    
+    console.log("Form elements found, initializing...");
+    
+    // Asegurar que el billing-section esté visible
+    const billingSection = document.getElementById("billing-section");
+    if (billingSection) {
+      billingSection.style.display = "block";
+    }
+    
+    // Configurar event listeners para "Resides en Panamá"
+    const residesPanamaYes = document.getElementById("resides_panama_yes");
+    const residesPanamaNo = document.getElementById("resides_panama_no");
 
-    if (modal) {
-      modal.close();
+    if (residesPanamaYes) {
+      residesPanamaYes.addEventListener("change", handleCountryChange);
+    }
+    if (residesPanamaNo) {
+      residesPanamaNo.addEventListener("change", handleCountryChange);
     }
 
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const d = JSON.parse(saved);
-      if (d.wantsInvoice) {
-        toggle.setAttribute("aria-checked", "true");
-        updateToggleText();
-
-        if (IS_LOGGED_IN) {
-          setTimeout(() => {
-            loadCustomerDataOnInit();
-          }, 500);
-        } else {
-          setTimeout(() => {
-            disableCheckout();
-          }, 500);
-        }
+    // Inicializar el estado inicial de los campos
+    setTimeout(() => {
+      if (billingSection) {
+        handleCountryChange();
       }
-    }
-
-    toggle.addEventListener("click", handleToggleChange);
-    if (modalClose) {
-      modalClose.addEventListener("click", closeModal);
-    }
-    if (modal) {
-      modal.addEventListener("click", function (e) {
-        if (e.target === modal) {
-          closeModal();
-        }
-      });
-    }
-
-    const updateDataSummaryBtn = document.getElementById(
-      "update-data-summary-btn",
-    );
-    if (updateDataSummaryBtn) {
-      updateDataSummaryBtn.addEventListener("click", function () {
-        const fd = document.getElementById("customer-form-container");
-        const dd = document.getElementById("customer-data-display");
-        if (fd) {
-          fd.style.display = "none";
-          fd.style.opacity = "0";
-        }
-        if (dd) {
-          dd.style.display = "none";
-          dd.style.opacity = "0";
-        }
-
-        openModal();
-
-        setTimeout(() => {
-          loadCustomerData();
-        }, 50);
-      });
-    }
-
-    const updateDataBtn = document.getElementById("update-data-btn");
-    if (updateDataBtn) {
-      updateDataBtn.addEventListener("click", function () {
-        const dd = document.getElementById("customer-data-display");
-        const fd = document.getElementById("customer-form-container");
-        if (dd) {
-          dd.style.display = "none";
-          dd.style.opacity = "0";
-        }
-
-        loadCustomerData();
-      });
-    }
-
-    interceptCheckoutSubmit();
-    checkCheckoutButton();
-    window.addEventListener("storage", handleStorageChange);
+    }, 100);
+    
+    // Inicializar formulario
+    setTimeout(() => {
+      initForm();
+    }, 100);
   }
 
   function loadCustomerDataOnInit() {
@@ -250,27 +209,18 @@
     const newState = !currentState;
     toggle.setAttribute("aria-checked", String(newState));
     updateToggleText();
-    const wantsInvoice = newState;
-    savePreference({ wantsInvoice });
-
-    const summaryContainer = document.getElementById("customer-data-summary");
-
-    if (wantsInvoice) {
-      if (IS_LOGGED_IN) {
-        loadCustomerDataOnInit();
-      } else {
-        openModal();
-        disableCheckout();
+    
+    const billingSection = document.getElementById("billing-section");
+    if (billingSection) {
+      billingSection.style.display = newState ? "block" : "none";
+      
+      // Si se muestra el billing-section, actualizar los campos condicionados
+      if (newState) {
+        setTimeout(() => {
+          handleCountryChange();
+        }, 50);
       }
-    } else {
-      closeModal();
-      if (summaryContainer) {
-        summaryContainer.style.display = "none";
-      }
-      enableCheckout();
     }
-
-    checkCheckoutButton();
   }
 
   function updateToggleText() {
@@ -319,7 +269,7 @@
 
       modal.style.height = "200px";
 
-      const form = document.getElementById("custom-invoice-form");
+      const form = document.getElementById("register-form");
 
       if (!showErrors) {
         if (form) {
@@ -482,7 +432,7 @@
           openModal(true);
           setTimeout(() => {
             loadCustomerData();
-            const form = document.getElementById("custom-invoice-form");
+            const form = document.getElementById("register-form");
             if (form) {
               form.classList.add("submitted");
             }
@@ -501,7 +451,7 @@
               openModal(true);
               setTimeout(() => {
                 loadCustomerData();
-                const form = document.getElementById("custom-invoice-form");
+                const form = document.getElementById("register-form");
                 if (form) {
                   form.classList.add("submitted");
                   const allFields = form.querySelectorAll(
@@ -531,7 +481,7 @@
             openModal(true);
             setTimeout(() => {
               loadCustomerData();
-              const form = document.getElementById("custom-invoice-form");
+              const form = document.getElementById("register-form");
               if (form) {
                 form.classList.add("submitted");
               }
@@ -542,7 +492,7 @@
         e.stopPropagation();
         openModal(true);
         setTimeout(() => {
-          const form = document.getElementById("custom-invoice-form");
+          const form = document.getElementById("register-form");
           if (form) {
             form.classList.add("submitted");
             const allFields = form.querySelectorAll(
@@ -692,7 +642,7 @@
             }, 800);
           } else {
             // Si no está logueado, validar todos los campos requeridos
-            const form = document.getElementById("custom-invoice-form");
+            const form = document.getElementById("register-form");
             if (form) {
               form.classList.add("submitted");
               validateEmptyFormFields();
@@ -1348,7 +1298,7 @@
       // Asegurar que todos los selects tengan el estilo correcto después de cargar datos
       // También verificar que el valor de la provincia persista
       setTimeout(() => {
-        const form = document.getElementById("custom-invoice-form");
+        const form = document.getElementById("register-form");
         if (form) {
           const allSelects = form.querySelectorAll(
             "select.custom-invoice-input",
@@ -1893,15 +1843,26 @@
   let locationDataLoaded = false;
 
   async function loadLocationData() {
-    if (locationDataLoaded) return locationHierarchy;
+    if (locationDataLoaded) {
+      console.log("Location data already loaded");
+      return locationHierarchy;
+    }
 
+    console.log("Loading location data from:", DGI_COUNTRY_CODES_URL);
     try {
-      const response = await fetch(window.config.DGI_COUNTRY_CODES_URL);
+      const response = await fetch(DGI_COUNTRY_CODES_URL);
+      if (!response.ok) {
+        console.error("Error loading location data:", response.status, response.statusText);
+        return null;
+      }
       const jsonData = await response.json();
+      console.log("Location data received, building hierarchy...");
       locationHierarchy = buildLocationHierarchy(jsonData);
       locationDataLoaded = true;
+      console.log("Location hierarchy built with", Object.keys(locationHierarchy).length, "provinces");
       return locationHierarchy;
     } catch (error) {
+      console.error("Error loading location data:", error);
       return null;
     }
   }
@@ -1929,7 +1890,14 @@
 
   function populateProvinceSelect(preserveValue = false) {
     const provinceSelect = document.getElementById("province");
-    if (!provinceSelect || !locationHierarchy) return;
+    if (!provinceSelect) {
+      console.warn("province select not found");
+      return;
+    }
+    if (!locationHierarchy) {
+      console.warn("locationHierarchy not loaded yet for province select");
+      return;
+    }
 
     // Guardar el valor actual si se debe preservar
     const currentValue = preserveValue ? provinceSelect.value : "";
@@ -1937,6 +1905,7 @@
     provinceSelect.innerHTML = '<option value="">Seleccione</option>';
 
     const provinces = Object.keys(locationHierarchy).sort();
+    console.log("Populating province select with", provinces.length, "provinces:", provinces.slice(0, 5), "...");
     provinces.forEach((province) => {
       const option = document.createElement("option");
       option.value = province;
@@ -2084,7 +2053,14 @@
   // Funciones para manejar los selects de ubicación de Consumidor final
   function populateProvinceSelectConsumidor(preserveValue = false) {
     const provinceSelect = document.getElementById("province_consumidor");
-    if (!provinceSelect || !locationHierarchy) return;
+    if (!provinceSelect) {
+      console.warn("province_consumidor select not found");
+      return;
+    }
+    if (!locationHierarchy) {
+      console.warn("locationHierarchy not loaded yet");
+      return;
+    }
 
     // Guardar el valor actual si se debe preservar
     const currentValue = preserveValue ? provinceSelect.value : "";
@@ -2233,7 +2209,14 @@
   // Funciones para manejar los selects de ubicación de Extranjero
   function populateProvinceSelectExtranjero(preserveValue = false) {
     const provinceSelect = document.getElementById("province_extranjero");
-    if (!provinceSelect || !locationHierarchy) return;
+    if (!provinceSelect) {
+      console.warn("province_extranjero select not found");
+      return;
+    }
+    if (!locationHierarchy) {
+      console.warn("locationHierarchy not loaded yet");
+      return;
+    }
 
     // Guardar el valor actual si se debe preservar
     const currentValue = preserveValue ? provinceSelect.value : "";
@@ -2380,8 +2363,14 @@
   }
 
   function initForm() {
-    const form = document.getElementById("custom-invoice-form");
-    if (!form) return;
+    // Buscar el formulario (puede ser custom-invoice-form o register-form)
+    const form = document.getElementById("custom-invoice-form") || document.getElementById("register-form");
+    if (!form) {
+      console.warn("Form not found in initForm(), retrying in 200ms...");
+      setTimeout(initForm, 200);
+      return;
+    }
+    console.log("Form found in initForm():", form.id);
 
     const residesPanamaYes = document.getElementById("resides_panama_yes");
     const residesPanamaNo = document.getElementById("resides_panama_no");
@@ -2671,11 +2660,18 @@
       });
     }
 
-    loadLocationData().then(() => {
+    loadLocationData().then((hierarchy) => {
+      if (!hierarchy) {
+        console.error("Failed to load location data");
+        return;
+      }
+      console.log("Location data loaded, populating selects...");
+      
       populateProvinceSelect();
       populateProvinceSelectConsumidor();
       populateProvinceSelectExtranjero();
 
+      // Verificar que los selects existan antes de agregar event listeners
       const provinceSelect = document.getElementById("province");
       const districtSelect = document.getElementById("district");
       const corregimientoSelect = document.getElementById("corregimiento");
@@ -2724,15 +2720,9 @@
       }
 
       // Event listeners para campos de ubicación de Extranjero
-      const provinceSelectExtranjero = document.getElementById(
-        "province_extranjero",
-      );
-      const districtSelectExtranjero = document.getElementById(
-        "district_extranjero",
-      );
-      const corregimientoSelectExtranjero = document.getElementById(
-        "corregimiento_extranjero",
-      );
+      const provinceSelectExtranjero = document.getElementById("province_extranjero");
+      const districtSelectExtranjero = document.getElementById("district_extranjero");
+      const corregimientoSelectExtranjero = document.getElementById("corregimiento_extranjero");
 
       if (provinceSelectExtranjero) {
         provinceSelectExtranjero.addEventListener(
@@ -2769,7 +2759,12 @@
       });
     }
 
-    if (form) form.addEventListener("submit", handleSubmit);
+    if (form) {
+      console.log("Adding submit event listener to form:", form.id);
+      form.addEventListener("submit", handleSubmit);
+    } else {
+      console.error("Form not found, cannot add submit event listener");
+    }
 
     const actionCancelBtn = document.getElementById("action-cancel-btn");
     if (actionCancelBtn) {
@@ -2784,7 +2779,7 @@
       actionUpdateBtn.addEventListener("click", function (e) {
         e.preventDefault();
 
-        const form = document.getElementById("custom-invoice-form");
+        const form = document.getElementById("register-form");
         if (form) {
           form.requestSubmit();
         }
@@ -2847,7 +2842,7 @@
       i.addEventListener("input", () => {
         // Solo limpiar el error si el campo tiene un valor válido
         // Si el formulario está en modo "submitted" y el campo está vacío, mantener el error
-        const form = document.getElementById("custom-invoice-form");
+        const form = document.getElementById("register-form");
         const isSubmitted = form && form.classList.contains("submitted");
         const hasValue = i.value && i.value.trim() !== "";
 
@@ -2896,11 +2891,7 @@
     const foreignFields = document.getElementById("foreign-billing-fields");
     const panamaFields = document.getElementById("panama-billing-fields");
 
-    if (!isPanama && (!residesPanamaNo || !residesPanamaNo.checked)) {
-      if (billingSection) billingSection.style.display = "none";
-      return;
-    }
-
+    // Asegurar que el billing-section esté siempre visible
     if (billingSection) billingSection.style.display = "block";
 
     if (isPanama) {
@@ -2930,7 +2921,7 @@
 
   function clearBillingErrors() {
     // No limpiar errores si el formulario está en modo "submitted" (validación activa)
-    const form = document.getElementById("custom-invoice-form");
+    const form = document.getElementById("register-form");
     if (form && form.classList.contains("submitted")) {
       // Si está en modo validación, no limpiar errores automáticamente
       // Solo se limpiarán cuando el usuario seleccione una opción válida
@@ -3679,7 +3670,8 @@
   }
 
   function validateForm() {
-    const form = document.getElementById("custom-invoice-form");
+    // Buscar el formulario (puede ser custom-invoice-form o register-form)
+    const form = document.getElementById("custom-invoice-form") || document.getElementById("register-form");
     if (!form) return false;
 
     form.classList.add("submitted");
@@ -3757,6 +3749,8 @@
         }
       }
     }
+
+    // Validar siempre los campos de facturación (ya no depende del toggle)
 
     const residesPanamaYes = document.getElementById("resides_panama_yes");
     const residesPanamaNo = document.getElementById("resides_panama_no");
@@ -4241,8 +4235,12 @@
   }
 
   function getFormData() {
-    const form = document.getElementById("custom-invoice-form");
-    if (!form) return null;
+    const form = document.getElementById("custom-invoice-form") || document.getElementById("register-form");
+    if (!form) {
+      console.error("Form not found in getFormData()");
+      return null;
+    }
+    console.log("Form found in getFormData():", form.id);
 
     const residesPanamaYes = document.getElementById("resides_panama_yes");
     const isPanama = residesPanamaYes && residesPanamaYes.checked;
@@ -4430,21 +4428,31 @@
   let isSuccessfullySubmitted = false;
 
   async function handleSubmit(e) {
+    console.log("handleSubmit called");
     e.preventDefault();
 
     // Prevenir múltiples envíos
     if (isSubmitting || isSuccessfullySubmitted) {
+      console.log("Form already submitting or already submitted, blocking", { isSubmitting, isSuccessfullySubmitted });
+      // Resetear si está bloqueado por más de 5 segundos (posible error previo)
+      if (isSubmitting) {
+        console.warn("isSubmitting stuck at true, resetting...");
+        isSubmitting = false;
+      }
       return;
     }
 
-    const form = document.getElementById("custom-invoice-form");
+    console.log("Starting form submission...");
+    const form = document.getElementById("register-form");
     if (form) {
       form.classList.add("submitted");
     }
 
     isSubmitting = true;
+    console.log("isSubmitting set to true");
 
     if (!validateForm()) {
+      console.log("Form validation failed, resetting isSubmitting");
       showFormMsg("Complete todos los campos", "error");
 
       const firstError = form?.querySelector(".custom-invoice-input.error");
@@ -4453,128 +4461,115 @@
         firstError.focus();
       }
       isSubmitting = false;
+      console.log("isSubmitting reset to false after validation failure");
       return;
     }
+    
+    console.log("Form validation passed");
 
-    // Validar que el email no esté registrado (solo para nuevos registros)
-    const customerId = document.getElementById("customer_id")?.value;
-    const isUpdate = !!customerId;
+    // Validar que el email no esté registrado
+    const emailField = document.getElementById("email");
+    const email = emailField?.value?.trim();
 
-    if (!isUpdate) {
-      const emailField = document.getElementById("email");
-      const email = emailField?.value?.trim();
+    if (email) {
+      const actionSubmitBtn = document.getElementById("action-submit-btn");
+      const originalText = actionSubmitBtn ? actionSubmitBtn.textContent : "";
+      if (actionSubmitBtn) {
+        actionSubmitBtn.disabled = true;
+        actionSubmitBtn.textContent = "Verificando...";
+      }
 
-      if (email) {
-        const actionUpdateBtn = document.getElementById("action-update-btn");
-        const originalText = actionUpdateBtn ? actionUpdateBtn.textContent : "";
-        if (actionUpdateBtn) {
-          actionUpdateBtn.disabled = true;
-          actionUpdateBtn.textContent = "Verificando...";
-        }
+      const emailExists = await checkEmailExists(email);
 
-        const emailExists = await checkEmailExists(email);
+      if (actionSubmitBtn) {
+        actionSubmitBtn.disabled = false;
+        actionSubmitBtn.textContent = originalText || "Registrarse";
+      }
 
-        if (actionUpdateBtn) {
-          actionUpdateBtn.disabled = false;
-          actionUpdateBtn.textContent = originalText || "Registrarse";
-        }
-
-        if (emailExists) {
-          showFormError(
-            "email",
-            "Este email ya está registrado. Usa otro email o inicia sesión",
-          );
-          emailField.classList.add("error");
-          emailField.scrollIntoView({ behavior: "smooth", block: "center" });
-          emailField.focus();
-          isSubmitting = false;
-          return;
-        }
+      if (emailExists) {
+        showFormError(
+          "email",
+          "Este email ya está registrado. Usa otro email o inicia sesión",
+        );
+        emailField.classList.add("error");
+        emailField.scrollIntoView({ behavior: "smooth", block: "center" });
+        emailField.focus();
+        isSubmitting = false;
+        return;
       }
     }
 
     const fd = getFormData();
-    if (!fd) return;
-    const actionUpdateBtn = document.getElementById("action-update-btn");
-    const originalText = actionUpdateBtn ? actionUpdateBtn.textContent : "";
-    if (actionUpdateBtn) {
-      actionUpdateBtn.disabled = true;
-      actionUpdateBtn.textContent = "Procesando...";
+    if (!fd) {
+      console.error("getFormData() returned null/undefined, resetting isSubmitting");
+      isSubmitting = false;
+      console.log("isSubmitting reset to false after getFormData() returned null");
+      return;
     }
-    const cid = document.getElementById("customer_id")?.value;
-    const isUp = !!cid;
+    
+    console.log("Form data retrieved successfully:", Object.keys(fd));
+    const actionSubmitBtn = document.getElementById("action-submit-btn");
+    const originalText = actionSubmitBtn ? actionSubmitBtn.textContent : "";
+    if (actionSubmitBtn) {
+      actionSubmitBtn.disabled = true;
+      actionSubmitBtn.textContent = "Procesando...";
+    }
     try {
-      const ep = isUp ? `${API_BASE}/update` : `${API_BASE}/create`;
-      if (isUp) {
-        fd.customer_id = cid;
-      }
-      const r = await fetch(ep, {
+      console.log("Sending registration request to:", `${API_BASE}/create`);
+      const r = await fetch(`${API_BASE}/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(fd),
       });
       const res = await r.json();
+      console.log("API response:", { status: r.status, ok: r.ok, hasError: !!res.error });
       if (!r.ok || res.error) {
+        console.error("API error detected:", res.error);
         const errorHandled = handleBackendError(res.error);
         const error = new Error(res.error || "Error");
         error.handled = errorHandled;
         throw error;
       }
-      if (isUp) {
-        isSubmitting = false; // Resetear después de actualización exitosa
-        if (actionUpdateBtn) {
-          actionUpdateBtn.disabled = false;
-          actionUpdateBtn.textContent = originalText || "Actualizar";
-        }
-        showFormMsg("Actualizado correctamente", "success");
-        setTimeout(() => {
-          closeModal();
-          enableCheckout();
+      
+      console.log("Registration successful!");
+      // Marcar como exitosamente enviado para prevenir validaciones adicionales
+      isSuccessfullySubmitted = true;
 
-          if (IS_LOGGED_IN) {
-            loadCustomerDataOnInit();
-          }
-        }, 1500);
-      } else {
-        // Marcar como exitosamente enviado para prevenir validaciones adicionales
-        isSuccessfullySubmitted = true;
-
-        if (actionUpdateBtn) {
-          actionUpdateBtn.disabled = false;
-          actionUpdateBtn.textContent = originalText || "Registrarse";
-        }
-        showFormMsg(
-          `Registro exitoso. Usa tu email para iniciar sesión`,
-          "success",
-        );
-        setTimeout(() => {
-          let loginUrl;
-
-          if (typeof window.getLoginUrl === "function") {
-            loginUrl = window.getLoginUrl();
-          } else {
-            const loginLink = document.getElementById("login-link");
-            if (loginLink && loginLink.href) {
-              loginUrl = loginLink.href;
-            } else {
-              loginUrl = LOGIN_URL;
-            }
-          }
-          if (loginUrl) {
-            window.location.href = loginUrl;
-          } else {
-            closeModal();
-          }
-        }, 2000); // Aumentar el tiempo para que el usuario vea el email
+      if (actionSubmitBtn) {
+        actionSubmitBtn.disabled = false;
+        actionSubmitBtn.textContent = originalText || "Registrarse";
       }
+      showFormMsg(
+        `Registro exitoso. Usa tu email para iniciar sesión`,
+        "success",
+      );
+      setTimeout(() => {
+        let loginUrl;
+
+        if (typeof window.getLoginUrl === "function") {
+          loginUrl = window.getLoginUrl();
+        } else {
+          const loginLink = document.getElementById("login-link");
+          if (loginLink && loginLink.href) {
+            loginUrl = loginLink.href;
+          } else {
+            loginUrl = LOGIN_URL;
+          }
+        }
+        if (loginUrl) {
+          window.location.href = loginUrl;
+        }
+      }, 2000);
     } catch (err) {
+      console.error("Error in handleSubmit:", err);
       isSubmitting = false; // Resetear en caso de error
+      console.log("isSubmitting reset to false after error");
       if (!err.handled) {
         showFormMsg(err.message || "Error al procesar la solicitud", "error");
       }
-      if (actionUpdateBtn) {
-        actionUpdateBtn.disabled = false;
-        actionUpdateBtn.textContent = originalText;
+      if (actionSubmitBtn) {
+        actionSubmitBtn.disabled = false;
+        actionSubmitBtn.textContent = originalText;
       }
     }
   }
@@ -4582,7 +4577,7 @@
   function handleBackendError(errorMessage) {
     if (!errorMessage) return false;
 
-    const form = document.getElementById("custom-invoice-form");
+    const form = document.getElementById("register-form");
     if (form) {
       form.classList.add("submitted");
     }

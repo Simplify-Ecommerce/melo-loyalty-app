@@ -1,0 +1,131 @@
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+<div class="register-form-block" {{ block.shopify_attributes }}>
+  <div class="register-form-container">
+    {% if customer %}
+      <h2 class="register-form-title">Hola, {{ customer.first_name }}</h2>
+      <p class="register-form-description">
+        Actualmente estás logueado con el correo {{ customer.email }}, si quieres registrar otra cuenta tienes que cerrar sesión.
+      </p>
+      
+      <div class="action-container" style="justify-content: flex-start; padding: 0;">
+        <div class="action-buttons">
+          <button type="button" id="logout-btn" class="custom-invoice-btn custom-invoice-btn-primary">
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+      
+      <script>
+        (function() {
+          const logoutBtn = document.getElementById('logout-btn');
+          if (logoutBtn) {
+            logoutBtn.addEventListener('click', async function(e) {
+              e.preventDefault();
+              
+              // Deshabilitar el botón mientras se procesa
+              logoutBtn.disabled = true;
+              logoutBtn.textContent = 'Cerrando sesión...';
+              
+              try {
+                // Hacer fetch al endpoint de logout
+                const response = await fetch('/account/logout', {
+                  method: 'GET',
+                  credentials: 'same-origin',
+                  redirect: 'manual'
+                });
+                
+                // Redirigir a la página de registro después del logout
+                window.location.href = '/pages/registro';
+              } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+                // Si hay error, intentar redirigir de todas formas
+                window.location.href = '/pages/registro';
+              }
+            });
+          }
+        })();
+      </script>
+    {% else %}
+      <h2 class="register-form-title">{{ block.settings.title }}</h2>
+      <p class="register-form-description">{{ block.settings.description }}</p>
+
+      <p class="register-form-login-prompt">
+        ¿Ya tienes cuenta?
+        <a href="{{ routes.storefront_login_url }}" id="login-link">Inicia sesión aquí</a>
+      </p>
+
+      <div id="register-form-wrapper">
+        {% render 'register-form', segmentation_section_title: block.settings.segmentation_section_title, segmentation_label: block.settings.segmentation_label, segmentation_options: block.settings.segmentation_options %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% unless customer %}
+<script>
+window.registerFormConfig = {
+  LOGIN_URL: '{{ routes.storefront_login_url }}',
+  DGI_COUNTRY_CODES_URL: '{{ "dgi-country-codes.json" | asset_url }}',
+  SUPPORT_LINK: '{% if block.settings.support_link %}{{ block.settings.support_link }}{% else %}#{% endif %}'
+};
+</script>
+<script src="{{ "register-form.js" | asset_url }}" defer></script>
+{% endunless %}
+
+{% schema %}
+{
+  "name": "Formulario de Registro",
+  "target": "section",
+  "stylesheet": "register-form.css",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Crea tu cuenta"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "Descripción",
+      "default": "Completa tus datos para crear tu cuenta"
+    },
+    {
+      "type": "url",
+      "id": "support_link",
+      "label": "Link de contacto con soporte",
+      "info": "URL a mostrar cuando el usuario intenta modificar datos que no se pueden cambiar"
+    },
+    {
+      "type": "header",
+      "content": "Sección de Segmentación"
+    },
+    {
+      "type": "text",
+      "id": "segmentation_section_title",
+      "label": "Título de la sección",
+      "default": "Información sobre tus mascotas",
+      "info": "Título que se mostrará arriba de los checkboxes"
+    },
+    {
+      "type": "text",
+      "id": "segmentation_label",
+      "label": "Label de los checkboxes",
+      "default": "Selecciona tus mascotas",
+      "info": "Texto que aparece antes de los checkboxes"
+    },
+    {
+      "type": "text",
+      "id": "segmentation_options",
+      "label": "Opciones disponibles",
+      "default": "Perro,Gato,Aves,Peces,Tortugas,Hámster,Cobayo,Conejo,Hurón,Erizo",
+      "info": "Lista de opciones separadas por comas (ej: Perro,Gato,Aves)"
+    }
+  ]
+}
+{% endschema %}
+

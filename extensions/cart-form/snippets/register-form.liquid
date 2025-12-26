@@ -1,9 +1,5 @@
 
-<form id="custom-invoice-form" class="custom-invoice-form">
-  {% if is_update and customer %}
-    <input type="hidden" id="customer_id" name="customer_id" value="{{ customer.id }}" />
-  {% endif %}
-
+<form id="register-form" class="register-form">
   <div class="form-section">
     <h3 class="form-section-title">Datos personales</h3>
     
@@ -54,7 +50,6 @@
         class="custom-invoice-input" 
         placeholder="Escribe tu correo electrónico"
         required
-        {% if is_update and customer %}readonly value="{{ customer.email }}"{% endif %}
       />
       <span class="custom-invoice-error" id="email_error"></span>
     </div>
@@ -101,7 +96,8 @@
 
       <div class="custom-invoice-form-group">
         <label for="gender" class="custom-invoice-label">
-          Género        </label>
+          Género
+        </label>
         <select id="gender" name="gender" class="custom-invoice-input" required>
           <option value="">Seleccione</option>
           <option value="M">Masculino</option>
@@ -129,7 +125,13 @@
         />
         <span class="custom-invoice-error" id="phone_error"></span>
       </div>
+    </div>
+  </div>
 
+  <div class="form-section" id="billing-section">
+    <h3 class="form-section-title">Información de facturación</h3>
+
+    <div class="custom-invoice-form-row">
       <div class="custom-invoice-form-group">
         <label class="custom-invoice-label">
           ¿Resides en Panamá?
@@ -149,10 +151,6 @@
         <span class="custom-invoice-error" id="country_error"></span>
       </div>
     </div>
-  </div>
-
-  <div class="form-section" id="billing-section" style="display: none;">
-    <h3 class="form-section-title">Información de facturación</h3>
 
     <div id="foreign-billing-fields" style="display: none;">
       <div class="custom-invoice-form-group">
@@ -500,7 +498,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -536,4 +533,14 @@
     </div>
   </div>
   {% endif %}
+
+  <div class="action-container">
+    <div id="form-message" class="custom-invoice-message" style="display: none;"></div>
+    <div class="action-buttons">
+      <button id="action-submit-btn" type="submit" class="custom-invoice-btn custom-invoice-btn-primary">
+        Registrarse
+      </button>
+    </div>
+  </div>
 </form>
+

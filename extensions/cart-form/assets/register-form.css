@@ -1,6 +1,8 @@
 /* Aplicar fuente Inter a toda la extensión */
-.custom-invoice-block,
-.custom-invoice-block * {
+.register-form-block,
+.register-form-block *,
+.register-form,
+.register-form * {
   font-family:
     "Inter",
     -apple-system,
@@ -14,8 +16,62 @@
   letter-spacing: 0;
 }
 
-.custom-invoice-block {
+.register-form-block {
   margin: 1.5rem 0;
+}
+
+.register-form-container {
+  max-width: 750px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 2.5rem;
+}
+
+@media screen and (min-width: 750px) {
+  .register-form-container {
+    padding: 3rem;
+  }
+}
+
+.register-form-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 0.8rem 0;
+  color: #000;
+}
+
+@media screen and (min-width: 750px) {
+  .register-form-title {
+    font-size: 2.8rem;
+  }
+}
+
+.register-form-description {
+  font-size: 1.4rem;
+  color: #666666;
+  line-height: 1.25;
+  margin-top: 0;
+  margin-bottom: 2.4rem;
+}
+
+.register-form-description:last-of-type {
+  margin-bottom: 2rem;
+}
+
+.register-form-login-prompt {
+  margin-bottom: 1.5rem;
+  color: #3d3d3d;
+  font-size: 1.5rem;
+}
+
+.register-form-login-prompt a {
+  color: #000;
+  text-decoration: underline;
+}
+
+.register-form-login-prompt a:hover {
+  color: #383838;
+  text-decoration: none;
 }
 
 .immutable-field-warning {
@@ -31,46 +87,9 @@
   text-decoration: none;
 }
 
-.custom-invoice-card {
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 2.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-@media screen and (min-width: 750px) {
-  .custom-invoice-card {
-    padding: 3rem;
-  }
-}
-
-.custom-invoice-title {
-  font-size: 1.6rem;
-  font-weight: 600;
-  margin: 0 0 0.8rem 0;
-  color: #000;
-}
-
-.custom-invoice-subtitle {
-  font-size: 1.4rem;
-  color: #666666;
-  line-height: 1.25;
-  margin-top: 0;
-  margin-bottom: 2.4rem;
-}
 
 .custom-invoice-toggle-wrapper {
   margin-top: 1rem;
-}
-
-.custom-invoice-toggle-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0 0 1.5rem 0;
-  color: #000;
-  display: block;
-  line-height: 1.25;
 }
 
 .custom-invoice-toggle-label {
@@ -383,123 +402,6 @@
   user-select: none;
 }
 
-.custom-invoice-modal {
-  border: none;
-  border-radius: 8px;
-  padding: 0;
-  max-width: 750px;
-  width: 90%;
-  max-height: 90vh;
-  overflow: hidden;
-  background: white;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
-  transition:
-    height 0.3s ease-in-out,
-    max-height 0.3s ease-in-out;
-}
-
-.custom-invoice-modal:not([open]) {
-  display: none;
-}
-
-.custom-invoice-modal::backdrop {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-}
-
-.custom-invoice-modal-content {
-  position: relative;
-  padding: 2.4rem;
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: min-height 0.3s ease-in-out;
-}
-
-@media screen and (min-width: 750px) {
-  .custom-invoice-modal-content {
-    padding: 4.8rem;
-  }
-}
-.custom-invoice-modal-close {
-  position: absolute;
-  top: 4rem;
-  right: 4rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  color: #666;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.custom-invoice-modal-close:hover {
-  color: #333;
-}
-
-.custom-invoice-modal-title {
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin: 0 0 0.8rem 0;
-  color: #000;
-  padding-right: 4rem;
-}
-@media screen and (min-width: 750px) {
-  .custom-invoice-modal-title {
-    font-size: 2.8rem;
-  }
-}
-
-.custom-invoice-modal-subtitle {
-  font-size: 1.5rem;
-  color: #666666;
-  line-height: 1.25;
-  margin-top: 0;
-  padding-right: 4rem;
-  padding-bottom: 3rem;
-}
-
-.custom-invoice-login-prompt {
-  margin-bottom: 1.5rem;
-  color: #3d3d3d;
-  font-size: 1.5rem;
-}
-
-.custom-invoice-login-prompt a {
-  color: #000;
-  text-decoration: underline;
-}
-.custom-invoice-login-prompt a:hover {
-  color: #383838;
-  text-decoration: none;
-}
-
-.custom-invoice-separator {
-  align-items: center;
-  display: flex;
-  width: 100%;
-  margin: 1.5rem 0;
-}
-
-.custom-invoice-separator:after,
-.custom-invoice-separator:before {
-  background: #e9ebf2;
-  content: "";
-  flex: 1 1;
-  height: 1px;
-}
-
-.custom-invoice-separator > span {
-  color: #6e6e6e;
-  font-size: 12px;
-  max-width: 70%;
-  padding: 0 30px;
-  word-break: break-all;
-}
 
 .custom-invoice-btn {
   background: #0066cc;
@@ -522,63 +424,8 @@
   cursor: not-allowed;
 }
 
-.customer-data-summary {
-  margin-top: 3rem;
-  padding: 2rem;
-  background: #f8f9fa;
-  border-radius: 6px;
-  border: 1px solid #e9ecef;
-}
 
-.customer-data-summary h3 {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.customer-data-summary-item {
-  padding: 0.4rem 0;
-  font-size: 1.4rem;
-  color: #495057;
-  line-height: 1.5;
-}
-
-.customer-data-summary-item strong {
-  color: #212529;
-  font-weight: 600;
-}
-
-.customer-data-item {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
-}
-
-.customer-data-item:last-child {
-  border-bottom: none;
-}
-
-.customer-data-item strong {
-  display: inline-block;
-  min-width: 120px;
-  color: #666;
-}
-
-.custom-invoice-link-btn {
-  background: none;
-  border: none;
-  color: #0066cc;
-  text-decoration: underline;
-  cursor: pointer;
-  font-size: 1.4rem;
-  padding: 0.5rem 0;
-  margin-top: 0.5rem;
-  transition: color 0.2s;
-}
-
-.custom-invoice-link-btn:hover {
-  color: #0052a3;
-}
-
+.register-form,
 .custom-invoice-form {
   display: flex;
   flex-direction: column;
@@ -591,9 +438,15 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
+.form-section-toggle {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
 .form-section:last-of-type {
   border-bottom: none;
   margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .form-section-title {
@@ -1011,12 +864,7 @@ select.custom-invoice-input {
   gap: 1rem;
   justify-content: flex-end;
   padding: 1.5rem 2rem;
-  border-top: 1px solid #e0e0e0;
-  background: #f8f9fa;
   flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
 }
 
 .action-container #form-message {
@@ -1166,30 +1014,6 @@ select.custom-invoice-input {
   }
 }
 
-#form-skeleton-loader {
-  animation: fadeIn 0.3s ease-in;
-  transition:
-    opacity 0.3s ease-in-out,
-    transform 0.3s ease-in-out;
-}
-
-#customer-form-container {
-  transition:
-    opacity 0.3s ease-in-out,
-    transform 0.3s ease-in-out;
-  transform-origin: top;
-}
-
-#customer-data-display {
-  transition:
-    opacity 0.3s ease-in-out,
-    transform 0.3s ease-in-out;
-  transform-origin: top;
-}
-
-#modal-content {
-  transition: min-height 0.3s ease-in-out;
-}
 
 @keyframes fadeIn {
   from {

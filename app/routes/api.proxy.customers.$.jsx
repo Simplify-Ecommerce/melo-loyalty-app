@@ -169,7 +169,7 @@ export const action = async ({ request, params }) => {
     const body = await request.json();
     console.log('[DEBUG PHONE API] Datos recibidos en API:', JSON.stringify(body, null, 2));
     console.log('[DEBUG PHONE API] Valor de phone en body:', body.phone);
-    const pets = Array.isArray(body.pets) ? body.pets.filter(Boolean) : [];
+    const segmentation = Array.isArray(body.segmentation) ? body.segmentation.filter(Boolean) : [];
     
     // Mapear document_number a tax_id si existe (para compatibilidad con metafields exchanger)
     if (body.document_number && !body.tax_id) {
@@ -214,12 +214,12 @@ export const action = async ({ request, params }) => {
         },
       ];
 
-      if (pets.length > 0) {
+      if (segmentation.length > 0) {
         metafields.push({
           namespace: "exchanger",
           key: "ex_segmentation",
           type: "list.single_line_text_field",
-          value: JSON.stringify(pets),
+          value: JSON.stringify(segmentation),
         });
       }
 
@@ -265,6 +265,38 @@ export const action = async ({ request, params }) => {
         }
       } else if (body.customer_type === "02") {
         // Consumidor final
+        // Establecer DV como "00" para Consumidor final
+        metafields.push({
+          namespace: "exchanger",
+          key: "ex_customer_dv",
+          type: "single_line_text_field",
+          value: "00",
+        });
+        if (body.taxpayer_name) {
+          metafields.push({
+            namespace: "exchanger",
+            key: "ex_taxpayer_name",
+            type: "single_line_text_field",
+            value: body.taxpayer_name,
+          });
+        }
+        if (body.taxpayer_kind) {
+          metafields.push({
+            namespace: "exchanger",
+            key: "ex_taxpayer_kind",
+            type: "single_line_text_field",
+            value: body.taxpayer_kind,
+          });
+        }
+      } else if (body.customer_type === "04") {
+        // Extranjero
+        // Establecer DV como "00" para Extranjero
+        metafields.push({
+          namespace: "exchanger",
+          key: "ex_customer_dv",
+          type: "single_line_text_field",
+          value: "00",
+        });
         if (body.taxpayer_name) {
           metafields.push({
             namespace: "exchanger",
@@ -410,7 +442,7 @@ export const action = async ({ request, params }) => {
       const existingCustomerType = existingMetafields.find(
         (mf) => mf.key === "ex_customer_type"
       )?.value;
-      const pets = Array.isArray(body.pets) ? body.pets.filter(Boolean) : [];
+      const segmentation = Array.isArray(body.segmentation) ? body.segmentation.filter(Boolean) : [];
 
       const existingEmail = customerData.data.customer.email;
 
@@ -482,13 +514,13 @@ export const action = async ({ request, params }) => {
       ];
       const metafieldsKeysToDelete = [];
 
-      if (pets.length > 0) {
+      if (segmentation.length > 0) {
         metafieldsToSet.push({
           ownerId: customerId,
           namespace: "exchanger",
           key: "ex_segmentation",
           type: "list.single_line_text_field",
-          value: JSON.stringify(pets),
+          value: JSON.stringify(segmentation),
         });
       } else if (existingByKey["ex_segmentation"]?.id) {
         metafieldsKeysToDelete.push("ex_segmentation");
@@ -537,10 +569,39 @@ export const action = async ({ request, params }) => {
           value: body.taxpayer_kind || "",
         });
       } else if (body.customer_type === "02") {
-        // Consumidor final (limpiar campos de contribuyente)
-        if (existingByKey["ex_customer_dv"]?.id) {
-          metafieldsKeysToDelete.push("ex_customer_dv");
-        }
+        // Consumidor final
+        // Establecer DV como "00" para Consumidor final (siempre)
+        metafieldsToSet.push({
+          ownerId: customerId,
+          namespace: "exchanger",
+          key: "ex_customer_dv",
+          type: "single_line_text_field",
+          value: "00",
+        });
+        metafieldsToSet.push({
+          ownerId: customerId,
+          namespace: "exchanger",
+          key: "ex_taxpayer_name",
+          type: "single_line_text_field",
+          value: body.taxpayer_name || "",
+        });
+        metafieldsToSet.push({
+          ownerId: customerId,
+          namespace: "exchanger",
+          key: "ex_taxpayer_kind",
+          type: "single_line_text_field",
+          value: body.taxpayer_kind || "",
+        });
+      } else if (body.customer_type === "04") {
+        // Extranjero
+        // Establecer DV como "00" para Extranjero (siempre)
+        metafieldsToSet.push({
+          ownerId: customerId,
+          namespace: "exchanger",
+          key: "ex_customer_dv",
+          type: "single_line_text_field",
+          value: "00",
+        });
         metafieldsToSet.push({
           ownerId: customerId,
           namespace: "exchanger",
