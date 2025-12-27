@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "74e12df5735cf6d7db0c06d8931b640f"
-name = "Melo Loyalty App"
-application_url = "https://example.com"
+client_id = "2b852b3694ab8008bb24e25f1f7fc5d4"
+name = "Melo P&G Loyalty App"
+application_url = "https://melo-pet-and-garden-loyalty-app.onrender.com"
 embedded = true
 
 [build]
@@ -24,9 +24,9 @@ api_version = "2026-01"
 scopes = "write_products,write_customers,read_customers"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [ "https://melo-pet-and-garden-loyalty-app.onrender.com/api/auth" ]
 
 [app_proxy]
-url = "https://example.com/api/proxy"
+url = "https://melo-pet-and-garden-loyalty-app.onrender.com/api/proxy"
 subpath = "custom-invoice"
 prefix = "apps"
