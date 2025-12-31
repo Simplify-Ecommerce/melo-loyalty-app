@@ -16,7 +16,9 @@ Tu aplicación ahora está configurada para usar **PostgreSQL** en lugar de SQLi
    - Selecciona la misma región que tu aplicación
    - Click en "Create Database"
 
-3. Una vez creada, copia la **Internal Database URL** (o la External si necesitas acceso desde fuera de Render)
+3. Una vez creada, copia la **Internal Database URL** para usar en producción (dentro de Render)
+   - **Internal Database URL**: Para usar en tu aplicación desplegada en Render (más rápido y seguro)
+   - **External Database URL**: Para usar desde tu máquina local o herramientas externas
 
 ### 2. Configurar Variable de Entorno en Render
 
@@ -44,23 +46,51 @@ O directamente:
 npx prisma migrate deploy
 ```
 
-### 4. Para Desarrollo Local (Opcional)
+### 4. Para Desarrollo Local
 
-Si quieres usar PostgreSQL también en desarrollo local:
+Tienes dos opciones para desarrollo local:
 
-1. Crea un archivo `.env` en la raíz del proyecto (no está en git)
-2. Agrega:
+#### Opción A: Usar la Base de Datos de Render (Recomendado para pruebas)
+
+Para probar con la misma base de datos de producción:
+
+1. Ve a tu base de datos PostgreSQL en Render
+2. En la sección "Connections", copia la **External Database URL** (NO la Internal)
+   - La Internal solo funciona dentro de la red de Render
+   - La External permite conexiones desde fuera de Render (tu máquina local)
+3. Crea un archivo `.env` en la raíz del proyecto (no está en git)
+4. Agrega:
    ```
-   DATABASE_URL="postgresql://user:password@localhost:5432/melo_loyalty_dev?schema=public"
+   DATABASE_URL="postgresql://user:password@external-host:5432/database?schema=public"
+   ```
+   (Reemplaza con la External Database URL que copiaste)
+
+**Nota de Seguridad**: Si usas la base de datos de producción para desarrollo, ten cuidado con los cambios que hagas. Considera crear una base de datos separada para desarrollo.
+
+#### Opción B: PostgreSQL Local
+
+Si prefieres una base de datos PostgreSQL local:
+
+1. Instala PostgreSQL en tu máquina local
+2. Crea una base de datos:
+   ```bash
+   createdb melo_loyalty_dev
+   ```
+3. Crea un archivo `.env` con:
+   ```
+   DATABASE_URL="postgresql://tu_usuario:tu_password@localhost:5432/melo_loyalty_dev?schema=public"
    ```
 
-O si prefieres seguir usando SQLite en desarrollo local, puedes crear un archivo `.env` con:
+#### Opción C: SQLite para Desarrollo Local (Más Simple)
 
-```
-DATABASE_URL="file:./dev.sqlite"
-```
+Si prefieres seguir usando SQLite en desarrollo local:
 
-Y cambiar temporalmente el `provider` en `prisma/schema.prisma` a `sqlite` cuando trabajes localmente.
+1. Crea un archivo `.env` con:
+   ```
+   DATABASE_URL="file:./dev.sqlite"
+   ```
+2. Cambia temporalmente el `provider` en `prisma/schema.prisma` a `sqlite` cuando trabajes localmente
+3. Recuerda cambiar de vuelta a `postgresql` antes de hacer commit
 
 ## Verificar que Funciona
 
