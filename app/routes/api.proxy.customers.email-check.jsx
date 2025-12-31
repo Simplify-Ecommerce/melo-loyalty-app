@@ -1,11 +1,26 @@
 import { authenticate } from "../shopify.server";
+import { getAdminFromShop } from "../utils/app-proxy.server";
 
 export const action = async ({ request }) => {
   try {
-    const auth = await authenticate.public.appProxy(request);
+    // Validar el app proxy request (valida la firma)
+    await authenticate.public.appProxy(request);
     
-    if (!auth.admin) {
-      return Response.json({ error: "App not installed or session not available" }, { status: 401 });
+    // Obtener el shop del request
+    const url = new URL(request.url);
+    const shop = url.searchParams.get("shop");
+    
+    if (!shop) {
+      return Response.json({ error: "Shop parameter is required" }, { status: 400 });
+    }
+
+    // Obtener el cliente admin desde el shop
+    const admin = await getAdminFromShop(shop);
+    
+    if (!admin) {
+      return Response.json({ 
+        error: "App not installed or session not available. Please authenticate the app first by accessing it from the Shopify admin." 
+      }, { status: 401 });
     }
 
     if (request.method !== "POST") {
@@ -18,8 +33,6 @@ export const action = async ({ request }) => {
     if (!email) {
       return Response.json({ error: "Email is required" }, { status: 400 });
     }
-
-    const { admin } = auth;
 
     // Buscar cliente por email usando GraphQL
     const checkEmailQuery = `

@@ -64,15 +64,6 @@
   margin-top: 1rem;
 }
 
-.custom-invoice-toggle-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0 0 1.5rem 0;
-  color: #000;
-  display: block;
-  line-height: 1.25;
-}
-
 .custom-invoice-toggle-label {
   display: flex;
   align-items: center;
