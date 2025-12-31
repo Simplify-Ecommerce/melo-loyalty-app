@@ -144,6 +144,7 @@ The following environment variables are required for the app to function:
 - `SHOPIFY_API_SECRET`: Your Shopify app API secret
 - `SCOPES`: Comma-separated list of API scopes
 - `SHOPIFY_APP_URL`: Your app URL
+- `DATABASE_URL`: PostgreSQL connection string (format: `postgresql://user:password@host:port/database?schema=public`)
 - `ALUDRA_API_KEY`: API key for Aludra DGI validation service (required for contribuyente validation in Panama)
 
 To set up the Aludra API key, add it to your `.env` file:
