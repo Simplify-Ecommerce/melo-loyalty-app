@@ -1,22 +1,10 @@
 import { authenticate } from "../shopify.server";
 import { validateCustomerData } from "../utils/validations.server";
-import { getAdminFromShop } from "../utils/app-proxy.server";
 
 export const loader = async ({ request, params }) => {
   try {
-    // Validar el app proxy request (valida la firma)
-    await authenticate.public.appProxy(request);
-    
-    // Obtener el shop del request
-    const url = new URL(request.url);
-    const shop = url.searchParams.get("shop");
-    
-    if (!shop) {
-      return Response.json({ error: "Shop parameter is required" }, { status: 400 });
-    }
-
-    // Obtener el cliente admin desde el shop
-    const admin = await getAdminFromShop(shop);
+    // Validar el app proxy request y obtener el contexto (incluye admin si hay sesión)
+    const { admin } = await authenticate.public.appProxy(request);
     
     if (!admin) {
       return Response.json({ 
@@ -166,19 +154,8 @@ export const loader = async ({ request, params }) => {
 
 export const action = async ({ request, params }) => {
   try {
-    // Validar el app proxy request (valida la firma)
-    await authenticate.public.appProxy(request);
-    
-    // Obtener el shop del request
-    const url = new URL(request.url);
-    const shop = url.searchParams.get("shop");
-    
-    if (!shop) {
-      return Response.json({ error: "Shop parameter is required" }, { status: 400 });
-    }
-
-    // Obtener el cliente admin desde el shop
-    const admin = await getAdminFromShop(shop);
+    // Validar el app proxy request y obtener el contexto (incluye admin si hay sesión)
+    const { admin } = await authenticate.public.appProxy(request);
     
     if (!admin) {
       return Response.json({ 
